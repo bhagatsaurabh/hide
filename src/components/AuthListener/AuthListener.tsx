@@ -1,20 +1,19 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import { useEffect, useRef } from "react";
+import { useEffect } from "react";
+import { getAuth, onAuthStateChanged } from "firebase/auth";
 import { setUser, selectStatus, setStatus, AuthStatus, handleExistingUser } from "@/store/auth";
-import { auth } from "@/config/firebase";
+import { app } from "@/config/firebase";
 import { useAppDispatch, useAppSelector } from "@/hooks/store";
-import { Unsubscribe } from "firebase/auth";
-import { Nullable } from "@/utils/types";
+
+const auth = getAuth(app);
+auth.useDeviceLanguage();
 
 const AuthListener = () => {
   const dispatch = useAppDispatch();
-
-  const unsubFn = useRef<Nullable<Unsubscribe>>(null);
   const status = useAppSelector(selectStatus);
-  useEffect(() => {
-    if (unsubFn.current) return;
 
-    const unsubscribe = auth.onAuthStateChanged(async (usr) => {
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, async (usr) => {
       if (usr) {
         dispatch(setUser(usr));
         if (status !== AuthStatus.SIGNING_IN) {
@@ -25,12 +24,11 @@ const AuthListener = () => {
         dispatch(setStatus(AuthStatus.SIGNED_OUT));
       }
     });
-    unsubFn.current = unsubscribe;
 
     return () => unsubscribe();
-  }, []);
+  }, [dispatch]);
 
-  return null;
+  return <></>;
 };
 
 export default AuthListener;

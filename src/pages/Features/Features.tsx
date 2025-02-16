@@ -5,8 +5,6 @@ export const Features = () => {
     <>
       <div>{"Features"}</div>
       <Link to="/">Home</Link>
-      <br />
-      <Link to="/auth">Sign In</Link>
     </>
   );
 };
