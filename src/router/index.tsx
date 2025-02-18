@@ -1,4 +1,4 @@
-import { createBrowserRouter } from "react-router";
+import { createBrowserRouter, Outlet } from "react-router";
 import { Home } from "@/pages/Home/Home";
 import { Auth } from "@/pages/Auth/Auth";
 import { Features } from "@/pages/Features/Features";
@@ -7,13 +7,15 @@ import { Create } from "@/pages/Create/Create";
 import { Project } from "@/pages/Project/Project";
 import { User } from "@/pages/User/User";
 import { Environment } from "@/pages/Environment/Environment";
-import { CrashBoard } from "@/components/CrashBoard/CrashBoard";
+import { CrashBoard } from "@/components/common/CrashBoard/CrashBoard";
+import { authGuard, noAuthGuard } from "./guards";
 
 const router = createBrowserRouter([
   {
     path: "/",
     element: <Home />,
     errorElement: <CrashBoard />,
+    loader: authGuard,
   },
   {
     path: "/features",
@@ -24,11 +26,13 @@ const router = createBrowserRouter([
     path: "/auth",
     element: <Auth />,
     errorElement: <CrashBoard />,
+    loader: noAuthGuard,
   },
   {
     path: "/dashboard",
     element: <Dashboard />,
     errorElement: <CrashBoard />,
+    loader: authGuard,
     children: [
       {
         path: "new",
@@ -46,11 +50,14 @@ const router = createBrowserRouter([
     path: "/profile",
     element: <User />,
     errorElement: <CrashBoard />,
+    loader: authGuard,
   },
   {
-    path: "/env/:id",
-    element: <Environment />,
+    path: "/env",
+    element: <Outlet />,
     errorElement: <CrashBoard />,
+    loader: authGuard,
+    children: [{ index: true, path: ":id", element: <Environment />, errorElement: <CrashBoard /> }],
   },
 ]);
 
