@@ -1,7 +1,7 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import { useEffect } from "react";
 import { getAuth, onAuthStateChanged } from "firebase/auth";
-import { setUser, selectStatus, setStatus, AuthStatus, handleExistingUser } from "@/store/auth";
+import { selectStatus, setStatus, AuthStatus, handleExistingUser } from "@/store/auth";
 import { app } from "@/config/firebase";
 import { useAppDispatch, useAppSelector } from "@/hooks/store";
 
@@ -14,8 +14,8 @@ const AuthListener = () => {
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (usr) => {
+      console.log(usr);
       if (usr) {
-        dispatch(setUser(usr));
         if (status !== AuthStatus.SIGNING_IN) {
           await dispatch(handleExistingUser());
           dispatch(setStatus(AuthStatus.SIGNED_IN));
@@ -25,7 +25,9 @@ const AuthListener = () => {
       }
     });
 
-    return () => unsubscribe();
+    return () => {
+      unsubscribe();
+    };
   }, [dispatch]);
 
   return <></>;
