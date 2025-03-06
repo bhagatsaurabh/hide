@@ -2,6 +2,8 @@ import { createAsyncThunk, createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { getAdditionalUserInfo, signInAnonymously } from "firebase/auth";
 import type { RootState } from "@/store";
 import { auth } from "@/config/firebase";
+import { register } from "@/services/user";
+import { isAxiosError } from "axios";
 
 export enum AuthStatus {
   PENDING,
@@ -30,9 +32,16 @@ export const authSlice = createSlice({
   },
 });
 
-export const handleNewUser = createAsyncThunk("auth/handle-new-user", async () => {});
+export const handleNewUser = createAsyncThunk("auth/handle-new-user", async (_, { rejectWithValue }) => {
+  try {
+    await register();
+  } catch (error) {
+    if (isAxiosError(error)) return rejectWithValue(error.code);
+    return rejectWithValue("Unexpected");
+  }
+});
 export const handleExistingUser = createAsyncThunk("auth/handle-existing-user", async () => {});
-export const signIn = createAsyncThunk<void, AuthType>("auth/sign-in", async (type, { dispatch }) => {
+export const signIn = createAsyncThunk<void, AuthType>("auth/sign-in", async (type, { dispatch, rejectWithValue }) => {
   dispatch(setStatus(AuthStatus.SIGNING_IN));
   if (type === AuthType.GUEST) {
     try {
@@ -44,8 +53,10 @@ export const signIn = createAsyncThunk<void, AuthType>("auth/sign-in", async (ty
       }
       dispatch(setStatus(AuthStatus.SIGNED_IN));
     } catch (error) {
+      console.log("here");
       console.log(error);
       // notify.push({ type: "snackbar", status: "warn", message: "Something went wrong, please try again" });
+      return rejectWithValue(error);
     }
   }
 });

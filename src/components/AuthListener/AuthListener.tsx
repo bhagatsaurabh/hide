@@ -14,7 +14,6 @@ const AuthListener = () => {
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (usr) => {
-      console.log(usr);
       if (usr) {
         if (status !== AuthStatus.SIGNING_IN) {
           await dispatch(handleExistingUser());
