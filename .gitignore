@@ -24,3 +24,4 @@ dist-ssr
 *.sw?
 .emulatorstate/
 firebase-export*/
+extensions/
