@@ -7,6 +7,8 @@
     "dev": "vite",
     "build": "tsc -b && vite build",
     "emulate": "firebase emulators:start --import ./.emulatorstate --export-on-exit ./.emulatorstate",
+    "caddy:start": "caddy start",
+    "caddy:stop": "caddy stop",
     "lint": "eslint .",
     "preview": "vite preview"
   },

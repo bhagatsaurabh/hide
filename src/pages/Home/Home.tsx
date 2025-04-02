@@ -1,12 +1,14 @@
-import { Link } from "react-router";
+import { Link, useNavigate } from "react-router";
 import { useAppDispatch, useAppSelector } from "@/hooks/store";
 import { AuthStatus, selectStatus, signOut } from "@/store/auth";
 
 export const Home = () => {
   const authStatus = useAppSelector(selectStatus);
   const dispatch = useAppDispatch();
+  const navigate = useNavigate();
 
   const handleSignOut = () => dispatch(signOut());
+  const handleDashboard = () => navigate("/dashboard");
 
   return (
     <>
@@ -14,7 +16,12 @@ export const Home = () => {
       <Link to="/features">Features</Link>
       <br />
       {authStatus === AuthStatus.SIGNED_OUT && <Link to="/auth">Sign In</Link>}
-      {authStatus === AuthStatus.SIGNED_IN && <button onClick={handleSignOut}>Sign Out</button>}
+      {authStatus === AuthStatus.SIGNED_IN && (
+        <>
+          <button onClick={handleSignOut}>Sign Out</button>
+          <button onClick={handleDashboard}>Dashboard</button>
+        </>
+      )}
       {authStatus === AuthStatus.PENDING && <span>...</span>}
     </>
   );
