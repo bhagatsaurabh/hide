@@ -1,3 +1,10 @@
 export const Create = () => {
-  return <div>{"Create"}</div>;
+  const handleCreateWorkspace = () => {};
+
+  return (
+    <>
+      <div>{"Create"}</div>
+      <button onClick={handleCreateWorkspace}>{"New Workspace"}</button>
+    </>
+  );
 };

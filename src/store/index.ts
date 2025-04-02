@@ -1,9 +1,11 @@
 import { configureStore } from "@reduxjs/toolkit";
 import authReducer from "./auth";
+import wsReducer from "./workspace";
 
 const store = configureStore({
   reducer: {
     auth: authReducer,
+    workspace: wsReducer,
   },
 });
 

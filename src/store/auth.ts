@@ -42,9 +42,10 @@ export const authSlice = createSlice({
   },
 });
 
-export const handleNewUser = createAsyncThunk("auth/handle-new-user", async (_, { rejectWithValue }) => {
+export const handleNewUser = createAsyncThunk("auth/handle-new-user", async (_, { rejectWithValue, getState }) => {
   try {
-    await register();
+    const state = getState() as RootState;
+    await register({ name: state.auth.name, username: state.auth.username });
   } catch (error) {
     if (isAxiosError(error)) return rejectWithValue(error.code);
     return rejectWithValue("Unexpected");
@@ -61,13 +62,12 @@ export const signIn = createAsyncThunk<void, { type: AuthType; name: string; use
         dispatch(setUsername(username));
         dispatch(setName(name));
         if (getAdditionalUserInfo(result)?.isNewUser) {
-          await dispatch(handleNewUser());
+          await dispatch(handleNewUser()).unwrap();
         } else {
-          await dispatch(handleExistingUser());
+          await dispatch(handleExistingUser()).unwrap();
         }
         dispatch(setStatus(AuthStatus.SIGNED_IN));
       } catch (error) {
-        console.log("here");
         console.log(error);
         // notify.push({ type: "snackbar", status: "warn", message: "Something went wrong, please try again" });
         return rejectWithValue(error);
