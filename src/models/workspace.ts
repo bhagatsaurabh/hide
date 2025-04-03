@@ -13,3 +13,8 @@ export interface MembershipDTO {
   role: string;
   joinedAt: string;
 }
+
+export interface WorkspaceCreateDTO {
+  name: string;
+  description: string;
+}

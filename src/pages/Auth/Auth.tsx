@@ -9,8 +9,8 @@ export const Auth = () => {
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
   const [username, setUsername] = useState("");
-  const [name, setName] = useState("");
   const status = useAppSelector(selectStatus);
+  const [name, setName] = useState("");
   const input = useRef<InputRef>(null);
   const nameInput = useRef<InputRef>(null);
   const [busy, setBusy] = useState(false);
