@@ -1,10 +1,10 @@
 import api from "@/config/axios";
-import { WorkspaceCreateDTO, WorkspaceDTO } from "@/models/workspace";
+import { ProvisionDTO, WorkspaceCreateDTO, WorkspaceDTO } from "@/models/workspace";
 
 export const getAllWorkspaces = async () => {
   return await api.get<WorkspaceDTO[]>("/workspace/all");
 };
 
 export const createWorkspace = async (data: WorkspaceCreateDTO) => {
-  return await api.post<WorkspaceDTO>("/provisioner/new", data);
+  return await api.post<ProvisionDTO>("/provisioner/new", data);
 };

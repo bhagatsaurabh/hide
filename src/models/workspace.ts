@@ -18,3 +18,8 @@ export interface WorkspaceCreateDTO {
   name: string;
   description: string;
 }
+export interface ProvisionDTO {
+  message: string;
+  privateKey: string;
+  workspace: WorkspaceDTO;
+}
