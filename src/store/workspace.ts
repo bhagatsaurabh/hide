@@ -1,7 +1,7 @@
 import { createAsyncThunk, createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { isAxiosError } from "axios";
-import { WorkspaceDTO } from "@/models/workspace";
-import { getAllWorkspaces } from "@/services/workspace";
+import { WorkspaceCreateDTO, WorkspaceDTO } from "@/models/workspace";
+import { createWorkspace, getAllWorkspaces } from "@/services/workspace";
 import { RootState } from ".";
 import { State } from "@/utils/types";
 
@@ -22,6 +22,9 @@ export const wsSlice = createSlice({
     setWorkspaces: (state, action: PayloadAction<WorkspaceDTO[]>) => {
       state.workspaces = action.payload;
     },
+    addWorkspace: (state, action: PayloadAction<WorkspaceDTO>) => {
+      state.workspaces.push(action.payload);
+    },
   },
 });
 
@@ -36,7 +39,21 @@ export const fetchWorkspaces = createAsyncThunk("workspace/get-all", async (_, {
   }
 });
 
-export const { setWorkspaces } = wsSlice.actions;
+export const createNewWorkspace = createAsyncThunk<void, WorkspaceCreateDTO>(
+  "workspace/create",
+  async (data, { rejectWithValue, dispatch }) => {
+    try {
+      const res = await createWorkspace(data);
+      dispatch(addWorkspace(res.data));
+    } catch (error) {
+      console.log(error);
+      if (isAxiosError(error)) return rejectWithValue(error.code);
+      return rejectWithValue("Unexpected");
+    }
+  }
+);
+
+export const { setWorkspaces, addWorkspace } = wsSlice.actions;
 
 export const selectWorkspaces = (state: RootState) => ({
   workspaces: state.workspace.workspaces,
