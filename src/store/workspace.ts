@@ -4,6 +4,9 @@ import { WorkspaceCreateDTO, WorkspaceDTO } from "@/models/workspace";
 import { createWorkspace, getAllWorkspaces } from "@/services/workspace";
 import { RootState } from ".";
 import { State } from "@/utils/types";
+import { updateObject } from "@/config/database/ops";
+import { auth } from "@/config/firebase";
+import { storeSSHKey } from "@/utils/driver";
 
 type WorkspaceState = {
   workspaces: WorkspaceDTO[];
@@ -43,8 +46,9 @@ export const createNewWorkspace = createAsyncThunk<void, WorkspaceCreateDTO>(
   "workspace/create",
   async (data, { rejectWithValue, dispatch }) => {
     try {
-      const res = await createWorkspace(data);
-      dispatch(addWorkspace(res.data));
+      const { workspace, privateKey } = (await createWorkspace(data)).data;
+      await storeSSHKey(auth.currentUser!.uid, workspace.uuid, privateKey);
+      dispatch(addWorkspace(workspace));
     } catch (error) {
       console.log(error);
       if (isAxiosError(error)) return rejectWithValue(error.code);
