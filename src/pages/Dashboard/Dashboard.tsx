@@ -17,11 +17,36 @@ export const Dashboard = () => {
   const handleCreate = () => {
     navigate("/dashboard/new");
   };
+  const handleSelectWorkspace = (uuid: string) => {
+    navigate(`/dashboard/${uuid}`);
+  };
 
   return (
     <>
       <div>{"Dashboard"}</div>
-      {state === State.PENDING ? "Loading..." : workspaces}
+      {state === State.PENDING ? (
+        "Loading..."
+      ) : (
+        <>
+          {workspaces.map((workspace) => (
+            <div key={workspace.id} onClick={() => handleSelectWorkspace(workspace.uuid)}>
+              <h2>{workspace.name}</h2>
+              <h4>{workspace.uuid}</h4>
+              <h3>{workspace.description}</h3>
+              <h5>{workspace.createdAt}</h5>
+              <ul>
+                {workspace.memberships.map((membership) => (
+                  <li key={membership.userId}>
+                    <h5>
+                      {membership.username}:{membership.role}:{membership.joinedAt}
+                    </h5>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          ))}
+        </>
+      )}
       <div>
         <button onClick={handleCreate}>{"Create Workspace"}</button>
       </div>
