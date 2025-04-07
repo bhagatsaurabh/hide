@@ -12,11 +12,15 @@ export interface MembershipDTO {
   userId: string;
   role: string;
   joinedAt: string;
+  name: string;
+  username: string;
+  picture: string;
 }
 
 export interface WorkspaceCreateDTO {
   name: string;
   description: string;
+  image: string;
 }
 export interface ProvisionDTO {
   message: string;

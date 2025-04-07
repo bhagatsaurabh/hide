@@ -3,21 +3,25 @@ import { useAppDispatch } from "@/hooks/store";
 import { createNewWorkspace } from "@/store/workspace";
 import { nameRegex } from "@/utils/constants";
 import { useRef, useState } from "react";
+import { useNavigate } from "react-router";
 
 export const Create = () => {
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
+  const [image, setImage] = useState("hide-node");
   const [busy, setBusy] = useState(false);
   const nameInput = useRef<InputRef>(null);
   const descInput = useRef<InputRef>(null);
   const dispatch = useAppDispatch();
+  const navigate = useNavigate();
 
   const handleCreateWorkspace = async () => {
     if (nameInput.current?.validate(name)) return;
 
     setBusy(true);
-    await dispatch(createNewWorkspace({ name, description }));
+    await dispatch(createNewWorkspace({ name, description, image }));
     setBusy(false);
+    navigate("/dashboard");
   };
 
   const validateName = (val: string) => {

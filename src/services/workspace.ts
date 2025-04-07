@@ -6,5 +6,5 @@ export const getAllWorkspaces = async () => {
 };
 
 export const createWorkspace = async (data: WorkspaceCreateDTO) => {
-  return await api.post<ProvisionDTO>("/provisioner/new", data);
+  return await api.post<ProvisionDTO>("/provisioner/provision", data);
 };

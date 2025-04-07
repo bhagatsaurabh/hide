@@ -4,7 +4,6 @@ import { WorkspaceCreateDTO, WorkspaceDTO } from "@/models/workspace";
 import { createWorkspace, getAllWorkspaces } from "@/services/workspace";
 import { RootState } from ".";
 import { State } from "@/utils/types";
-import { updateObject } from "@/config/database/ops";
 import { auth } from "@/config/firebase";
 import { storeSSHKey } from "@/utils/driver";
 
