@@ -8,7 +8,7 @@ import { Project } from "@/pages/Project/Project";
 import { User } from "@/pages/User/User";
 import { Environment } from "@/pages/Environment/Environment";
 import { CrashBoard } from "@/components/common/CrashBoard/CrashBoard";
-import { authGuard, noAuthGuard } from "./guards";
+import { authGuard, noAuthGuard, workspaceLoader } from "./guards";
 
 const router = createBrowserRouter([
   {
@@ -43,6 +43,7 @@ const router = createBrowserRouter([
         path: ":id",
         element: <Project />,
         errorElement: <CrashBoard />,
+        loader: workspaceLoader,
       },
     ],
   },
@@ -57,7 +58,15 @@ const router = createBrowserRouter([
     element: <Outlet />,
     errorElement: <CrashBoard />,
     loader: authGuard,
-    children: [{ index: true, path: ":id", element: <Environment />, errorElement: <CrashBoard /> }],
+    children: [
+      {
+        index: true,
+        path: ":id",
+        element: <Environment />,
+        errorElement: <CrashBoard />,
+        loader: workspaceLoader,
+      },
+    ],
   },
 ]);
 

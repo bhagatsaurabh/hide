@@ -58,9 +58,9 @@ export const createNewWorkspace = createAsyncThunk<void, WorkspaceCreateDTO>(
 
 export const { setWorkspaces, addWorkspace } = wsSlice.actions;
 
-export const selectWorkspaces = (state: RootState) => ({
-  workspaces: state.workspace.workspaces,
-  state: state.workspace.state,
-});
+export const selectWorkspaces = (state: RootState) => state.workspace;
+export const selectWorkspace = (state: RootState, uuid: string) => {
+  return state.workspace.workspaces.find((workspace) => workspace.uuid === uuid);
+};
 
 export default wsSlice.reducer;
