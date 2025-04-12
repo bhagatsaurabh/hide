@@ -5,6 +5,7 @@ import { auth } from "@/config/firebase";
 import { register } from "@/services/user";
 import { isAxiosError } from "axios";
 import { openDB } from "@/config/database";
+import { connectSocket } from "@/config/socket";
 
 export enum AuthStatus {
   PENDING,
@@ -56,6 +57,7 @@ export const handleNewUser = createAsyncThunk("auth/handle-new-user", async (_, 
 export const handleExistingUser = createAsyncThunk("auth/handle-existing-user", async (_, { rejectWithValue }) => {
   try {
     await openDB(auth.currentUser!.uid);
+    await connectSocket();
   } catch (error) {
     console.log(error);
     return rejectWithValue("Unexpected");
