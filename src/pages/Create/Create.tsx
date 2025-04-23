@@ -8,7 +8,7 @@ import { useNavigate } from "react-router";
 export const Create = () => {
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
-  const [image, setImage] = useState("hide-node");
+  const [image, setImage] = useState("hide-env-node-dev");
   const [busy, setBusy] = useState(false);
   const nameInput = useRef<InputRef>(null);
   const descInput = useRef<InputRef>(null);
