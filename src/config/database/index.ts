@@ -2,7 +2,7 @@ let db: IDBDatabase;
 
 const openDB = async (uid: string, version?: number) => {
   return new Promise((resolve, reject) => {
-    const request = indexedDB.open("ocdb", version);
+    const request = indexedDB.open("hidedb", version);
 
     request.addEventListener("upgradeneeded", () => {
       const database = request.result;
@@ -29,6 +29,12 @@ const createSchema = (database: IDBDatabase, uid: string) => {
     database.createObjectStore(`sshkeys:${uid}`);
   }
 };
+const schemaChange = async (uid: string) => {
+  if (db.objectStoreNames.contains(`sshkeys:${uid}`)) return;
+
+  closeDB();
+  await openDB(uid, db.version + 1);
+};
 const closeDB = () => {
   db?.removeEventListener("close", closeListener);
   db?.close();
@@ -37,4 +43,4 @@ function closeListener(this: IDBOpenDBRequest) {
   console.log(this.error);
 }
 
-export { db, openDB, closeDB };
+export { db, openDB, schemaChange, closeDB };

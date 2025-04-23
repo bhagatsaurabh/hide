@@ -6,6 +6,7 @@ import { register } from "@/services/user";
 import { isAxiosError } from "axios";
 import { openDB } from "@/config/database";
 import { connectSocket } from "@/config/socket";
+import { storeUser } from "@/utils/driver";
 
 export enum AuthStatus {
   PENDING,
@@ -49,6 +50,7 @@ export const handleNewUser = createAsyncThunk("auth/handle-new-user", async (_, 
     const state = getState() as RootState;
     await register({ name: state.auth.name, username: state.auth.username });
     await openDB(auth.currentUser!.uid);
+    await storeUser(auth.currentUser!.uid);
   } catch (error) {
     if (isAxiosError(error)) return rejectWithValue(error.code);
     return rejectWithValue("Unexpected");

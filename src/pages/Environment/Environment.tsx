@@ -8,19 +8,26 @@ import { WebLinksAddon } from "@xterm/addon-web-links";
 import { socket } from "@/config/socket";
 import { getSSHKey } from "@/utils/driver";
 import { auth } from "@/config/firebase";
+import { useAppDispatch, useAppSelector } from "@/hooks/store";
+import { openDirectory, selectExplorer } from "@/store/env";
+import { Explorer } from "@/components/Explorer/Explorer";
 
 export const Environment = () => {
   const workspace = useLoaderData<typeof workspaceLoader>();
   const term = useRef<Terminal>(null);
   const termEl = useRef<HTMLDivElement>(null);
   const [sessionId, setSessionId] = useState("");
+  const dispatch = useAppDispatch();
+  const fileTree = useAppSelector(selectExplorer);
 
   useEffect(() => {
+    dispatch(openDirectory({ uuid: workspace.uuid, path: "/" }));
+
     return () => {
       socket.emit("ssh:closeall", { workspaceUUID: workspace.uuid });
       term.current?.dispose();
     };
-  }, [workspace.uuid]);
+  }, [dispatch, workspace.uuid]);
 
   const handleNewTerminal = async () => {
     const privateKey = await getSSHKey(auth.currentUser!.uid, workspace.uuid);
@@ -38,7 +45,9 @@ export const Environment = () => {
       term.current.open(termEl.current!);
       fitAddon.fit();
       term.current.write("Connecting...");
-      term.current.onData((data) => socket.emit("ssh:data", { workspaceUUID: workspace.uuid, sessionId: id, input: data }));
+      term.current.onData((data) =>
+        socket.emit("ssh:data", { workspaceUUID: workspace.uuid, sessionId: id, input: data })
+      );
     });
 
     socket.on("ssh:output", (data) => term.current!.write(data.output));
@@ -72,6 +81,7 @@ export const Environment = () => {
         <h3>{workspace.description}</h3>
         <h5>{workspace.createdAt}</h5>
       </div>
+      <Explorer root={fileTree} />
       <button onClick={handleNewTerminal}>Connect</button>
       {sessionId && <button onClick={handleCloseTerminal}>Close</button>}
       <div ref={termEl} style={{ width: "100%", height: "20rem", textAlign: "left" }}></div>
