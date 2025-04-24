@@ -11,6 +11,7 @@ import { auth } from "@/config/firebase";
 import { useAppDispatch, useAppSelector } from "@/hooks/store";
 import { openDirectory, selectExplorer } from "@/store/env";
 import { Explorer } from "@/components/Explorer/Explorer";
+import { FSSyncDTO } from "@/models/filesystem";
 
 export const Environment = () => {
   const workspace = useLoaderData<typeof workspaceLoader>();
@@ -22,10 +23,18 @@ export const Environment = () => {
 
   useEffect(() => {
     dispatch(openDirectory({ uuid: workspace.uuid, path: "/" }));
+    socket.on("fs", (msg: FSSyncDTO) => {
+      console.log(msg);
+    });
 
     return () => {
       socket.emit("ssh:closeall", { workspaceUUID: workspace.uuid });
       term.current?.dispose();
+      socket.off("ssh:open");
+      socket.off("ssh:output");
+      socket.off("ssh:error");
+      socket.off("ssh:closed");
+      socket.off("fs");
     };
   }, [dispatch, workspace.uuid]);
 
@@ -49,7 +58,6 @@ export const Environment = () => {
         socket.emit("ssh:data", { workspaceUUID: workspace.uuid, sessionId: id, input: data })
       );
     });
-
     socket.on("ssh:output", (data) => term.current!.write(data.output));
     socket.on("ssh:error", (err) => {
       if (err.sessionId) {
@@ -58,7 +66,7 @@ export const Environment = () => {
         console.log(err);
       }
     });
-    socket.on("ssh:closed", (data) => {
+    socket.on("ssh:closed", (_) => {
       term.current?.write("Disconnected");
     });
 
