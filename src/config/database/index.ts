@@ -1,6 +1,6 @@
-let db: IDBDatabase;
+let db: IDBDatabase | null = null;
 
-const openDB = async (uid: string, version?: number) => {
+const openDB = async (uid?: string, version?: number) => {
   return new Promise((resolve, reject) => {
     const request = indexedDB.open("hidedb", version);
 
@@ -12,34 +12,43 @@ const openDB = async (uid: string, version?: number) => {
     request.addEventListener("success", () => {
       db = request.result;
       db.addEventListener("close", closeListener);
+      console.log("db connected");
       resolve(db);
     });
 
     request.addEventListener("error", () => {
+      console.log(request.error);
       reject(request.error);
     });
 
-    request.addEventListener("blocked", () => {
-      reject(request.error);
+    request.addEventListener("blocked", (ev) => {
+      console.log(ev);
+      reject(ev);
     });
   });
 };
-const createSchema = (database: IDBDatabase, uid: string) => {
-  if (!database.objectStoreNames.contains(`sshkeys:${uid}`)) {
-    database.createObjectStore(`sshkeys:${uid}`);
+const createSchema = (database: IDBDatabase, uid?: string) => {
+  if (uid) {
+    const keystoreName = `sshkeys:${uid}`;
+    if (!database.objectStoreNames.contains(keystoreName)) {
+      database.createObjectStore(keystoreName);
+    }
   }
 };
 const schemaChange = async (uid: string) => {
-  if (db.objectStoreNames.contains(`sshkeys:${uid}`)) return;
+  if (db!.objectStoreNames.contains(`sshkeys:${uid}`)) return;
 
-  closeDB();
-  await openDB(uid, db.version + 1);
+  console.log("close start");
+  await closeDB();
+  console.log("close end");
+  await openDB(uid, db!.version + 1);
 };
-const closeDB = () => {
-  db?.removeEventListener("close", closeListener);
+const closeDB = async () => {
+  db?.addEventListener("close", closeListener);
   db?.close();
 };
 function closeListener(this: IDBOpenDBRequest) {
+  db = null;
   console.log(this.error);
 }
 
