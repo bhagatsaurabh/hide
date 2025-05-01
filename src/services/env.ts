@@ -8,3 +8,11 @@ export const openDir = async (wsUuid: string, path: string) => {
     },
   });
 };
+
+export const closeDir = async (wsUuid: string, path: string) => {
+  return await api.post<FSOpenDTO[]>(`/workspace-${wsUuid}/dir/close`, {
+    params: {
+      path,
+    },
+  });
+};

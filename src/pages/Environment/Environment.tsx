@@ -8,10 +8,8 @@ import { WebLinksAddon } from "@xterm/addon-web-links";
 import { socket } from "@/config/socket";
 import { getSSHKey } from "@/utils/driver";
 import { auth } from "@/config/firebase";
-import { useAppDispatch, useAppSelector } from "@/hooks/store";
-import { openDirectory, selectExplorer } from "@/store/env";
+import { useAppDispatch } from "@/hooks/store";
 import { Explorer } from "@/components/Explorer/Explorer";
-import { FSSyncDTO } from "@/models/filesystem";
 
 export const Environment = () => {
   const workspace = useLoaderData<typeof workspaceLoader>();
@@ -19,14 +17,8 @@ export const Environment = () => {
   const termEl = useRef<HTMLDivElement>(null);
   const [sessionId, setSessionId] = useState("");
   const dispatch = useAppDispatch();
-  const fileTree = useAppSelector(selectExplorer);
 
   useEffect(() => {
-    dispatch(openDirectory({ uuid: workspace.uuid, path: "/" }));
-    socket.on("fs", (msg: FSSyncDTO) => {
-      console.log(msg);
-    });
-
     return () => {
       socket.emit("ssh:closeall", { workspaceUUID: workspace.uuid });
       term.current?.dispose();
@@ -89,7 +81,7 @@ export const Environment = () => {
         <h3>{workspace.description}</h3>
         <h5>{workspace.createdAt}</h5>
       </div>
-      <Explorer root={fileTree} />
+      <Explorer uuid={workspace.uuid} />
       <button onClick={handleNewTerminal}>Connect</button>
       {sessionId && <button onClick={handleCloseTerminal}>Close</button>}
       <div ref={termEl} style={{ width: "100%", height: "20rem", textAlign: "left" }}></div>
