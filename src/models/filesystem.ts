@@ -4,11 +4,7 @@ export interface FSOpenDTO {
   name: string;
   path: string;
   type: "file" | "dir";
-}
-export interface FSSyncDTO {
-  uid: string;
-  path: string;
-  action: "add" | "addDir" | "unlink" | "unlinkDir" | "change";
+  id: number;
 }
 
 export type FSEventType = "create" | "remove" | "rename" | "write";
@@ -34,8 +30,4 @@ export interface FSDTO<T extends SocketMessagePayload> {
   uid: string;
   type: string;
   data: T;
-}
-
-export interface FileTreeNode extends FSOpenDTO {
-  children: FileTreeNode[];
 }
