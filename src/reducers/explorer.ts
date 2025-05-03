@@ -1,5 +1,8 @@
+import { getPath } from "@/utils";
+
 interface FTActionMap {
   LOAD: { path: string; nodes: FileNode[] };
+  UNLOAD: { path: string };
   CREATE: { id: number; parentId: number };
   WRITE: { id: number };
   RENAME: { id: number };
@@ -19,9 +22,9 @@ type FileNodeMap = {
 export type FileNode = {
   [K in keyof FileNodeMap]: {
     name: string;
-    path: string;
     type: K;
     id: number;
+    parent?: FileNode;
     isOpen?: boolean;
     children: FileNodeMap[K];
   };
@@ -40,8 +43,21 @@ export function fileTreeReducer(state: ExplorerState, action: FTAction): Explore
 
       dirNode.children = action.payload.nodes;
       action.payload.nodes.forEach((node) => {
-        state.pathMap.set(node.path, node);
+        if (node.type === "dir") node.children = [];
+        node.parent = dirNode;
+        state.pathMap.set(`${getPath(dirNode)}/${node.name}`, node);
       });
+      return { ...state };
+    }
+    case "UNLOAD": {
+      const dirNode = state.pathMap.get(action.payload.path);
+      if (!dirNode) return state;
+
+      const path = getPath(dirNode);
+      dirNode.children?.forEach((child) => {
+        state.pathMap.delete(`${path}/${child.name}`);
+      });
+      dirNode.children = [];
       return { ...state };
     }
     case "CREATE":

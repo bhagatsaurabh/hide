@@ -1,6 +1,7 @@
 import { useContext } from "react";
 import { EnvContext } from "@/pages/Environment/context";
 import { FileNode as FNode } from "@/reducers/explorer";
+import { getPath } from "@/utils";
 
 interface FileNodeProps {
   node: FNode;
@@ -13,8 +14,8 @@ export const FileNode = ({ node }: FileNodeProps) => {
   const handleClick = () => {
     if (isDir) {
       node.isOpen = !node.isOpen;
-      if (node.isOpen) envCtx.open(node.path);
-      else envCtx.close(node.path);
+      const path = getPath(node);
+      envCtx[node.isOpen ? "open" : "close"](path);
     }
   };
 
