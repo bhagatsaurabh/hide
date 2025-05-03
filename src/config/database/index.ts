@@ -12,7 +12,6 @@ const openDB = async (uid?: string, version?: number) => {
     request.addEventListener("success", () => {
       db = request.result;
       db.addEventListener("close", closeListener);
-      console.log("db connected");
       resolve(db);
     });
 
@@ -38,9 +37,7 @@ const createSchema = (database: IDBDatabase, uid?: string) => {
 const schemaChange = async (uid: string) => {
   if (db!.objectStoreNames.contains(`sshkeys:${uid}`)) return;
 
-  console.log("close start");
   await closeDB();
-  console.log("close end");
   await openDB(uid, db!.version + 1);
 };
 const closeDB = async () => {
