@@ -1,4 +1,10 @@
-export type SocketMessagePayload = {
+export type SocketMessagePayload<T = string> = {
   [k: string]: unknown;
-  action: string;
+  action: T;
+};
+
+export type SocketMessage<T extends SocketMessagePayload> = {
+  type: string;
+  uid: string;
+  data: T;
 };

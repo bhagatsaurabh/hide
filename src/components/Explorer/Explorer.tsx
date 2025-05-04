@@ -2,9 +2,10 @@ import { useCallback, useEffect, useMemo, useReducer } from "react";
 import { FileNode as FNode, fileTreeReducer } from "@/reducers/explorer";
 import { FileNode } from "../FileNode/FileNode";
 import { closeDir, openDir } from "@/services/env";
-import { FSEvent } from "@/models/filesystem";
+import { FSBlock, FSEventBatch, FSPayload, FSResume } from "@/models/filesystem";
 import { socket } from "@/config/socket";
 import { EnvContext } from "@/pages/Environment/context";
+import { SocketMessage } from "@/models/common";
 
 interface ExplorerProps {
   uuid: string;
@@ -36,9 +37,23 @@ export const Explorer = ({ uuid }: ExplorerProps) => {
     }
   }, [uuid]);
   const setListeners = () => {
-    socket.on("fs", (msg: FSEvent) => {
-      console.log(msg);
-      // TODO
+    socket.on("fs", (msg: SocketMessage<FSPayload>) => {
+      switch (msg.data.action) {
+        case "batch": {
+          fsDispatch({ type: "BATCH", payload: { events: (msg.data as FSEventBatch).events } });
+          break;
+        }
+        case "block": {
+          fsDispatch({ type: "BLOCK", payload: { path: (msg.data as FSBlock).path } });
+          break;
+        }
+        case "resume": {
+          fsDispatch({ type: "RESUME", payload: { path: (msg.data as FSResume).path } });
+          break;
+        }
+        default:
+          break;
+      }
     });
   };
 
