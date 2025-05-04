@@ -15,14 +15,17 @@ export type FSEvent = {
   ino?: number;
   action: FSEventType;
   timestamp: number;
+  type: "dir" | "file";
 };
 
-export interface FSBlock extends SocketMessagePayload {
+export type FSPayload<A = "block" | "resume" | "batch"> = SocketMessagePayload<A>;
+export interface FSBlock extends FSPayload<"block"> {
   path: string;
 }
-export type FSResume = FSBlock;
-
-export interface FSEventBatch extends SocketMessagePayload {
+export interface FSResume extends FSPayload<"resume"> {
+  path: string;
+}
+export interface FSEventBatch extends FSPayload<"batch"> {
   events: FSEvent[];
 }
 
