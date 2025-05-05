@@ -2,8 +2,9 @@ import { FSEvent } from "@/models/filesystem";
 import { getPath } from "@/utils";
 
 interface FTActionMap {
-  LOAD: { path: string; nodes: FileNode[] };
+  LOAD: { path: string; nodes: FileNode[]; forceOpen?: boolean };
   UNLOAD: { path: string };
+  CLEAR_STALE: unknown;
   BATCH: { events: FSEvent[] };
   RESUME: { path: string };
   BLOCK: { path: string };
@@ -29,10 +30,11 @@ export type FileNode = {
     children: FileNodeMap[K];
   };
 }[keyof FileNodeMap];
-
+type PathPair<T> = [T, T | undefined];
 export type ExplorerState = {
   root: FileNode;
   pathMap: Map<string, FileNode>;
+  stalePaths: PathPair<string>[];
 };
 
 interface FSCoalescedEventMap {
@@ -68,6 +70,9 @@ export function fileTreeReducer(state: ExplorerState, action: FTAction): Explore
         node.parent = dirNode;
         state.pathMap.set(`${getPath(dirNode)}/${node.name}`, node);
       });
+      if (action.payload.forceOpen) {
+        dirNode.isOpen = true;
+      }
       return { ...state };
     }
     case "UNLOAD": {
@@ -81,8 +86,13 @@ export function fileTreeReducer(state: ExplorerState, action: FTAction): Explore
       dirNode.children = [];
       return { ...state };
     }
+    case "CLEAR_STALE": {
+      if (state.stalePaths.length === 0) return state;
+      return { ...state, stalePaths: [] };
+    }
     case "BATCH": {
       const events = coalescer(action.payload.events);
+      const stalePaths: PathPair<string>[] = [];
       for (const event of events) {
         if (event.action === "create") {
           const dirNode = state.pathMap.get(event.data.watchedPath);
@@ -107,22 +117,32 @@ export function fileTreeReducer(state: ExplorerState, action: FTAction): Explore
           if (!node) {
             continue;
           }
+          let oldPath, newPath;
           if (oldDirNode) {
+            oldPath = getPath(node);
+            state.pathMap.delete(oldPath);
             oldDirNode.children!.splice(
               oldDirNode.children!.findIndex((n) => n === node),
               1
             );
-            state.pathMap.delete(`${getPath(oldDirNode)}/${node.name}`);
           }
           if (newDirNode) {
+            console.log(event);
             node.name = event.data.newPath!.substring(event.data.newPath!.lastIndexOf("/") + 1);
             node.parent = newDirNode;
             newDirNode.children?.push(node);
-            state.pathMap.set(`${getPath(newDirNode)}/${node.name}`, node);
+            newPath = getPath(node);
+            state.pathMap.set(newPath, node);
+          }
+          if (node.type === "dir" && node.isOpen) {
+            node.children?.forEach((child) => child.type === "dir" && (child.isOpen = false));
+            node.isOpen = false;
+            stalePaths.push([oldPath!, newPath]);
           }
         } else if (event.action === "modify") {
           // TODO: Notify users with possible integration with yjs & arbitration in-case of conflicts
         } else if (event.action === "remove") {
+          // TODO: Notify users with possible integration with yjs & arbitration in-case of conflicts
           const dirNode = state.pathMap.get(event.data.watchedPath);
           const node = state.pathMap.get(event.data.path);
           if (!node) {
@@ -137,7 +157,7 @@ export function fileTreeReducer(state: ExplorerState, action: FTAction): Explore
           }
         }
       }
-      return { ...state };
+      return { ...state, stalePaths: [...state.stalePaths, ...stalePaths] };
     }
     default:
       return state;
@@ -178,6 +198,7 @@ const coalescer = (events: FSEvent[]) => {
               newPath: event.path,
               timestamp: event.timestamp,
               type: event.type,
+              ino: event.ino,
             },
           });
           renameCandidates.delete(oldPath);
