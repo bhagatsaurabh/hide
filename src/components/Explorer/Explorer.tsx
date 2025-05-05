@@ -25,6 +25,7 @@ export const Explorer = ({ uuid }: ExplorerProps) => {
   const [fs, fsDispatch] = useReducer(fileTreeReducer, {
     root,
     pathMap: new Map<string, FNode>([["/", root]]),
+    stalePaths: [],
   });
 
   const init = useCallback(async () => {
@@ -36,25 +37,26 @@ export const Explorer = ({ uuid }: ExplorerProps) => {
       console.log(error);
     }
   }, [uuid]);
-  const setListeners = () => {
-    socket.on("fs", (msg: SocketMessage<FSPayload>) => {
-      switch (msg.data.action) {
-        case "batch": {
-          fsDispatch({ type: "BATCH", payload: { events: (msg.data as FSEventBatch).events } });
-          break;
-        }
-        case "block": {
-          fsDispatch({ type: "BLOCK", payload: { path: (msg.data as FSBlock).path } });
-          break;
-        }
-        case "resume": {
-          fsDispatch({ type: "RESUME", payload: { path: (msg.data as FSResume).path } });
-          break;
-        }
-        default:
-          break;
+  const handleFSMessage = (msg: SocketMessage<FSPayload>) => {
+    switch (msg.data.action) {
+      case "batch": {
+        fsDispatch({ type: "BATCH", payload: { events: (msg.data as FSEventBatch).events } });
+        break;
       }
-    });
+      case "block": {
+        fsDispatch({ type: "BLOCK", payload: { path: (msg.data as FSBlock).path } });
+        break;
+      }
+      case "resume": {
+        fsDispatch({ type: "RESUME", payload: { path: (msg.data as FSResume).path } });
+        break;
+      }
+      default:
+        break;
+    }
+  };
+  const setListeners = () => {
+    socket.on("fs", handleFSMessage);
   };
 
   useEffect(() => {
@@ -62,9 +64,28 @@ export const Explorer = ({ uuid }: ExplorerProps) => {
     setListeners();
 
     return () => {
+      socket.off("fs", handleFSMessage);
       socket.emit("fs", { action: "close", payload: { path: "/" } });
     };
   }, [init]);
+  useEffect(() => void handleStalePaths(), [fs.stalePaths]);
+
+  const handleStalePaths = async () => {
+    // Unwatch all stale paths
+    await Promise.all(fs.stalePaths.map((pathPair) => closeDir(uuid, pathPair[0])));
+    // Watch all new "moved" paths
+    const newPaths = fs.stalePaths.filter((pathPair) => !!pathPair[1]).map((pathPair) => pathPair[1]!);
+    const resps = await Promise.all(newPaths.map((newPath) => openDir(uuid, newPath)));
+    newPaths.forEach((newPath, idx) => {
+      if (resps?.[idx]?.data) {
+        fsDispatch({
+          type: "LOAD",
+          payload: { path: newPath, nodes: resps[idx].data as unknown as FNode[], forceOpen: true },
+        });
+      }
+    });
+    fsDispatch({ type: "CLEAR_STALE", payload: null });
+  };
 
   const open = async (path: string) => {
     try {
