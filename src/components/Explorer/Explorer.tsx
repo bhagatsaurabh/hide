@@ -1,11 +1,13 @@
 import { useCallback, useEffect, useMemo, useReducer } from "react";
 import { FileNode as FNode, fileTreeReducer } from "@/reducers/explorer";
 import { FileNode } from "../FileNode/FileNode";
-import { closeDir, openDir } from "@/services/env";
-import { FSBlock, FSEventBatch, FSPayload, FSResume } from "@/models/filesystem";
+import { closeDir, closeFile, openDir, openFile } from "@/services/env";
+import { FSBlock, FSEventBatch, FSPayload, FSResume, FSUpdate } from "@/models/filesystem";
 import { socket } from "@/config/socket";
 import { EnvContext } from "@/pages/Environment/context";
 import { SocketMessage } from "@/models/common";
+import { editor } from "monaco-editor";
+import { applyUpdate, Doc, encodeStateAsUpdate } from "yjs";
 
 interface ExplorerProps {
   uuid: string;
@@ -51,6 +53,11 @@ export const Explorer = ({ uuid }: ExplorerProps) => {
         fsDispatch({ type: "RESUME", payload: { path: (msg.data as FSResume).path } });
         break;
       }
+      case "update": {
+        const update = new Uint8Array((msg.data as FSUpdate).update);
+        // applyUpdate(doc, update);
+        break;
+      }
       default:
         break;
     }
@@ -87,31 +94,71 @@ export const Explorer = ({ uuid }: ExplorerProps) => {
     fsDispatch({ type: "CLEAR_STALE", payload: null });
   };
 
-  const open = async (path: string) => {
-    try {
-      const res = await openDir(uuid, path);
-      const nodes = res.data as unknown as FNode[];
-      fsDispatch({ type: "LOAD", payload: { path, nodes } });
-    } catch (error) {
-      console.log(error);
+  const open = async (path: string, isDir: boolean) => {
+    if (isDir) {
+      try {
+        const res = await openDir(uuid, path);
+        const nodes = res.data as unknown as FNode[];
+        fsDispatch({ type: "LOAD", payload: { path, nodes } });
+      } catch (error) {
+        console.log(error);
+      }
+    } else {
+      try {
+        const res = await openFile(uuid, path);
+        const update = Uint8Array.from(atob(res.data), (c) => c.charCodeAt(0));
+
+        const doc = new Doc();
+        const type = doc.getText("monaco");
+        const codeEditor = editor.create(document.getElementById("editor")!, {
+          value: "",
+          language: "javascript",
+        });
+
+        // const monacoBinding = new MonacoBinding(type, editor.getModel(), new Set([editor]), provider.awareness)
+
+        type.observe(() => {
+          const encoded = encodeStateAsUpdate(doc);
+          socket.emit("fs", { action: "update", payload: { path, update: encoded } });
+        });
+        codeEditor.setValue(type.toString());
+        codeEditor.onDidChangeModelContent(() => {
+          const newText = codeEditor.getValue();
+          type.delete(0, type.length);
+          type.insert(0, newText);
+        });
+      } catch (error) {
+        console.log(error);
+      }
     }
   };
-  const close = async (path: string) => {
-    try {
-      await closeDir(uuid, path);
-      fsDispatch({ type: "UNLOAD", payload: { path } });
-    } catch (error) {
-      console.log(error);
+  const close = async (path: string, isDir: boolean) => {
+    if (isDir) {
+      try {
+        await closeDir(uuid, path);
+        fsDispatch({ type: "UNLOAD", payload: { path } });
+      } catch (error) {
+        console.log(error);
+      }
+    } else {
+      try {
+        await closeFile(uuid, path);
+      } catch (error) {
+        console.log(error);
+      }
     }
   };
 
   return (
-    <EnvContext.Provider value={{ open, close }}>
-      <div style={{ textAlign: "left" }}>
-        {fs.root.children!.map((node, index) => (
-          <FileNode key={index} node={node} />
-        ))}
-      </div>
-    </EnvContext.Provider>
+    <>
+      <EnvContext.Provider value={{ open, close }}>
+        <div style={{ textAlign: "left" }}>
+          {fs.root.children!.map((node, index) => (
+            <FileNode key={index} node={node} />
+          ))}
+        </div>
+      </EnvContext.Provider>
+      <div id="editor"></div>
+    </>
   );
 };
