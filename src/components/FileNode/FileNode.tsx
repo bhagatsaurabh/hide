@@ -12,9 +12,13 @@ export const FileNode = ({ node }: FileNodeProps) => {
   const envCtx = useContext(EnvContext)!;
 
   const handleClick = () => {
-    node.isOpen = !node.isOpen;
     const path = getPath(node);
-    envCtx[node.isOpen ? "open" : "close"](path, isDir);
+    if (isDir) {
+      node.isOpen = !node.isOpen;
+      envCtx[node.isOpen ? "open" : "close"](path, isDir);
+    } else {
+      envCtx.open(path, isDir);
+    }
   };
 
   return (
