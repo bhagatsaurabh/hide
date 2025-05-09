@@ -1,13 +1,14 @@
 import { useCallback, useEffect, useMemo, useReducer } from "react";
 import { FileNode as FNode, fileTreeReducer } from "@/reducers/explorer";
+import { applyUpdate, Doc } from "yjs";
+import { editor } from "monaco-editor";
+import { MonacoBinding } from "y-monaco";
 import { FileNode } from "../FileNode/FileNode";
 import { closeDir, closeFile, openDir, openFile } from "@/services/env";
 import { FSBlock, FSEventBatch, FSPayload, FSResume, FSUpdate } from "@/models/filesystem";
 import { socket } from "@/config/socket";
 import { EnvContext } from "@/pages/Environment/context";
 import { SocketMessage } from "@/models/common";
-import { editor } from "monaco-editor";
-import { applyUpdate, Doc, encodeStateAsUpdate } from "yjs";
 
 interface ExplorerProps {
   uuid: string;
@@ -106,27 +107,51 @@ export const Explorer = ({ uuid }: ExplorerProps) => {
     } else {
       try {
         const res = await openFile(uuid, path);
-        const update = Uint8Array.from(atob(res.data), (c) => c.charCodeAt(0));
-
-        const doc = new Doc();
-        const type = doc.getText("monaco");
+        const content = Uint8Array.from(atob(res.data), (c) => c.charCodeAt(0));
         const codeEditor = editor.create(document.getElementById("editor")!, {
           value: "",
           language: "javascript",
         });
+        const doc = new Doc();
+        const yText = doc.getText("monaco");
+        applyUpdate(doc, content, "init");
+        codeEditor.setValue(yText.toString());
+        const model = codeEditor.getModel()!;
+        const binding = new MonacoBinding(yText, model, new Set([codeEditor]) /* , provider.awareness */);
 
-        // const monacoBinding = new MonacoBinding(type, editor.getModel(), new Set([editor]), provider.awareness)
-
-        type.observe(() => {
-          const encoded = encodeStateAsUpdate(doc);
-          socket.emit("fs", { action: "update", payload: { path, update: encoded } });
+        /* yText.observe((event) => {
+          // const encoded = encodeStateAsUpdate(doc);
+          // socket.emit("fs", { action: "update", payload: { path, update: encoded } });
+          let index = 0;
+          event.delta.forEach((op) => {
+            if (op.retain !== undefined) {
+              index += op.retain;
+            } else if (op.insert !== undefined) {
+              const pos = model.getPositionAt(index);
+              const range = new Selection(pos.lineNumber, pos.column, pos.lineNumber, pos.column);
+              const insert = op.insert;
+              model.applyEdits([{ range, text: insert as string }]);
+              index += (insert as string).length;
+            } else if (op.delete !== undefined) {
+              const pos = model.getPositionAt(index);
+              const endPos = model.getPositionAt(index + op.delete);
+              const range = new Selection(pos.lineNumber, pos.column, endPos.lineNumber, endPos.column);
+              model.applyEdits([{ range, text: "" }]);
+            } else {
+              console.log("Error: unexpected case");
+            }
+          });
         });
-        codeEditor.setValue(type.toString());
-        codeEditor.onDidChangeModelContent(() => {
-          const newText = codeEditor.getValue();
-          type.delete(0, type.length);
-          type.insert(0, newText);
-        });
+        codeEditor.getModel()!.onDidChangeContent((event) => {
+          doc.transact(() => {
+            event.changes
+              .sort((c1, c2) => c2.rangeOffset - c1.rangeOffset)
+              .forEach((change) => {
+                yText.delete(change.rangeOffset, change.rangeLength);
+                yText.insert(change.rangeOffset, change.text);
+              });
+          });
+        }); */
       } catch (error) {
         console.log(error);
       }
@@ -158,7 +183,7 @@ export const Explorer = ({ uuid }: ExplorerProps) => {
           ))}
         </div>
       </EnvContext.Provider>
-      <div id="editor"></div>
+      <div id="editor" style={{ height: "40vh" }}></div>
     </>
   );
 };
