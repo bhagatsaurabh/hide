@@ -1,6 +1,6 @@
 export type SocketMessagePayload<T = string> = {
-  [k: string]: unknown;
   action: T;
+  [k: string]: unknown;
 };
 
 export type SocketMessage<T extends SocketMessagePayload> = {

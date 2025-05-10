@@ -18,7 +18,7 @@ export type FSEvent = {
   type: "dir" | "file";
 };
 
-export type FSPayload<A = "block" | "resume" | "batch" | "update"> = SocketMessagePayload<A>;
+export type FSPayload<A = "block" | "resume" | "batch" | "sync"> = SocketMessagePayload<A>;
 export interface FSBlock extends FSPayload<"block"> {
   path: string;
 }
@@ -28,8 +28,8 @@ export interface FSResume extends FSPayload<"resume"> {
 export interface FSEventBatch extends FSPayload<"batch"> {
   events: FSEvent[];
 }
-export interface FSUpdate extends FSPayload<"update"> {
-  update: Uint8Array<ArrayBufferLike>;
+export interface FSSync extends FSPayload<"sync"> {
+  buf: Uint8Array<ArrayBufferLike>;
 }
 
 export interface FSDTO<T extends SocketMessagePayload> {
