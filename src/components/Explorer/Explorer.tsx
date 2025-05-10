@@ -5,10 +5,11 @@ import { editor } from "monaco-editor";
 import { MonacoBinding } from "y-monaco";
 import { FileNode } from "../FileNode/FileNode";
 import { closeDir, closeFile, openDir, openFile } from "@/services/env";
-import { FSBlock, FSEventBatch, FSPayload, FSResume, FSUpdate } from "@/models/filesystem";
+import { FSBlock, FSEventBatch, FSPayload, FSResume, FSSync } from "@/models/filesystem";
 import { socket } from "@/config/socket";
 import { EnvContext } from "@/pages/Environment/context";
 import { SocketMessage } from "@/models/common";
+import { WebsocketProvider } from "@/lib/y-websocket";
 
 interface ExplorerProps {
   uuid: string;
@@ -52,11 +53,6 @@ export const Explorer = ({ uuid }: ExplorerProps) => {
       }
       case "resume": {
         fsDispatch({ type: "RESUME", payload: { path: (msg.data as FSResume).path } });
-        break;
-      }
-      case "update": {
-        const update = new Uint8Array((msg.data as FSUpdate).update);
-        // applyUpdate(doc, update);
         break;
       }
       default:
@@ -117,41 +113,8 @@ export const Explorer = ({ uuid }: ExplorerProps) => {
         applyUpdate(doc, content, "init");
         codeEditor.setValue(yText.toString());
         const model = codeEditor.getModel()!;
-        const binding = new MonacoBinding(yText, model, new Set([codeEditor]) /* , provider.awareness */);
-
-        /* yText.observe((event) => {
-          // const encoded = encodeStateAsUpdate(doc);
-          // socket.emit("fs", { action: "update", payload: { path, update: encoded } });
-          let index = 0;
-          event.delta.forEach((op) => {
-            if (op.retain !== undefined) {
-              index += op.retain;
-            } else if (op.insert !== undefined) {
-              const pos = model.getPositionAt(index);
-              const range = new Selection(pos.lineNumber, pos.column, pos.lineNumber, pos.column);
-              const insert = op.insert;
-              model.applyEdits([{ range, text: insert as string }]);
-              index += (insert as string).length;
-            } else if (op.delete !== undefined) {
-              const pos = model.getPositionAt(index);
-              const endPos = model.getPositionAt(index + op.delete);
-              const range = new Selection(pos.lineNumber, pos.column, endPos.lineNumber, endPos.column);
-              model.applyEdits([{ range, text: "" }]);
-            } else {
-              console.log("Error: unexpected case");
-            }
-          });
-        });
-        codeEditor.getModel()!.onDidChangeContent((event) => {
-          doc.transact(() => {
-            event.changes
-              .sort((c1, c2) => c2.rangeOffset - c1.rangeOffset)
-              .forEach((change) => {
-                yText.delete(change.rangeOffset, change.rangeLength);
-                yText.insert(change.rangeOffset, change.text);
-              });
-          });
-        }); */
+        const provider = new WebsocketProvider(socket, doc);
+        const binding = new MonacoBinding(yText, model, new Set([codeEditor]), provider.awareness);
       } catch (error) {
         console.log(error);
       }
