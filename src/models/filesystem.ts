@@ -29,6 +29,7 @@ export interface FSEventBatch extends FSPayload<"batch"> {
   events: FSEvent[];
 }
 export interface FSSync extends FSPayload<"sync"> {
+  path: string;
   buf: Uint8Array<ArrayBufferLike>;
 }
 

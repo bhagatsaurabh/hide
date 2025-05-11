@@ -49,6 +49,7 @@ export class WebsocketProvider {
   constructor(
     public socket: Socket,
     public doc: Doc,
+    public path: string,
     { awareness = new awarenessProtocol.Awareness(doc), resyncInterval = -1 } = {}
   ) {
     this.doc = doc;
@@ -64,7 +65,10 @@ export class WebsocketProvider {
           syncProtocol.writeSyncStep1(encoder, doc);
           this.socket.emit("fs", {
             action: "sync",
-            payload: encoding.toUint8Array(encoder),
+            payload: {
+              buf: encoding.toUint8Array(encoder),
+              path: this.path,
+            },
           });
         }
       }, resyncInterval) as unknown as number;
@@ -105,7 +109,10 @@ export class WebsocketProvider {
     syncProtocol.writeSyncStep1(encoder, this.doc);
     this.socket.emit("fs", {
       action: "sync",
-      payload: encoding.toUint8Array(encoder),
+      payload: {
+        buf: encoding.toUint8Array(encoder),
+        path: this.path,
+      },
     });
     if (this.awareness.getLocalState() !== null) {
       const encoderAwarenessState = encoding.createEncoder();
@@ -116,16 +123,24 @@ export class WebsocketProvider {
       );
       this.socket.emit("fs", {
         action: "sync",
-        payload: encoding.toUint8Array(encoderAwarenessState),
+        payload: {
+          buf: encoding.toUint8Array(encoderAwarenessState),
+          path: this.path,
+        },
       });
     }
-    this.socket.on("fs:sync", (msg: SocketMessage<FSSync>) => {
+    this.socket.on("fs", (msg: SocketMessage<FSSync>) => {
+      if (msg.data.action !== "sync" || msg.data.path !== this.path) return;
+
       this.wsLastMessageReceived = time.getUnixTime();
       const encoder = this.readMessage(msg, true);
       if (encoding.length(encoder) > 1) {
         this.socket.emit("fs", {
           action: "sync",
-          payload: encoding.toUint8Array(encoder),
+          payload: {
+            buf: encoding.toUint8Array(encoder),
+            path: this.path,
+          },
         });
       }
     });
@@ -145,7 +160,10 @@ export class WebsocketProvider {
   sendMessage(socket: Socket, buf: ArrayBuffer) {
     socket.emit("fs", {
       action: "sync",
-      payload: buf,
+      payload: {
+        buf,
+        path: this.path,
+      },
     });
   }
   destroy() {
