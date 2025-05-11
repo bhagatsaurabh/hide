@@ -92,6 +92,7 @@ export const Explorer = ({ uuid }: ExplorerProps) => {
   };
 
   const open = async (path: string, isDir: boolean) => {
+    console.log(path);
     if (isDir) {
       try {
         const res = await openDir(uuid, path);
@@ -102,19 +103,16 @@ export const Explorer = ({ uuid }: ExplorerProps) => {
       }
     } else {
       try {
-        const res = await openFile(uuid, path);
-        const content = Uint8Array.from(atob(res.data), (c) => c.charCodeAt(0));
         const codeEditor = editor.create(document.getElementById("editor")!, {
           value: "",
           language: "javascript",
         });
+        const model = codeEditor.getModel()!;
         const doc = new Doc();
         const yText = doc.getText("monaco");
-        applyUpdate(doc, content, "init");
-        codeEditor.setValue(yText.toString());
-        const model = codeEditor.getModel()!;
         const provider = new WebsocketProvider(socket, doc, path);
         const binding = new MonacoBinding(yText, model, new Set([codeEditor]), provider.awareness);
+        await openFile(uuid, path);
       } catch (error) {
         console.log(error);
       }

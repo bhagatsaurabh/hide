@@ -30,7 +30,7 @@ export interface FSEventBatch extends FSPayload<"batch"> {
 }
 export interface FSSync extends FSPayload<"sync"> {
   path: string;
-  buf: Uint8Array<ArrayBufferLike>;
+  buf: string;
 }
 
 export interface FSDTO<T extends SocketMessagePayload> {
