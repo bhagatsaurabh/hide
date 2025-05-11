@@ -8,6 +8,7 @@ import { Socket } from "socket.io-client";
 
 import { SocketMessage } from "@/models/common";
 import { FSSync } from "@/models/filesystem";
+import { base64ToU8, u8ToBase64 } from "@/utils";
 
 export const messageSync = 0;
 export const messageQueryAwareness = 3;
@@ -66,7 +67,7 @@ export class WebsocketProvider {
           this.socket.emit("fs", {
             action: "sync",
             payload: {
-              buf: encoding.toUint8Array(encoder),
+              buf: u8ToBase64(encoding.toUint8Array(encoder)),
               path: this.path,
             },
           });
@@ -74,8 +75,8 @@ export class WebsocketProvider {
       }, resyncInterval) as unknown as number;
     }
 
-    this.doc.on("update", this._updateHandler);
-    awareness.on("update", this._awarenessUpdateHandler);
+    this.doc.on("update", this._updateHandler.bind(this));
+    awareness.on("update", this._awarenessUpdateHandler.bind(this));
     this._checkInterval = setInterval(() => {
       if (messageReconnectTimeout < time.getUnixTime() - this.wsLastMessageReceived) {
         this.closeWebsocketConnection();
@@ -110,7 +111,7 @@ export class WebsocketProvider {
     this.socket.emit("fs", {
       action: "sync",
       payload: {
-        buf: encoding.toUint8Array(encoder),
+        buf: u8ToBase64(encoding.toUint8Array(encoder)),
         path: this.path,
       },
     });
@@ -124,12 +125,13 @@ export class WebsocketProvider {
       this.socket.emit("fs", {
         action: "sync",
         payload: {
-          buf: encoding.toUint8Array(encoderAwarenessState),
+          buf: u8ToBase64(encoding.toUint8Array(encoderAwarenessState)),
           path: this.path,
         },
       });
     }
     this.socket.on("fs", (msg: SocketMessage<FSSync>) => {
+      console.log(msg);
       if (msg.data.action !== "sync" || msg.data.path !== this.path) return;
 
       this.wsLastMessageReceived = time.getUnixTime();
@@ -138,7 +140,7 @@ export class WebsocketProvider {
         this.socket.emit("fs", {
           action: "sync",
           payload: {
-            buf: encoding.toUint8Array(encoder),
+            buf: u8ToBase64(encoding.toUint8Array(encoder)),
             path: this.path,
           },
         });
@@ -146,7 +148,8 @@ export class WebsocketProvider {
     });
   }
   readMessage(msg: SocketMessage<FSSync>, emitSynced: boolean) {
-    const decoder = decoding.createDecoder(msg.data.buf);
+    const buf = base64ToU8(msg.data.buf);
+    const decoder = decoding.createDecoder(buf);
     const encoder = encoding.createEncoder();
     const messageType = decoding.readVarUint(decoder);
     const messageHandler = this.messageHandlers[messageType];
@@ -157,11 +160,11 @@ export class WebsocketProvider {
     }
     return encoder;
   }
-  sendMessage(socket: Socket, buf: ArrayBuffer) {
+  sendMessage(socket: Socket, buf: Uint8Array) {
     socket.emit("fs", {
       action: "sync",
       payload: {
-        buf,
+        buf: u8ToBase64(buf),
         path: this.path,
       },
     });
