@@ -113,7 +113,7 @@ export const Explorer = ({ uuid }: ExplorerProps) => {
         applyUpdate(doc, content, "init");
         codeEditor.setValue(yText.toString());
         const model = codeEditor.getModel()!;
-        const provider = new WebsocketProvider(socket, doc);
+        const provider = new WebsocketProvider(socket, doc, path);
         const binding = new MonacoBinding(yText, model, new Set([codeEditor]), provider.awareness);
       } catch (error) {
         console.log(error);
