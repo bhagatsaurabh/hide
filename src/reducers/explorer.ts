@@ -1,9 +1,21 @@
+import { WebsocketProvider } from "@/lib/y-websocket";
 import { FSEvent } from "@/models/filesystem";
 import { getPath } from "@/utils";
+import { editor } from "monaco-editor";
+import { MonacoBinding } from "y-monaco";
+import { Doc } from "yjs";
 
 interface FTActionMap {
-  LOAD: { path: string; nodes: FileNode[]; forceOpen?: boolean };
+  LOAD: { path: string; nodes: FNode[]; forceOpen?: boolean };
   UNLOAD: { path: string };
+  OPEN_FILE: {
+    path: string;
+    doc: Doc;
+    provider: WebsocketProvider;
+    binding: MonacoBinding;
+    editor: editor.IStandaloneCodeEditor;
+  };
+  CLOSE_FILE: { path: string };
   CLEAR_STALE: unknown;
   BATCH: { events: FSEvent[] };
   RESUME: { path: string };
@@ -16,24 +28,31 @@ type FTAction = {
   };
 }[keyof FTActionMap];
 
-interface FileNodeMap {
-  file: undefined;
-  dir: FileNode[];
-}
-export type FileNode = {
-  [K in keyof FileNodeMap]: {
+type FNodeMap = {
+  file: {
+    isDirty?: boolean;
+    doc?: Doc;
+    provider?: WebsocketProvider;
+    binding?: MonacoBinding;
+    editor?: editor.IStandaloneCodeEditor;
+  };
+  dir: { children: FNode[] };
+};
+export type FNode = {
+  [K in keyof FNodeMap]: {
     name: string;
     type: K;
     id: number;
-    parent?: FileNode;
-    isOpen?: boolean;
-    children: FileNodeMap[K];
-  };
-}[keyof FileNodeMap];
+    isOpen: boolean;
+    parent?: FNodeOf<"dir">;
+  } & FNodeMap[K];
+}[keyof FNodeMap];
+export type FNodeOf<T extends keyof FNodeMap> = Extract<FNode, { type: T }>;
+
 type PathPair<T> = [T, T | undefined];
 export type ExplorerState = {
-  root: FileNode;
-  pathMap: Map<string, FileNode>;
+  root: FNodeOf<"dir">;
+  pathMap: Map<string, FNode>;
   stalePaths: PathPair<string>[];
 };
 
@@ -62,7 +81,7 @@ export function fileTreeReducer(state: ExplorerState, action: FTAction): Explore
   switch (action.type) {
     case "LOAD": {
       const dirNode = state.pathMap.get(action.payload.path);
-      if (!dirNode) return state;
+      if (!dirNode || dirNode.type !== "dir") return state;
 
       dirNode.children = action.payload.nodes;
       action.payload.nodes.forEach((node) => {
@@ -77,13 +96,38 @@ export function fileTreeReducer(state: ExplorerState, action: FTAction): Explore
     }
     case "UNLOAD": {
       const dirNode = state.pathMap.get(action.payload.path);
-      if (!dirNode) return state;
+      if (!dirNode || dirNode.type !== "dir") return state;
 
       const path = getPath(dirNode);
       dirNode.children?.forEach((child) => {
         state.pathMap.delete(`${path}/${child.name}`);
       });
       dirNode.children = [];
+      return { ...state };
+    }
+    case "OPEN_FILE": {
+      const node = state.pathMap.get(action.payload.path);
+      if (!node || node.type !== "file") return state;
+
+      node.isOpen = true;
+      node.doc = action.payload.doc;
+      node.provider = action.payload.provider;
+      node.binding = action.payload.binding;
+      node.editor = action.payload.editor;
+      return { ...state };
+    }
+    case "CLOSE_FILE": {
+      const node = state.pathMap.get(action.payload.path);
+      if (!node || node.type !== "file") return state;
+
+      node.binding?.destroy();
+      node.provider?.destroy();
+      node.editor?.dispose();
+
+      node.isOpen = false;
+      node.binding = undefined;
+      node.provider = undefined;
+      node.editor = undefined;
       return { ...state };
     }
     case "CLEAR_STALE": {
@@ -96,41 +140,41 @@ export function fileTreeReducer(state: ExplorerState, action: FTAction): Explore
       for (const event of events) {
         if (event.action === "create") {
           const dirNode = state.pathMap.get(event.data.watchedPath);
-          if (!dirNode) continue;
+          if (!dirNode || dirNode.type !== "dir") continue;
           const common = {
             id: event.data.ino!,
             name: event.data.path.substring(event.data.path.lastIndexOf("/") + 1),
             parent: dirNode,
           };
-          const node = {
-            ...common,
-            type: event.data.type,
-            children: event.data.type === "dir" ? [] : undefined,
-          } as FileNode;
-          dirNode.children?.push(node);
+          let node: FNode;
+          if (event.data.type === "dir") {
+            node = { ...common, type: "dir", isOpen: false, children: [] };
+          } else {
+            node = { ...common, type: "file", isOpen: false };
+          }
+          dirNode.children.push(node);
           state.pathMap.set(`${getPath(dirNode)}/${node.name}`, node);
         } else if (event.action === "move") {
           const oldDirNode = state.pathMap.get(event.data.from);
-          let newDirNode: FileNode | undefined;
+          let newDirNode: FNode | undefined;
           if (event.data.to) newDirNode = state.pathMap.get(event.data.to);
           const node = state.pathMap.get(event.data.oldPath);
           if (!node) {
             continue;
           }
           let oldPath, newPath;
-          if (oldDirNode) {
+          if (oldDirNode && oldDirNode.type === "dir") {
             oldPath = getPath(node);
             state.pathMap.delete(oldPath);
-            oldDirNode.children!.splice(
-              oldDirNode.children!.findIndex((n) => n === node),
+            oldDirNode.children.splice(
+              oldDirNode.children.findIndex((n) => n === node),
               1
             );
           }
-          if (newDirNode) {
-            console.log(event);
+          if (newDirNode && newDirNode.type === "dir") {
             node.name = event.data.newPath!.substring(event.data.newPath!.lastIndexOf("/") + 1);
             node.parent = newDirNode;
-            newDirNode.children?.push(node);
+            newDirNode.children.push(node);
             newPath = getPath(node);
             state.pathMap.set(newPath, node);
           }
@@ -141,14 +185,16 @@ export function fileTreeReducer(state: ExplorerState, action: FTAction): Explore
           }
         } else if (event.action === "modify") {
           // TODO: Notify users with possible integration with yjs & arbitration in-case of conflicts
+          console.log("CONFLICT !");
         } else if (event.action === "remove") {
-          // TODO: Notify users with possible integration with yjs & arbitration in-case of conflicts
+          // TODO: Notify users
+          console.log("DELETED !");
           const dirNode = state.pathMap.get(event.data.watchedPath);
           const node = state.pathMap.get(event.data.path);
           if (!node) {
             continue;
           }
-          if (dirNode) {
+          if (dirNode && dirNode.type === "dir") {
             dirNode.children!.splice(
               dirNode.children!.findIndex((n) => n === node),
               1

@@ -1,6 +1,6 @@
 import { useContext } from "react";
 import { EnvContext } from "@/pages/Environment/context";
-import { FileNode as FNode } from "@/reducers/explorer";
+import { FNode } from "@/reducers/explorer";
 import { getPath } from "@/utils";
 
 interface FileNodeProps {
@@ -17,14 +17,22 @@ export const FileNode = ({ node }: FileNodeProps) => {
       node.isOpen = !node.isOpen;
       envCtx[node.isOpen ? "open" : "close"](path, isDir);
     } else {
-      envCtx.open(path, isDir);
+      if (!node.isOpen) {
+        envCtx.open(path, isDir);
+      }
     }
   };
 
   return (
     <div style={{ marginLeft: 20 }}>
       <div onClick={handleClick} style={{ cursor: isDir ? "pointer" : "default" }}>
-        {isDir ? (node.isOpen ? "📂" : "📁") : "📄"} {node.name}
+        {isDir ? (node.isOpen ? "📂" : "📁") : "📄"} {node.name}{" "}
+        {node.type === "file" && (
+          <>
+            {node.isOpen && <button onClick={() => envCtx.close(getPath(node), isDir)}>Close</button>}
+            <button onClick={() => envCtx.save(getPath(node))}>Save</button>
+          </>
+        )}
       </div>
 
       {isDir && node.isOpen && (

@@ -18,3 +18,6 @@ export const openFile = async (wsUuid: string, path: string) => {
 export const closeFile = async (wsUuid: string, path: string) => {
   return await api.post<void>(`/workspace-${wsUuid}/file/close`, { path });
 };
+export const saveFile = async (wsUuid: string, path: string) => {
+  return await api.post<void>(`/workspace-${wsUuid}/file/save`, { path });
+};
