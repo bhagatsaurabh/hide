@@ -46,6 +46,8 @@ export class WebsocketProvider {
   wsLastMessageReceived: number;
   _resyncInterval: number;
   _checkInterval: number;
+  private updateHandler: typeof this._updateHandler;
+  private awarenessUpdateHandler: typeof this._awarenessUpdateHandler;
 
   constructor(
     public socket: Socket,
@@ -75,11 +77,13 @@ export class WebsocketProvider {
       }, resyncInterval) as unknown as number;
     }
 
-    this.doc.on("update", this._updateHandler.bind(this));
-    awareness.on("update", this._awarenessUpdateHandler.bind(this));
+    this.updateHandler = this._updateHandler.bind(this);
+    this.awarenessUpdateHandler = this._awarenessUpdateHandler.bind(this);
+    this.doc.on("update", this.updateHandler);
+    this.awareness.on("update", this.awarenessUpdateHandler);
     this._checkInterval = setInterval(() => {
       if (messageReconnectTimeout < time.getUnixTime() - this.wsLastMessageReceived) {
-        this.closeWebsocketConnection();
+        this.close();
       }
     }, messageReconnectTimeout / 10) as unknown as number;
     this.setupWS();
@@ -102,7 +106,7 @@ export class WebsocketProvider {
   }
 
   setupWS() {
-    this.socket.on("disconnect", () => this.closeWebsocketConnection());
+    this.socket.on("disconnect", () => this.close());
 
     this.wsLastMessageReceived = time.getUnixTime();
     const encoder = encoding.createEncoder();
@@ -131,7 +135,6 @@ export class WebsocketProvider {
       });
     }
     this.socket.on("fs", (msg: SocketMessage<FSSync>) => {
-      console.log(msg);
       if (msg.data.action !== "sync" || msg.data.path !== this.path) return;
 
       this.wsLastMessageReceived = time.getUnixTime();
@@ -174,11 +177,11 @@ export class WebsocketProvider {
       clearInterval(this._resyncInterval);
     }
     clearInterval(this._checkInterval);
-    this.closeWebsocketConnection();
-    this.awareness.off("update", this._awarenessUpdateHandler);
-    this.doc.off("update", this._updateHandler);
+    this.close();
+    this.awareness.off("update", this.awarenessUpdateHandler);
+    this.doc.off("update", this.updateHandler);
   }
-  closeWebsocketConnection() {
+  close() {
     awarenessProtocol.removeAwarenessStates(
       this.awareness,
       Array.from(this.awareness.getStates().keys()).filter((client) => client !== this.doc.clientID),

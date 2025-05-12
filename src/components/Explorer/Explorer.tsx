@@ -1,11 +1,11 @@
 import { useCallback, useEffect, useMemo, useReducer } from "react";
-import { FileNode as FNode, fileTreeReducer } from "@/reducers/explorer";
-import { applyUpdate, Doc } from "yjs";
+import { FNode, FNodeOf, fileTreeReducer } from "@/reducers/explorer";
+import { Doc } from "yjs";
 import { editor } from "monaco-editor";
 import { MonacoBinding } from "y-monaco";
 import { FileNode } from "../FileNode/FileNode";
-import { closeDir, closeFile, openDir, openFile } from "@/services/env";
-import { FSBlock, FSEventBatch, FSPayload, FSResume, FSSync } from "@/models/filesystem";
+import { closeDir, closeFile, openDir, openFile, saveFile } from "@/services/env";
+import { FSBlock, FSEventBatch, FSPayload, FSResume } from "@/models/filesystem";
 import { socket } from "@/config/socket";
 import { EnvContext } from "@/pages/Environment/context";
 import { SocketMessage } from "@/models/common";
@@ -16,13 +16,14 @@ interface ExplorerProps {
 }
 
 export const Explorer = ({ uuid }: ExplorerProps) => {
-  const root: FNode = useMemo(
+  const root: FNodeOf<"dir"> = useMemo(
     () => ({
       id: 0,
       name: "",
       path: "/",
       type: "dir",
       children: [],
+      isOpen: true,
     }),
     []
   );
@@ -92,7 +93,6 @@ export const Explorer = ({ uuid }: ExplorerProps) => {
   };
 
   const open = async (path: string, isDir: boolean) => {
-    console.log(path);
     if (isDir) {
       try {
         const res = await openDir(uuid, path);
@@ -102,6 +102,9 @@ export const Explorer = ({ uuid }: ExplorerProps) => {
         console.log(error);
       }
     } else {
+      const node = fs.pathMap.get(path);
+      if (!node || node.isOpen) return;
+
       try {
         const codeEditor = editor.create(document.getElementById("editor")!, {
           value: "",
@@ -113,6 +116,7 @@ export const Explorer = ({ uuid }: ExplorerProps) => {
         const provider = new WebsocketProvider(socket, doc, path);
         const binding = new MonacoBinding(yText, model, new Set([codeEditor]), provider.awareness);
         await openFile(uuid, path);
+        fsDispatch({ type: "OPEN_FILE", payload: { path, provider, binding, editor: codeEditor, doc } });
       } catch (error) {
         console.log(error);
       }
@@ -129,15 +133,23 @@ export const Explorer = ({ uuid }: ExplorerProps) => {
     } else {
       try {
         await closeFile(uuid, path);
+        fsDispatch({ type: "CLOSE_FILE", payload: { path } });
       } catch (error) {
         console.log(error);
       }
     }
   };
+  const save = async (path: string) => {
+    try {
+      await saveFile(uuid, path);
+    } catch (error) {
+      console.log(error);
+    }
+  };
 
   return (
     <>
-      <EnvContext.Provider value={{ open, close }}>
+      <EnvContext.Provider value={{ open, close, save }}>
         <div style={{ textAlign: "left" }}>
           {fs.root.children!.map((node, index) => (
             <FileNode key={index} node={node} />
