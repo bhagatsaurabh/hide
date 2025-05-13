@@ -19,6 +19,11 @@ export const Environment = () => {
   const dispatch = useAppDispatch();
 
   useEffect(() => {
+    const msg = { action: "ping", payload: { uuid: workspace.uuid } };
+    const heartbeat = setInterval(() => socket.emit("env", msg), 5000);
+    return () => clearInterval(heartbeat);
+  }, [workspace.uuid]);
+  useEffect(() => {
     return () => {
       socket.emit("ssh:closeall", { workspaceUUID: workspace.uuid });
       term.current?.dispose();
