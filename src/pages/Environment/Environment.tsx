@@ -19,18 +19,21 @@ export const Environment = () => {
   const dispatch = useAppDispatch();
 
   useEffect(() => {
-    const msg = { action: "ping", payload: { uuid: workspace.uuid } };
-    const heartbeat = setInterval(() => socket.emit("env", msg), 5000);
+    const msg = { service: "env", action: "ping", payload: { uuid: workspace.uuid } };
+    const heartbeat = setInterval(() => socket.emit("msg", msg), 5000);
     return () => clearInterval(heartbeat);
   }, [workspace.uuid]);
   useEffect(() => {
     return () => {
-      socket.emit("ssh:closeall", { workspaceUUID: workspace.uuid });
+      socket.emit("msg", {
+        service: "env",
+        action: "ssh.closeall",
+        payload: {
+          uuid: workspace.uuid,
+        },
+      });
       term.current?.dispose();
-      socket.off("ssh:open");
-      socket.off("ssh:output");
-      socket.off("ssh:error");
-      socket.off("ssh:closed");
+      socket.off("ssh");
       socket.off("fs");
     };
   }, [dispatch, workspace.uuid]);
@@ -38,7 +41,7 @@ export const Environment = () => {
   const handleNewTerminal = async () => {
     const privateKey = await getSSHKey(auth.currentUser!.uid, workspace.uuid);
 
-    socket.on("ssh:open", (id) => {
+    socket.on("ssh.open", (id) => {
       setSessionId(id);
 
       term.current = new Terminal();
@@ -52,28 +55,40 @@ export const Environment = () => {
       fitAddon.fit();
       term.current.write("Connecting...");
       term.current.onData((data) =>
-        socket.emit("ssh:data", { workspaceUUID: workspace.uuid, sessionId: id, input: data })
+        socket.emit("msg", {
+          service: "env",
+          action: "ssh.data",
+          payload: {
+            uuid: workspace.uuid,
+            sessionId: id,
+            input: data,
+          },
+        })
       );
     });
-    socket.on("ssh:output", (data) => term.current!.write(data.output));
-    socket.on("ssh:error", (err) => {
+    socket.on("ssh.output", (data) => term.current!.write(data.output));
+    socket.on("ssh.error", (err) => {
       if (err.sessionId) {
         term.current?.write(err.message);
       } else {
         console.log(err);
       }
     });
-    socket.on("ssh:closed", (_) => {
+    socket.on("ssh.closed", (_: unknown) => {
       term.current?.write("Disconnected");
     });
 
-    socket.emit("ssh:request", {
-      privateKey,
-      workspaceUUID: workspace.uuid,
+    socket.emit("msg", {
+      service: "env",
+      action: "ssh.request",
+      payload: {
+        privateKey,
+        uuid: workspace.uuid,
+      },
     });
   };
   const handleCloseTerminal = () => {
-    socket.emit("ssh:close", { workspaceUUID: workspace.uuid, sessionId });
+    socket.emit("msg", { service: "env", action: "ssh.close", uuid: workspace.uuid, sessionId });
     setSessionId("");
     term.current?.dispose();
   };
