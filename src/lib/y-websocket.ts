@@ -50,6 +50,7 @@ export class WebsocketProvider {
   private awarenessUpdateHandler: typeof this._awarenessUpdateHandler;
 
   constructor(
+    public uuid: string,
     public socket: Socket,
     public doc: Doc,
     public path: string,
@@ -66,9 +67,11 @@ export class WebsocketProvider {
           const encoder = encoding.createEncoder();
           encoding.writeVarUint(encoder, messageSync);
           syncProtocol.writeSyncStep1(encoder, doc);
-          this.socket.emit("fs", {
-            action: "sync",
+          this.socket.emit("msg", {
+            service: "env",
+            action: "fs.sync",
             payload: {
+              uuid: this.uuid,
               buf: u8ToBase64(encoding.toUint8Array(encoder)),
               path: this.path,
             },
@@ -112,9 +115,11 @@ export class WebsocketProvider {
     const encoder = encoding.createEncoder();
     encoding.writeVarUint(encoder, messageSync);
     syncProtocol.writeSyncStep1(encoder, this.doc);
-    this.socket.emit("fs", {
-      action: "sync",
+    this.socket.emit("msg", {
+      service: "env",
+      action: "fs.sync",
       payload: {
+        uuid: this.uuid,
         buf: u8ToBase64(encoding.toUint8Array(encoder)),
         path: this.path,
       },
@@ -126,9 +131,11 @@ export class WebsocketProvider {
         encoderAwarenessState,
         awarenessProtocol.encodeAwarenessUpdate(this.awareness, [this.doc.clientID])
       );
-      this.socket.emit("fs", {
-        action: "sync",
+      this.socket.emit("msg", {
+        service: "env",
+        action: "fs.sync",
         payload: {
+          uuid: this.uuid,
           buf: u8ToBase64(encoding.toUint8Array(encoderAwarenessState)),
           path: this.path,
         },
@@ -140,9 +147,11 @@ export class WebsocketProvider {
       this.wsLastMessageReceived = time.getUnixTime();
       const encoder = this.readMessage(msg, true);
       if (encoding.length(encoder) > 1) {
-        this.socket.emit("fs", {
-          action: "sync",
+        this.socket.emit("msg", {
+          service: "env",
+          action: "fs.sync",
           payload: {
+            uuid: this.uuid,
             buf: u8ToBase64(encoding.toUint8Array(encoder)),
             path: this.path,
           },
@@ -164,9 +173,11 @@ export class WebsocketProvider {
     return encoder;
   }
   sendMessage(socket: Socket, buf: Uint8Array) {
-    socket.emit("fs", {
-      action: "sync",
+    socket.emit("msg", {
+      service: "env",
+      action: "fs.sync",
       payload: {
+        uuid: this.uuid,
         buf: u8ToBase64(buf),
         path: this.path,
       },

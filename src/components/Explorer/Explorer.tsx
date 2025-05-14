@@ -70,7 +70,7 @@ export const Explorer = ({ uuid }: ExplorerProps) => {
 
     return () => {
       socket.off("fs", handleFSMessage);
-      socket.emit("fs", { action: "close", payload: { path: "/" } });
+      socket.emit("msg", { service: "env", action: "fs.close", payload: { uuid, path: "/" } });
     };
   }, [init]);
   useEffect(() => void handleStalePaths(), [fs.stalePaths]);
@@ -113,7 +113,7 @@ export const Explorer = ({ uuid }: ExplorerProps) => {
         const model = codeEditor.getModel()!;
         const doc = new Doc();
         const yText = doc.getText("monaco");
-        const provider = new WebsocketProvider(socket, doc, path);
+        const provider = new WebsocketProvider(uuid, socket, doc, path);
         const binding = new MonacoBinding(yText, model, new Set([codeEditor]), provider.awareness);
         await openFile(uuid, path);
         fsDispatch({ type: "OPEN_FILE", payload: { path, provider, binding, editor: codeEditor, doc } });
