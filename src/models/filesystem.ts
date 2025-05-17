@@ -1,4 +1,4 @@
-import { SocketMessagePayload } from "./common";
+import { InSocketMessagePayload } from "./common";
 
 export interface FSOpenDTO {
   name: string;
@@ -15,26 +15,31 @@ export type FSEvent = {
   ino?: number;
   action: FSEventType;
   timestamp: number;
-  type: "dir" | "file";
+  type: "file" | "dir";
 };
 
-export type FSPayload<A = "block" | "resume" | "batch" | "sync"> = SocketMessagePayload<A>;
-export interface FSBlock extends FSPayload<"block"> {
-  path: string;
-}
-export interface FSResume extends FSPayload<"resume"> {
-  path: string;
-}
-export interface FSEventBatch extends FSPayload<"batch"> {
+export interface FSEventBatch extends InSocketMessagePayload {
   events: FSEvent[];
 }
-export interface FSSync extends FSPayload<"sync"> {
+export interface FSBlock extends InSocketMessagePayload {
+  path: string;
+}
+export type FSResume = FSBlock;
+export interface FSSync extends InSocketMessagePayload {
+  uuid: string;
   path: string;
   buf: string;
 }
 
-export interface FSDTO<T extends SocketMessagePayload> {
-  uid: string;
-  type: string;
-  data: T;
-}
+export type FSResponseMap = {
+  batch: FSEventBatch;
+  block: FSBlock;
+  resume: FSResume;
+  sync: FSSync;
+};
+export type FSPayload = {
+  [K in keyof FSResponseMap]: {
+    action: K;
+    payload: FSResponseMap[K];
+  };
+}[keyof FSResponseMap];

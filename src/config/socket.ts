@@ -1,22 +1,26 @@
-/* eslint-disable no-async-promise-executor */
 import { io, Socket } from "socket.io-client";
-import { auth } from "./firebase";
+import { DefaultEventsMap } from "socket.io";
 
-let socket: Socket;
+import { auth } from "./firebase";
+import { InSocketMessage } from "@/models/common";
+
+export interface InSocketEventsMap {
+  ssh: (msg: InSocketMessage<"ssh">) => void;
+  fs: (msg: InSocketMessage<"fs">) => void;
+  notification: (msg: InSocketMessage<"notification">) => void;
+}
+type TypedSocket = Socket<InSocketEventsMap, DefaultEventsMap>;
+let socket: TypedSocket;
 
 export const connectSocket = async () => {
-  return new Promise<Socket>(async (resolve, reject) => {
-    try {
-      const token = await auth.currentUser?.getIdToken();
-      if (!token) {
-        throw new Error("Cannot get token");
-      }
+  const token = await auth.currentUser?.getIdToken();
+  if (!token) {
+    throw new Error("Cannot get token");
+  }
 
-      socket = io(import.meta.env.VITE_HIDE_WS_SERVER, {
-        auth: {
-          token,
-        },
-      });
+  return new Promise<TypedSocket>((resolve, reject) => {
+    try {
+      socket = io(import.meta.env.VITE_HIDE_WS_SERVER, { auth: { token } });
 
       socket.io.on("error", (err) => reject(err));
       socket.io.on("open", () => resolve(socket));

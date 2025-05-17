@@ -9,6 +9,7 @@ import { User } from "@/pages/User/User";
 import { Environment } from "@/pages/Environment/Environment";
 import { CrashBoard } from "@/components/common/CrashBoard/CrashBoard";
 import { authGuard, noAuthGuard, workspaceLoader } from "./guards";
+import { CompleteProfile } from "@/pages/CompleteProfile/CompleteProfile";
 
 const router = createBrowserRouter([
   {
@@ -27,6 +28,12 @@ const router = createBrowserRouter([
     element: <Auth />,
     errorElement: <CrashBoard />,
     loader: noAuthGuard,
+  },
+  {
+    path: "/complete-profile",
+    element: <CompleteProfile />,
+    errorElement: <CrashBoard />,
+    loader: authGuard,
   },
   {
     path: "/dashboard",
