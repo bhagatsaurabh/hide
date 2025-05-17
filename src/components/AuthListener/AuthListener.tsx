@@ -16,8 +16,12 @@ const AuthListener = () => {
     const unsubscribe = onAuthStateChanged(auth, async (usr) => {
       if (usr) {
         if (status !== AuthStatus.SIGNING_IN) {
-          await dispatch(handleExistingUser());
-          dispatch(setStatus(AuthStatus.SIGNED_IN));
+          const status = await dispatch(handleExistingUser()).unwrap();
+          if (status === "incomplete") {
+            dispatch(setStatus(AuthStatus.INCOMPLETE_PROFILE));
+          } else {
+            dispatch(setStatus(AuthStatus.SIGNED_IN));
+          }
         }
       } else {
         dispatch(setStatus(AuthStatus.SIGNED_OUT));

@@ -6,9 +6,9 @@ import * as syncProtocol from "y-protocols/sync";
 import * as awarenessProtocol from "y-protocols/awareness";
 import { Socket } from "socket.io-client";
 
-import { SocketMessage } from "@/models/common";
 import { FSSync } from "@/models/filesystem";
 import { base64ToU8, u8ToBase64 } from "@/utils";
+import { InSocketMessage } from "@/models/common";
 
 export const messageSync = 0;
 export const messageQueryAwareness = 3;
@@ -141,11 +141,11 @@ export class WebsocketProvider {
         },
       });
     }
-    this.socket.on("fs", (msg: SocketMessage<FSSync>) => {
-      if (msg.data.action !== "sync" || msg.data.path !== this.path) return;
+    this.socket.on("fs", (msg: InSocketMessage<"fs">) => {
+      if (msg.action !== "sync" || msg.payload.path !== this.path) return;
 
       this.wsLastMessageReceived = time.getUnixTime();
-      const encoder = this.readMessage(msg, true);
+      const encoder = this.readMessage(msg.payload, true);
       if (encoding.length(encoder) > 1) {
         this.socket.emit("msg", {
           service: "env",
@@ -159,8 +159,8 @@ export class WebsocketProvider {
       }
     });
   }
-  readMessage(msg: SocketMessage<FSSync>, emitSynced: boolean) {
-    const buf = base64ToU8(msg.data.buf);
+  readMessage(data: FSSync, emitSynced: boolean) {
+    const buf = base64ToU8(data.buf);
     const decoder = decoding.createDecoder(buf);
     const encoder = encoding.createEncoder();
     const messageType = decoding.readVarUint(decoder);

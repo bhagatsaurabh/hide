@@ -5,6 +5,10 @@ const api = axios.create({
   baseURL: import.meta.env.VITE_HIDE_SERVER,
 });
 
+const publicApi = axios.create({
+  baseURL: import.meta.env.VITE_HIDE_SERVER,
+});
+
 api.interceptors.request.use(
   async (config) => {
     const user = auth.currentUser;
@@ -21,3 +25,4 @@ api.interceptors.request.use(
 );
 
 export default api;
+export { publicApi };

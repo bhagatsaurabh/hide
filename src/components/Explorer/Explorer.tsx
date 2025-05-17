@@ -5,11 +5,10 @@ import { editor } from "monaco-editor";
 import { MonacoBinding } from "y-monaco";
 import { FileNode } from "../FileNode/FileNode";
 import { closeDir, closeFile, openDir, openFile, saveFile } from "@/services/env";
-import { FSBlock, FSEventBatch, FSPayload, FSResume } from "@/models/filesystem";
 import { socket } from "@/config/socket";
 import { EnvContext } from "@/pages/Environment/context";
-import { SocketMessage } from "@/models/common";
 import { WebsocketProvider } from "@/lib/y-websocket";
+import { InSocketMessage } from "@/models/common";
 
 interface ExplorerProps {
   uuid: string;
@@ -42,18 +41,18 @@ export const Explorer = ({ uuid }: ExplorerProps) => {
       console.log(error);
     }
   }, [uuid]);
-  const handleFSMessage = (msg: SocketMessage<FSPayload>) => {
-    switch (msg.data.action) {
+  const handleFSMessage = (msg: InSocketMessage<"fs">) => {
+    switch (msg.action) {
       case "batch": {
-        fsDispatch({ type: "BATCH", payload: { events: (msg.data as FSEventBatch).events } });
+        fsDispatch({ type: "BATCH", payload: { events: msg.payload.events } });
         break;
       }
       case "block": {
-        fsDispatch({ type: "BLOCK", payload: { path: (msg.data as FSBlock).path } });
+        fsDispatch({ type: "BLOCK", payload: { path: msg.payload.path } });
         break;
       }
       case "resume": {
-        fsDispatch({ type: "RESUME", payload: { path: (msg.data as FSResume).path } });
+        fsDispatch({ type: "RESUME", payload: { path: msg.payload.path } });
         break;
       }
       default:
@@ -72,7 +71,7 @@ export const Explorer = ({ uuid }: ExplorerProps) => {
       socket.off("fs", handleFSMessage);
       socket.emit("msg", { service: "env", action: "fs.close", payload: { uuid, path: "/" } });
     };
-  }, [init]);
+  }, [init, uuid]);
   useEffect(() => void handleStalePaths(), [fs.stalePaths]);
 
   const handleStalePaths = async () => {

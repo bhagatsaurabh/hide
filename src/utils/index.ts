@@ -1,6 +1,6 @@
-import { FileNode } from "@/reducers/explorer";
+import { FNode } from "@/reducers/explorer";
 
-export const getPath = (node?: FileNode) => {
+export const getPath = (node?: FNode) => {
   const path = [];
   while (node) {
     path.push(node.name);
@@ -25,4 +25,16 @@ export const base64ToU8 = (b64: string) => {
     bytes[i] = str.charCodeAt(i);
   }
   return bytes;
+};
+
+export const debounce = <C extends (...args: never[]) => Promise<never> | Promise<void> | never>(
+  func: C,
+  wait: number
+) => {
+  let timeout: NodeJS.Timeout | null = null;
+
+  return (...args: Parameters<C>): void => {
+    if (timeout) clearTimeout(timeout);
+    timeout = setTimeout(() => void func(...args), wait);
+  };
 };

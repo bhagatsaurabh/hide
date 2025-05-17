@@ -10,6 +10,7 @@ import { getSSHKey } from "@/utils/driver";
 import { auth } from "@/config/firebase";
 import { useAppDispatch } from "@/hooks/store";
 import { Explorer } from "@/components/Explorer/Explorer";
+import { SSHClosed, SSHError, SSHOpen, SSHOutput } from "@/models/ssh";
 
 export const Environment = () => {
   const workspace = useLoaderData<typeof workspaceLoader>();
@@ -34,48 +35,33 @@ export const Environment = () => {
       });
       term.current?.dispose();
       socket.off("ssh");
-      socket.off("fs");
     };
   }, [dispatch, workspace.uuid]);
 
   const handleNewTerminal = async () => {
     const privateKey = await getSSHKey(auth.currentUser!.uid, workspace.uuid);
 
-    socket.on("ssh.open", (id) => {
-      setSessionId(id);
-
-      term.current = new Terminal();
-      const fitAddon = new FitAddon();
-      const clipboardAddon = new ClipboardAddon();
-      term.current.loadAddon(fitAddon);
-      term.current.loadAddon(clipboardAddon);
-      term.current.loadAddon(new WebLinksAddon());
-
-      term.current.open(termEl.current!);
-      fitAddon.fit();
-      term.current.write("Connecting...");
-      term.current.onData((data) =>
-        socket.emit("msg", {
-          service: "env",
-          action: "ssh.data",
-          payload: {
-            uuid: workspace.uuid,
-            sessionId: id,
-            input: data,
-          },
-        })
-      );
-    });
-    socket.on("ssh.output", (data) => term.current!.write(data.output));
-    socket.on("ssh.error", (err) => {
-      if (err.sessionId) {
-        term.current?.write(err.message);
-      } else {
-        console.log(err);
+    socket.on("ssh", (msg) => {
+      switch (msg.action) {
+        case "open": {
+          handleSSHOpen(msg.payload);
+          break;
+        }
+        case "output": {
+          handleSSHOutput(msg.payload);
+          break;
+        }
+        case "error": {
+          handleSSHError(msg.payload);
+          break;
+        }
+        case "closed": {
+          handleSSHClosed(msg.payload);
+          break;
+        }
+        default:
+          break;
       }
-    });
-    socket.on("ssh.closed", (_: unknown) => {
-      term.current?.write("Disconnected");
     });
 
     socket.emit("msg", {
@@ -87,6 +73,45 @@ export const Environment = () => {
       },
     });
   };
+  const handleSSHOpen = (payload: SSHOpen) => {
+    setSessionId(payload.sessionId);
+
+    term.current = new Terminal();
+    const fitAddon = new FitAddon();
+    const clipboardAddon = new ClipboardAddon();
+    term.current.loadAddon(fitAddon);
+    term.current.loadAddon(clipboardAddon);
+    term.current.loadAddon(new WebLinksAddon());
+
+    term.current.open(termEl.current!);
+    fitAddon.fit();
+    term.current.write("Connecting...");
+    term.current.onData((data) =>
+      socket.emit("msg", {
+        service: "env",
+        action: "ssh.data",
+        payload: {
+          uuid: workspace.uuid,
+          sessionId: payload.sessionId,
+          input: data,
+        },
+      })
+    );
+  };
+  const handleSSHOutput = (payload: SSHOutput) => {
+    term.current!.write(payload.output);
+  };
+  const handleSSHError = (payload: SSHError) => {
+    if (payload.sessionId) {
+      term.current?.write(payload.message);
+    } else {
+      console.error(payload);
+    }
+  };
+  const handleSSHClosed = (payload: SSHClosed) => {
+    term.current?.write(`Disconnected: ${payload.sessionId}`);
+  };
+
   const handleCloseTerminal = () => {
     socket.emit("msg", { service: "env", action: "ssh.close", uuid: workspace.uuid, sessionId });
     setSessionId("");
