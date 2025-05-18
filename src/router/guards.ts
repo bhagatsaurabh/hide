@@ -4,7 +4,13 @@ import { Params, redirect } from "react-router";
 
 export const authGuard = async ({ request }: { request: Request }) => {
   const path = new URL(request.url).pathname;
-  if (!auth.currentUser && (path.startsWith("/dashboard") || path.startsWith("/profile") || path.startsWith("/env"))) {
+  if (
+    !auth.currentUser &&
+    (path.startsWith("/dashboard") ||
+      path.startsWith("/profile") ||
+      path.startsWith("/env") ||
+      path.startsWith("/complete-profile"))
+  ) {
     return redirect("/auth");
   }
   return null;

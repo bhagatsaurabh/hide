@@ -1,18 +1,24 @@
-import { useEffect } from "react";
+import { useCallback, useEffect } from "react";
 import { Outlet, useNavigate } from "react-router";
 import { useSelector } from "react-redux";
 import { useAppDispatch } from "@/hooks/store";
-import { fetchWorkspaces, selectWorkspaces } from "@/store/workspace";
-import { State } from "@/utils/types";
+import { fetchWorkspaces, selectWorkspaces, setConnected } from "@/store/workspace";
+import { connectSocket } from "@/config/socket";
 
 export const Dashboard = () => {
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
-  const { workspaces, state } = useSelector(selectWorkspaces);
+  const { workspaces, connected } = useSelector(selectWorkspaces);
+
+  const init = useCallback(async () => {
+    await connectSocket();
+    dispatch(setConnected(true));
+  }, [dispatch]);
 
   useEffect(() => {
     dispatch(fetchWorkspaces());
-  }, [dispatch]);
+    init();
+  }, [dispatch, init]);
 
   const handleCreate = () => {
     navigate("/dashboard/new");
@@ -24,7 +30,7 @@ export const Dashboard = () => {
   return (
     <>
       <div>{"Dashboard"}</div>
-      {state === State.PENDING ? (
+      {!connected ? (
         "Loading..."
       ) : (
         <>
