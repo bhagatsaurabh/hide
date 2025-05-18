@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useNavigate } from "react-router";
 import { Input, InputRef } from "@/components/common/Input/Input";
 import { useAppDispatch, useAppSelector } from "@/hooks/store";
@@ -25,7 +25,10 @@ export const CreateProfile = () => {
     }
   }, [navigate, status]);
 
-  const checkUsernameExistence = debounce(async (username: string) => await _checkUsernameExistence(username), 1000);
+  const checkUsernameExistence = useMemo(
+    () => debounce(async (username: string) => await _checkUsernameExistence(username), 1000),
+    []
+  );
   const _checkUsernameExistence = async (username: string) => {
     try {
       const res = await checkUsername(username);
@@ -48,8 +51,10 @@ export const CreateProfile = () => {
   };
   const handleUsernameChange = (username: string) => {
     setUsername(username);
-    checkUsernameExistence(username);
-    setUsernameCheckState("...");
+    if (usernameRegex.test(username)) {
+      checkUsernameExistence(username);
+      setUsernameCheckState("...");
+    }
   };
   const handleContinue = async () => {
     if (input.current?.validate(username)) return;
