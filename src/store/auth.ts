@@ -1,9 +1,7 @@
 import { createAsyncThunk, createSlice, PayloadAction } from "@reduxjs/toolkit";
-import { getAdditionalUserInfo, signInAnonymously } from "firebase/auth";
+import { getAdditionalUserInfo, signInAnonymously, UserCredential } from "firebase/auth";
 import type { RootState } from "@/store";
 import { auth, db } from "@/config/firebase";
-import { isAxiosError } from "axios";
-import { connectSocket } from "@/config/socket";
 import { storeUser } from "@/utils/driver";
 import { collection, doc, getDocs, query, setDoc, where } from "firebase/firestore";
 
@@ -45,80 +43,66 @@ export const authSlice = createSlice({
   },
 });
 
-export const handleNewUser = createAsyncThunk(
-  "auth/handle-new-user",
-  async (_, { dispatch, rejectWithValue, getState }) => {
+type UserProfile = { name: string; username: string };
+export const createProfile = createAsyncThunk<boolean, UserProfile>(
+  "auth/create-profile",
+  async ({ name, username }, { dispatch }) => {
     try {
       await storeUser(auth.currentUser!.uid);
 
-      // Set profile
-      const state = getState() as RootState;
-      await setDoc(doc(db, "users", state.auth.username), {
-        name: state.auth.name,
-        username: state.auth.username,
+      await setDoc(doc(db, "users", username), {
+        name,
+        username,
         uid: auth.currentUser!.uid,
       });
 
-      // Now the user is truly existing
-      await dispatch(handleExistingUser()).unwrap();
+      dispatch(setName(name));
+      dispatch(setUsername(username));
     } catch (error) {
-      if (isAxiosError(error)) return rejectWithValue(error.code);
-      setTimeout(() => location.reload(), 2000);
-      return rejectWithValue("Unexpected");
+      void error;
+      return false;
     }
+    return true;
   }
 );
 export const fetchProfile = createAsyncThunk("auth/fetch-profile", async (_, { dispatch }) => {
+  const qSnap = await getDocs(query(collection(db, "users"), where("uid", "==", auth.currentUser!.uid)));
+  const profileSnap = qSnap.docs[0];
+  if (!profileSnap.exists()) return null;
+
+  const profile = profileSnap.data();
+  dispatch(setUsername(profile.username));
+  dispatch(setName(profile.name));
+  return profile as UserProfile;
+});
+export const signIn = createAsyncThunk<void, { type: AuthType }>("auth/sign-in", async ({ type }, { dispatch }) => {
+  dispatch(setStatus(AuthStatus.SIGNING_IN));
+  let userCred: UserCredential | null = null;
+
   try {
-    const qSnap = await getDocs(query(collection(db, "users"), where("uid", "==", auth.currentUser!.uid)));
-    const profile = qSnap.docs[0].data();
-    dispatch(setUsername(profile.username));
-    dispatch(setName(profile.name));
-    return profile as { name: string; username: string };
+    if (type === AuthType.GUEST) {
+      userCred = await signInAnonymously(auth);
+    } else {
+      userCred = await signInAnonymously(auth);
+    }
   } catch (error) {
+    // notify.push({ type: "snackbar", status: "warn", message: "Something went wrong, please try again" });
+    dispatch(setStatus(AuthStatus.PENDING));
     console.log(error);
+    return;
+  }
+
+  if (getAdditionalUserInfo(userCred!)?.isNewUser) {
+    dispatch(setStatus(AuthStatus.INCOMPLETE_PROFILE));
+  } else {
+    const profile = await dispatch(fetchProfile()).unwrap();
+    if (profile) {
+      dispatch(setStatus(AuthStatus.SIGNED_IN));
+    } else {
+      dispatch(setStatus(AuthStatus.INCOMPLETE_PROFILE));
+    }
   }
 });
-export const handleExistingUser = createAsyncThunk(
-  "auth/handle-existing-user",
-  async (_, { dispatch, rejectWithValue }) => {
-    try {
-      // Fetch profile
-      const profile = await dispatch(fetchProfile()).unwrap();
-      if (!profile) {
-        return "incomplete";
-      }
-
-      await connectSocket();
-    } catch (error) {
-      console.log(error);
-      return rejectWithValue("Unexpected");
-    }
-  }
-);
-export const signIn = createAsyncThunk<void, { type: AuthType; name: string; username: string }>(
-  "auth/sign-in",
-  async ({ type, name, username }, { dispatch, rejectWithValue }) => {
-    dispatch(setStatus(AuthStatus.SIGNING_IN));
-    if (type === AuthType.GUEST) {
-      try {
-        const result = await signInAnonymously(auth);
-        dispatch(setUsername(username));
-        dispatch(setName(name));
-        if (getAdditionalUserInfo(result)?.isNewUser) {
-          await dispatch(handleNewUser()).unwrap();
-        } else {
-          await dispatch(handleExistingUser()).unwrap();
-        }
-        dispatch(setStatus(AuthStatus.SIGNED_IN));
-      } catch (error) {
-        console.log(error);
-        // notify.push({ type: "snackbar", status: "warn", message: "Something went wrong, please try again" });
-        return rejectWithValue(error);
-      }
-    }
-  }
-);
 export const signOut = createAsyncThunk("auth/sign-out", async () => {
   try {
     await auth.signOut();

@@ -3,18 +3,17 @@ import { isAxiosError } from "axios";
 import { WorkspaceCreateDTO, WorkspaceDTO } from "@/models/workspace";
 import { createWorkspace, getAllWorkspaces } from "@/services/workspace";
 import { RootState } from ".";
-import { State } from "@/utils/types";
 import { auth } from "@/config/firebase";
 import { storeSSHKey } from "@/utils/driver";
 
 type WorkspaceState = {
   workspaces: WorkspaceDTO[];
-  state: State;
+  connected: boolean;
 };
 
 const initialState: WorkspaceState = {
   workspaces: [],
-  state: State.INIT,
+  connected: false,
 };
 
 export const wsSlice = createSlice({
@@ -26,6 +25,9 @@ export const wsSlice = createSlice({
     },
     addWorkspace: (state, action: PayloadAction<WorkspaceDTO>) => {
       state.workspaces.push(action.payload);
+    },
+    setConnected: (state, action: PayloadAction<boolean>) => {
+      state.connected = action.payload;
     },
   },
 });
@@ -56,8 +58,9 @@ export const createNewWorkspace = createAsyncThunk<void, WorkspaceCreateDTO>(
   }
 );
 
-export const { setWorkspaces, addWorkspace } = wsSlice.actions;
+export const { setWorkspaces, addWorkspace, setConnected } = wsSlice.actions;
 
+export const selectConnected = (state: RootState) => state.workspace.connected;
 export const selectWorkspaces = (state: RootState) => state.workspace;
 export const selectWorkspace = (state: RootState, uuid: string) => {
   return state.workspace.workspaces.find((workspace) => workspace.uuid === uuid);
