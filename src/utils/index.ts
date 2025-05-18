@@ -31,10 +31,11 @@ export const debounce = <C extends (...args: never[]) => Promise<never> | Promis
   func: C,
   wait: number
 ) => {
-  let timeout: NodeJS.Timeout | null = null;
+  let timeout: number;
 
   return (...args: Parameters<C>): void => {
+    console.log(timeout);
     if (timeout) clearTimeout(timeout);
-    timeout = setTimeout(() => void func(...args), wait);
+    timeout = setTimeout(() => void func(...args), wait) as unknown as number;
   };
 };

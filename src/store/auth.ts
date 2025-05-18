@@ -68,7 +68,7 @@ export const createProfile = createAsyncThunk<boolean, UserProfile>(
 export const fetchProfile = createAsyncThunk("auth/fetch-profile", async (_, { dispatch }) => {
   const qSnap = await getDocs(query(collection(db, "users"), where("uid", "==", auth.currentUser!.uid)));
   const profileSnap = qSnap.docs[0];
-  if (!profileSnap.exists()) return null;
+  if (!profileSnap || !profileSnap.exists()) return null;
 
   const profile = profileSnap.data();
   dispatch(setUsername(profile.username));
@@ -79,6 +79,7 @@ export const signIn = createAsyncThunk<void, { type: AuthType }>("auth/sign-in",
   dispatch(setStatus(AuthStatus.SIGNING_IN));
   let userCred: UserCredential | null = null;
 
+  console.log("yep");
   try {
     if (type === AuthType.GUEST) {
       userCred = await signInAnonymously(auth);
