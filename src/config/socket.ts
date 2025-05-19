@@ -1,15 +1,17 @@
 import { io, Socket } from "socket.io-client";
-import { DefaultEventsMap } from "socket.io";
 
 import { auth } from "./firebase";
-import { InSocketMessage } from "@/models/common";
+import { InSocketMessage, OutSocketMessage } from "@/models/common";
 
 export interface InSocketEventsMap {
   ssh: (msg: InSocketMessage<"ssh">) => void;
   fs: (msg: InSocketMessage<"fs">) => void;
   notification: (msg: InSocketMessage<"notification">) => void;
 }
-type TypedSocket = Socket<InSocketEventsMap, DefaultEventsMap>;
+export interface OutSocketEventsMap {
+  msg: (msg: OutSocketMessage) => void;
+}
+export type TypedSocket = Socket<InSocketEventsMap, OutSocketEventsMap>;
 let socket: TypedSocket;
 
 export const connectSocket = async () => {

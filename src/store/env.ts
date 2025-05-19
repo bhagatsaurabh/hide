@@ -1,5 +1,6 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { State } from "@/utils/types";
+import { RootState } from ".";
 
 type EnvState = {
   uuid: string;
@@ -22,5 +23,7 @@ export const envSlice = createSlice({
 });
 
 export const { setUuid } = envSlice.actions;
+
+export const selectActiveUuid = (state: RootState) => state.env.uuid;
 
 export default envSlice.reducer;

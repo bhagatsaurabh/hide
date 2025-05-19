@@ -1,4 +1,5 @@
 import { InSocketMessagePayload } from "./common";
+import { OutSocketMessageEnv } from "./env";
 
 export interface FSOpenDTO {
   name: string;
@@ -43,3 +44,16 @@ export type FSPayload = {
     payload: FSResponseMap[K];
   };
 }[keyof FSResponseMap];
+
+////////
+
+export type FSAction = "fs.sync" | "fs.close";
+
+export interface FSSyncOut extends OutSocketMessageEnv {
+  path: string;
+  buf: string;
+}
+
+export interface FSClose extends OutSocketMessageEnv {
+  path: string;
+}

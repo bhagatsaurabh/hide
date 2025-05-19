@@ -1,5 +1,5 @@
 import { createAsyncThunk, createSlice, PayloadAction } from "@reduxjs/toolkit";
-import { isAxiosError } from "axios";
+
 import { WorkspaceCreateDTO, WorkspaceDTO } from "@/models/workspace";
 import { createWorkspace, getAllWorkspaces } from "@/services/workspace";
 import { RootState } from ".";
@@ -32,28 +32,24 @@ export const wsSlice = createSlice({
   },
 });
 
-export const fetchWorkspaces = createAsyncThunk("workspace/get-all", async (_, { rejectWithValue, dispatch }) => {
+export const fetchWorkspaces = createAsyncThunk("workspace/get-all", async (_, { dispatch }) => {
   try {
     const res = await getAllWorkspaces();
     dispatch(setWorkspaces(res.data));
   } catch (error) {
     console.log(error);
-    if (isAxiosError(error)) return rejectWithValue(error.code);
-    return rejectWithValue("Unexpected");
   }
 });
 
 export const createNewWorkspace = createAsyncThunk<void, WorkspaceCreateDTO>(
   "workspace/create",
-  async (data, { rejectWithValue, dispatch }) => {
+  async (data, { dispatch }) => {
     try {
       const { workspace, privateKey } = (await createWorkspace(data)).data;
       await storeSSHKey(auth.currentUser!.uid, workspace.uuid, privateKey);
       dispatch(addWorkspace(workspace));
     } catch (error) {
       console.log(error);
-      if (isAxiosError(error)) return rejectWithValue(error.code);
-      return rejectWithValue("Unexpected");
     }
   }
 );
