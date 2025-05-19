@@ -1,7 +1,7 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import { useEffect } from "react";
 import { getAuth, onAuthStateChanged } from "firebase/auth";
-import { selectStatus, setStatus, AuthStatus, fetchProfile } from "@/store/auth";
+import { selectStatus, setStatus, AuthStatus, fetchProfile, setUsername, setName } from "@/store/auth";
 import { app } from "@/config/firebase";
 import { useAppDispatch, useAppSelector } from "@/hooks/store";
 
@@ -25,6 +25,8 @@ const AuthListener = () => {
         }
       } else {
         dispatch(setStatus(AuthStatus.SIGNED_OUT));
+        dispatch(setUsername(""));
+        dispatch(setName(""));
       }
     });
 

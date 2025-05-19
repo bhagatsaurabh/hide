@@ -1,4 +1,5 @@
 import { InSocketMessagePayload } from "./common";
+import { OutSocketMessageEnv } from "./env";
 
 export interface SSHError extends InSocketMessagePayload {
   message: string;
@@ -26,3 +27,19 @@ export type SSHPayload = {
     payload: SSHResponseMap[K];
   };
 }[keyof SSHResponseMap];
+
+///////
+
+export type SSHAction = "ssh.request" | "ssh.data" | "ssh.close" | "ssh.closeall";
+
+export interface SSHRequest extends OutSocketMessageEnv {
+  privateKey: string;
+}
+export interface SSHData extends OutSocketMessageEnv {
+  sessionId: string;
+  input: string;
+}
+export interface SSHClose extends OutSocketMessageEnv {
+  sessionId: string;
+}
+export type SSHCloseAll = OutSocketMessageEnv;

@@ -59,22 +59,7 @@ export const Explorer = ({ uuid }: ExplorerProps) => {
         break;
     }
   };
-  const setListeners = () => {
-    socket.on("fs", handleFSMessage);
-  };
-
-  useEffect(() => {
-    init();
-    setListeners();
-
-    return () => {
-      socket.off("fs", handleFSMessage);
-      socket.emit("msg", { service: "env", action: "fs.close", payload: { uuid, path: "/" } });
-    };
-  }, [init, uuid]);
-  useEffect(() => void handleStalePaths(), [fs.stalePaths]);
-
-  const handleStalePaths = async () => {
+  const handleStalePaths = useCallback(async () => {
     // Unwatch all stale paths
     await Promise.all(fs.stalePaths.map((pathPair) => closeDir(uuid, pathPair[0])));
     // Watch all new "moved" paths
@@ -89,7 +74,20 @@ export const Explorer = ({ uuid }: ExplorerProps) => {
       }
     });
     fsDispatch({ type: "CLEAR_STALE", payload: null });
-  };
+  }, [fs.stalePaths, uuid]);
+
+  useEffect(() => {
+    init();
+    socket.on("fs", handleFSMessage);
+
+    return () => {
+      socket.off("fs", handleFSMessage);
+      socket.emit("msg", { service: "env", action: "fs.close", payload: { uuid, path: "/" } });
+    };
+  }, [init, uuid]);
+  useEffect(() => {
+    handleStalePaths();
+  }, [fs.stalePaths, handleStalePaths]);
 
   const open = async (path: string, isDir: boolean) => {
     if (isDir) {

@@ -9,6 +9,7 @@ export const Create = () => {
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
   const [image, setImage] = useState("hide-env-node-dev");
+  void setImage;
   const [busy, setBusy] = useState(false);
   const nameInput = useRef<InputRef>(null);
   const descInput = useRef<InputRef>(null);

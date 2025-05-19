@@ -52,7 +52,7 @@ export const Input = ({
 
   useEffect(() => {
     if (focus) native.current?.focus();
-  }, []);
+  }, [focus]);
   useImperativeHandle(ref, () => ({
     native: native.current!,
     validate,

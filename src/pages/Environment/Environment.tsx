@@ -1,16 +1,18 @@
 import { useEffect, useRef, useState } from "react";
 import { useLoaderData } from "react-router";
-import { workspaceLoader } from "@/router/guards";
 import { Terminal } from "@xterm/xterm";
 import { FitAddon } from "@xterm/addon-fit";
 import { ClipboardAddon } from "@xterm/addon-clipboard";
 import { WebLinksAddon } from "@xterm/addon-web-links";
+
+import { workspaceLoader } from "@/router/guards";
 import { socket } from "@/config/socket";
 import { getSSHKey } from "@/utils/driver";
 import { auth } from "@/config/firebase";
 import { useAppDispatch } from "@/hooks/store";
 import { Explorer } from "@/components/Explorer/Explorer";
 import { SSHClosed, SSHError, SSHOpen, SSHOutput } from "@/models/ssh";
+import { OutSocketMessage } from "@/models/common";
 
 export const Environment = () => {
   const workspace = useLoaderData<typeof workspaceLoader>();
@@ -20,7 +22,11 @@ export const Environment = () => {
   const dispatch = useAppDispatch();
 
   useEffect(() => {
-    const msg = { service: "env", action: "ping", payload: { uuid: workspace.uuid } };
+    const msg: OutSocketMessage = {
+      service: "env",
+      action: "ping",
+      payload: { uuid: workspace.uuid },
+    };
     const heartbeat = setInterval(() => socket.emit("msg", msg), 5000);
     return () => clearInterval(heartbeat);
   }, [workspace.uuid]);
@@ -68,8 +74,8 @@ export const Environment = () => {
       service: "env",
       action: "ssh.request",
       payload: {
-        privateKey,
         uuid: workspace.uuid,
+        privateKey,
       },
     });
   };
@@ -113,7 +119,7 @@ export const Environment = () => {
   };
 
   const handleCloseTerminal = () => {
-    socket.emit("msg", { service: "env", action: "ssh.close", uuid: workspace.uuid, sessionId });
+    socket.emit("msg", { service: "env", action: "ssh.close", payload: { uuid: workspace.uuid, sessionId } });
     setSessionId("");
     term.current?.dispose();
   };

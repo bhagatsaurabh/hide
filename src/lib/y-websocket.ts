@@ -9,6 +9,7 @@ import { Socket } from "socket.io-client";
 import { FSSync } from "@/models/filesystem";
 import { base64ToU8, u8ToBase64 } from "@/utils";
 import { InSocketMessage } from "@/models/common";
+import { TypedSocket } from "@/config/socket";
 
 export const messageSync = 0;
 export const messageQueryAwareness = 3;
@@ -51,7 +52,7 @@ export class WebsocketProvider {
 
   constructor(
     public uuid: string,
-    public socket: Socket,
+    public socket: TypedSocket,
     public doc: Doc,
     public path: string,
     { awareness = new awarenessProtocol.Awareness(doc), resyncInterval = -1 } = {}
@@ -72,8 +73,8 @@ export class WebsocketProvider {
             action: "fs.sync",
             payload: {
               uuid: this.uuid,
-              buf: u8ToBase64(encoding.toUint8Array(encoder)),
               path: this.path,
+              buf: u8ToBase64(encoding.toUint8Array(encoder)),
             },
           });
         }
@@ -120,8 +121,8 @@ export class WebsocketProvider {
       action: "fs.sync",
       payload: {
         uuid: this.uuid,
-        buf: u8ToBase64(encoding.toUint8Array(encoder)),
         path: this.path,
+        buf: u8ToBase64(encoding.toUint8Array(encoder)),
       },
     });
     if (this.awareness.getLocalState() !== null) {
@@ -136,8 +137,8 @@ export class WebsocketProvider {
         action: "fs.sync",
         payload: {
           uuid: this.uuid,
-          buf: u8ToBase64(encoding.toUint8Array(encoderAwarenessState)),
           path: this.path,
+          buf: u8ToBase64(encoding.toUint8Array(encoderAwarenessState)),
         },
       });
     }
@@ -152,8 +153,8 @@ export class WebsocketProvider {
           action: "fs.sync",
           payload: {
             uuid: this.uuid,
-            buf: u8ToBase64(encoding.toUint8Array(encoder)),
             path: this.path,
+            buf: u8ToBase64(encoding.toUint8Array(encoder)),
           },
         });
       }
@@ -172,14 +173,14 @@ export class WebsocketProvider {
     }
     return encoder;
   }
-  sendMessage(socket: Socket, buf: Uint8Array) {
+  sendMessage(socket: TypedSocket, buf: Uint8Array) {
     socket.emit("msg", {
       service: "env",
       action: "fs.sync",
       payload: {
         uuid: this.uuid,
-        buf: u8ToBase64(buf),
         path: this.path,
+        buf: u8ToBase64(buf),
       },
     });
   }

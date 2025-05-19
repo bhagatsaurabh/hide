@@ -79,7 +79,6 @@ export const signIn = createAsyncThunk<void, { type: AuthType }>("auth/sign-in",
   dispatch(setStatus(AuthStatus.SIGNING_IN));
   let userCred: UserCredential | null = null;
 
-  console.log("yep");
   try {
     if (type === AuthType.GUEST) {
       userCred = await signInAnonymously(auth);
@@ -107,7 +106,6 @@ export const signIn = createAsyncThunk<void, { type: AuthType }>("auth/sign-in",
 export const signOut = createAsyncThunk("auth/sign-out", async () => {
   try {
     await auth.signOut();
-    // dispatch(clearUser());
   } catch (error) {
     console.log(error);
     // notify.push({ type: "snackbar", status: "warn", message: "Something went wrong, please try again" });

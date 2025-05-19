@@ -6,7 +6,7 @@ export const storeSSHKey = async (uid: string, workspaceUUID: string, sshKey: st
 };
 
 export const getSSHKey = async (uid: string, workspaceUUID: string) => {
-  return await getObject(`sshkeys:${uid}`, workspaceUUID);
+  return await getObject<string>(`sshkeys:${uid}`, workspaceUUID);
 };
 
 export const storeUser = async (uid: string) => {
