@@ -15,7 +15,7 @@ export const Heartbeat = () => {
       const msg: OutSocketMessage = { service: "presence", action: "ping", payload: { uuid } };
       handle = setInterval(() => {
         socket.emit("msg", msg);
-      }, 10000) as unknown as number;
+      }, 6000) as unknown as number;
     }
 
     return () => clearInterval(handle);

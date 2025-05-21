@@ -19,12 +19,14 @@ interface AuthState {
   status: AuthStatus;
   username: string;
   name: string;
+  uid: string;
 }
 
 const initialState: AuthState = {
   status: AuthStatus.PENDING,
   username: "",
   name: "",
+  uid: "",
 };
 
 export const authSlice = createSlice({
@@ -39,6 +41,9 @@ export const authSlice = createSlice({
     },
     setName: (state, action: PayloadAction<string>) => {
       state.name = action.payload;
+    },
+    setUid: (state, action: PayloadAction<string>) => {
+      state.uid = action.payload;
     },
   },
 });
@@ -58,6 +63,7 @@ export const createProfile = createAsyncThunk<boolean, UserProfile>(
 
       dispatch(setName(name));
       dispatch(setUsername(username));
+      dispatch(setUid(auth.currentUser!.uid));
     } catch (error) {
       void error;
       return false;
@@ -73,6 +79,7 @@ export const fetchProfile = createAsyncThunk("auth/fetch-profile", async (_, { d
   const profile = profileSnap.data();
   dispatch(setUsername(profile.username));
   dispatch(setName(profile.name));
+  dispatch(setUid(auth.currentUser!.uid));
   return profile as UserProfile;
 });
 export const signIn = createAsyncThunk<void, { type: AuthType }>("auth/sign-in", async ({ type }, { dispatch }) => {
@@ -112,7 +119,7 @@ export const signOut = createAsyncThunk("auth/sign-out", async () => {
   }
 });
 
-export const { setStatus, setUsername, setName } = authSlice.actions;
+export const { setStatus, setUsername, setName, setUid } = authSlice.actions;
 
 export const selectStatus = (state: RootState) => state.auth.status;
 
