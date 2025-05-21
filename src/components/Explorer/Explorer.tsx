@@ -4,7 +4,6 @@ import { Doc } from "yjs";
 import { editor } from "monaco-editor";
 import { MonacoBinding } from "y-monaco";
 import { FileNode } from "../FileNode/FileNode";
-import { closeDir, closeFile, openDir, openFile, saveFile } from "@/services/env";
 import { socket } from "@/config/socket";
 import { EnvContext } from "@/pages/Environment/context";
 import { WebsocketProvider } from "@/lib/y-websocket";
@@ -34,9 +33,9 @@ export const Explorer = ({ uuid }: ExplorerProps) => {
 
   const init = useCallback(async () => {
     try {
-      const res = await openDir(uuid, "/");
+      /* const res = await openDir(uuid, "/");
       const nodes = res.data as unknown as FNode[];
-      fsDispatch({ type: "LOAD", payload: { path: "/", nodes } });
+      fsDispatch({ type: "LOAD", payload: { path: "/", nodes } }); */
     } catch (error) {
       console.log(error);
     }
@@ -61,10 +60,10 @@ export const Explorer = ({ uuid }: ExplorerProps) => {
   };
   const handleStalePaths = useCallback(async () => {
     // Unwatch all stale paths
-    await Promise.all(fs.stalePaths.map((pathPair) => closeDir(uuid, pathPair[0])));
+    // await Promise.all(fs.stalePaths.map((pathPair) => closeDir(uuid, pathPair[0])));
     // Watch all new "moved" paths
     const newPaths = fs.stalePaths.filter((pathPair) => !!pathPair[1]).map((pathPair) => pathPair[1]!);
-    const resps = await Promise.all(newPaths.map((newPath) => openDir(uuid, newPath)));
+    /* const resps = await Promise.all(newPaths.map((newPath) => openDir(uuid, newPath)));
     newPaths.forEach((newPath, idx) => {
       if (resps?.[idx]?.data) {
         fsDispatch({
@@ -72,7 +71,7 @@ export const Explorer = ({ uuid }: ExplorerProps) => {
           payload: { path: newPath, nodes: resps[idx].data as unknown as FNode[], forceOpen: true },
         });
       }
-    });
+    }); */
     fsDispatch({ type: "CLEAR_STALE", payload: null });
   }, [fs.stalePaths, uuid]);
 
@@ -92,9 +91,9 @@ export const Explorer = ({ uuid }: ExplorerProps) => {
   const open = async (path: string, isDir: boolean) => {
     if (isDir) {
       try {
-        const res = await openDir(uuid, path);
+        /* const res = await openDir(uuid, path);
         const nodes = res.data as unknown as FNode[];
-        fsDispatch({ type: "LOAD", payload: { path, nodes } });
+        fsDispatch({ type: "LOAD", payload: { path, nodes } }); */
       } catch (error) {
         console.log(error);
       }
@@ -112,7 +111,7 @@ export const Explorer = ({ uuid }: ExplorerProps) => {
         const yText = doc.getText("monaco");
         const provider = new WebsocketProvider(uuid, socket, doc, path);
         const binding = new MonacoBinding(yText, model, new Set([codeEditor]), provider.awareness);
-        await openFile(uuid, path);
+        // await openFile(uuid, path);
         fsDispatch({ type: "OPEN_FILE", payload: { path, provider, binding, editor: codeEditor, doc } });
       } catch (error) {
         console.log(error);
@@ -122,14 +121,14 @@ export const Explorer = ({ uuid }: ExplorerProps) => {
   const close = async (path: string, isDir: boolean) => {
     if (isDir) {
       try {
-        await closeDir(uuid, path);
+        // await closeDir(uuid, path);
         fsDispatch({ type: "UNLOAD", payload: { path } });
       } catch (error) {
         console.log(error);
       }
     } else {
       try {
-        await closeFile(uuid, path);
+        // await closeFile(uuid, path);
         fsDispatch({ type: "CLOSE_FILE", payload: { path } });
       } catch (error) {
         console.log(error);
@@ -138,7 +137,7 @@ export const Explorer = ({ uuid }: ExplorerProps) => {
   };
   const save = async (path: string) => {
     try {
-      await saveFile(uuid, path);
+      // await saveFile(uuid, path);
     } catch (error) {
       console.log(error);
     }
