@@ -59,6 +59,7 @@ export type OutSocketMessage = {
       service: T;
       action: S;
       payload: OutSocketMessagePayloadMap[T][S];
+      correlationId?: string;
     };
   }[keyof OutSocketMessagePayloadMap[T]];
 }[keyof OutSocketMessagePayloadMap];

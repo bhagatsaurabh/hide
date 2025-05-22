@@ -1,9 +1,4 @@
-import api from "@/config/axios";
-import { FSOpenDTO } from "@/models/filesystem";
 
-export const open = async (wsUuid: string) => {
-  return await api.get<FSOpenDTO[]>(`/env/${wsUuid}`);
-};
 
 /* export const closeDir = async (wsUuid: string, path: string) => {
   return await api.post<FSOpenDTO[]>(`/workspace-${wsUuid}/dir/close`, { path });
