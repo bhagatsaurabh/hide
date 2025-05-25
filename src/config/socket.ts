@@ -13,11 +13,10 @@ export interface OutSocketEventsMap {
 }
 export type TypedSocket = Socket<InSocketEventsMap, OutSocketEventsMap>;
 let socket: TypedSocket;
-let socketId: string | undefined;
 
 const getAuth = (token: string) => ({
   token,
-  previousId: socketId,
+  sessionId: sessionStorage.getItem("sessionId"),
 });
 export const connectSocket = async () => {
   const token = await auth.currentUser?.getIdToken();
@@ -30,7 +29,6 @@ export const connectSocket = async () => {
       socket = io(import.meta.env.VITE_HIDE_WS_SERVER, { auth: (cb) => cb(getAuth(token)) });
 
       socket.on("connect", () => {
-        socketId = socket.id;
         resolve(socket);
       });
       socket.io.on("error", (err) => reject(err));

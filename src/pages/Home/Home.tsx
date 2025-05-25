@@ -1,6 +1,7 @@
 import { Link, useNavigate } from "react-router";
 import { useAppDispatch, useAppSelector } from "@/hooks/store";
 import { AuthStatus, selectStatus, signOut } from "@/store/auth";
+import { NotificationBar } from "@/components/NotificationBar/NotificationBar";
 
 export const Home = () => {
   const authStatus = useAppSelector(selectStatus);
@@ -14,6 +15,7 @@ export const Home = () => {
     <>
       <div>{"Home"}</div>
       <Link to="/features">Features</Link>
+      <NotificationBar />
       <br />
       {authStatus === AuthStatus.SIGNED_OUT && <Link to="/auth">Sign In</Link>}
       {authStatus === AuthStatus.SIGNED_IN && (
