@@ -1,24 +1,18 @@
-import { useCallback, useEffect } from "react";
+import { useEffect } from "react";
 import { Outlet, useNavigate } from "react-router";
 import { useSelector } from "react-redux";
 import { useAppDispatch } from "@/hooks/store";
-import { fetchWorkspaces, selectWorkspaces, setConnected } from "@/store/workspace";
-import { connectSocket } from "@/config/socket";
+import { fetchWorkspaces, selectWorkspaces } from "@/store/workspace";
+import { NotificationBar } from "@/components/NotificationBar/NotificationBar";
 
 export const Dashboard = () => {
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
   const { workspaces, connected } = useSelector(selectWorkspaces);
 
-  const init = useCallback(async () => {
-    await connectSocket();
-    dispatch(setConnected(true));
-  }, [dispatch]);
-
   useEffect(() => {
     dispatch(fetchWorkspaces());
-    init();
-  }, [dispatch, init]);
+  }, [dispatch]);
 
   const handleCreate = () => {
     navigate("/dashboard/new");
@@ -30,6 +24,7 @@ export const Dashboard = () => {
   return (
     <>
       <div>{"Dashboard"}</div>
+      <NotificationBar />
       {!connected ? (
         "Loading..."
       ) : (

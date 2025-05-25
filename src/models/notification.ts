@@ -28,3 +28,7 @@ export interface ExclusionData extends UserNotificationPayload {
   actorId: string;
   workspaceUUID: string;
 }
+
+export type NotificationReadDTO = {
+  id: string;
+};
