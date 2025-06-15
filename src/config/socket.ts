@@ -7,6 +7,7 @@ export interface InSocketEventsMap {
   ssh: (msg: InSocketMessage<"ssh">) => void;
   fs: (msg: InSocketMessage<"fs">) => void;
   notification: (msg: InSocketMessage<"notification">) => void;
+  env: (msg: InSocketMessage<"env">) => void;
 }
 export interface OutSocketEventsMap {
   msg: (msg: OutSocketMessage) => void;

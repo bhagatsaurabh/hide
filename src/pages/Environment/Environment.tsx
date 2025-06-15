@@ -34,9 +34,10 @@ export const Environment = () => {
     return () => {
       socket.emit("msg", {
         service: "env",
-        action: "ssh.closeall",
+        action: "ssh.close",
         payload: {
           uuid: workspace.uuid,
+          sessionId: "#all",
         },
       });
       term.current?.dispose();
@@ -116,6 +117,7 @@ export const Environment = () => {
   };
   const handleSSHClosed = (payload: SSHClosed) => {
     term.current?.write(`Disconnected: ${payload.sessionId}`);
+    term.current?.dispose();
   };
 
   const handleCloseTerminal = () => {
