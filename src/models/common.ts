@@ -1,15 +1,18 @@
-import { EnvPing, OutSocketMessageEnv } from "./env";
-import { FSClose, FSPayload, FSSyncOut } from "./filesystem";
+import { EnvPayload, EnvPing, OutSocketMessageEnv } from "./env";
+import { FSClose, FSOpen, FSPayload, FSSyncOut } from "./filesystem";
 import { NotificationPayload } from "./notification";
 import { OutSocketMessagePresence, PresencePing } from "./presence";
-import { SSHClose, SSHCloseAll, SSHData, SSHPayload, SSHRequest } from "./ssh";
+import { SSHClose, SSHData, SSHPayload, SSHRequest } from "./ssh";
 
 export type InSocketMessageActionMap = {
   ssh: SSHPayload;
   fs: FSPayload;
   notification: NotificationPayload;
+  env: EnvPayload;
 };
 export type InSocketMessagePayload = {
+  correlationId?: string;
+  error?: { code: string };
   [key: string]: unknown;
 };
 
@@ -34,7 +37,7 @@ export type OutSocketMessagePayloadMap = EnforcedOutSocketMessagePayloadActionMa
     "ssh.request": SSHRequest;
     "ssh.data": SSHData;
     "ssh.close": SSHClose;
-    "ssh.closeall": SSHCloseAll;
+    "fs.open": FSOpen;
     "fs.sync": FSSyncOut;
     "fs.close": FSClose;
     ping: EnvPing;

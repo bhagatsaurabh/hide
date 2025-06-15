@@ -40,6 +40,5 @@ export interface SSHData extends OutSocketMessageEnv {
   input: string;
 }
 export interface SSHClose extends OutSocketMessageEnv {
-  sessionId: string;
+  sessionId: "#all" | string;
 }
-export type SSHCloseAll = OutSocketMessageEnv;
