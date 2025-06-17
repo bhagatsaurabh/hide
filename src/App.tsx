@@ -4,6 +4,7 @@ import { RouterProvider } from "react-router";
 import router from "./router";
 import AuthListener from "./components/AuthListener/AuthListener";
 import { openDB } from "./config/database";
+import { Heartbeat } from "./components/Heartbeat/Heartbeat";
 
 function App() {
   const [ready, setReady] = useState(false);
@@ -24,6 +25,7 @@ function App() {
       ) : (
         <>
           <AuthListener />
+          <Heartbeat />
           <RouterProvider router={router} />
         </>
       )}

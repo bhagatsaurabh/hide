@@ -12,7 +12,7 @@ export const Heartbeat = () => {
   useEffect(() => {
     let handle = -1;
     if (connected) {
-      const msg: OutSocketMessage = { service: "presence", action: "ping", payload: { uuid } };
+      const msg: OutSocketMessage = { service: "presence", action: "session.ping", payload: { uuid } };
       handle = setInterval(() => {
         socket.emit("msg", msg);
       }, 6000) as unknown as number;
