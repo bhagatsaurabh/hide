@@ -7,6 +7,9 @@ import { uuidv4 as uuid } from "lib0/random.js";
 export const open = async (wsUuid: string) => {
   return await api.post<FSOpenDTO[]>(`/env/open`, { uuid: wsUuid });
 };
+export const close = async (wsUuid: string) => {
+  return await api.post<FSOpenDTO[]>(`/env/close`, { uuid: wsUuid });
+};
 export const openPath = async <T extends InSocketMessagePayload>(wsUuid: string, path: string) =>
   new Promise<T>((res, rej) => {
     const correlationId = uuid();
