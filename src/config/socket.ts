@@ -3,12 +3,14 @@ import { io, Socket } from "socket.io-client";
 import { auth } from "./firebase";
 import { InSocketMessage, OutSocketMessage } from "@/models/common";
 
-export interface InSocketEventsMap {
+export type InSocketEventsMap = {
   ssh: (msg: InSocketMessage<"ssh">) => void;
   fs: (msg: InSocketMessage<"fs">) => void;
   notification: (msg: InSocketMessage<"notification">) => void;
   env: (msg: InSocketMessage<"env">) => void;
-}
+} & {
+  [key: string]: (msg: InSocketMessage<string>) => void;
+};
 export interface OutSocketEventsMap {
   msg: (msg: OutSocketMessage) => void;
 }

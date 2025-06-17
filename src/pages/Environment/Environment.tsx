@@ -12,7 +12,6 @@ import { auth } from "@/config/firebase";
 import { useAppDispatch } from "@/hooks/store";
 import { Explorer } from "@/components/Explorer/Explorer";
 import { SSHClosed, SSHError, SSHOpen, SSHOutput } from "@/models/ssh";
-import { OutSocketMessage } from "@/models/common";
 
 export const Environment = () => {
   const workspace = useLoaderData<typeof workspaceLoader>();
@@ -21,15 +20,6 @@ export const Environment = () => {
   const [sessionId, setSessionId] = useState("");
   const dispatch = useAppDispatch();
 
-  useEffect(() => {
-    const msg: OutSocketMessage = {
-      service: "env",
-      action: "ping",
-      payload: { uuid: workspace.uuid },
-    };
-    const heartbeat = setInterval(() => socket.emit("msg", msg), 5000);
-    return () => clearInterval(heartbeat);
-  }, [workspace.uuid]);
   useEffect(() => {
     return () => {
       socket.emit("msg", {

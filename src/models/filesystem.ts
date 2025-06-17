@@ -26,7 +26,7 @@ export interface FSBlock extends InSocketMessagePayload {
   path: string;
 }
 export type FSResume = FSBlock;
-export type FSNoop = InSocketMessagePayload;
+export type FSLost = FSBlock;
 export interface FSSync extends InSocketMessagePayload {
   uuid: string;
   path: string;
@@ -38,13 +38,20 @@ export interface FSDirEntries extends InSocketMessagePayload {
 export interface FSFile extends InSocketMessagePayload {
   content: string;
 }
+export interface FSDirEntries extends InSocketMessagePayload {
+  entries: FSOpenDTO[];
+}
+export interface FSFile extends InSocketMessagePayload {
+  content: string;
+}
+export type FSNoop = InSocketMessagePayload;
 
 export type FSResponseMap = {
-  "open.reply": FSDirEntries | FSFile | FSNoop;
   batch: FSEventBatch;
   block: FSBlock;
   resume: FSResume;
   sync: FSSync;
+  lost: FSLost;
 };
 export type FSPayload = {
   [K in keyof FSResponseMap]: {
