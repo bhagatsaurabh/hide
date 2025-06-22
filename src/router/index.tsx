@@ -1,7 +1,6 @@
 import { createBrowserRouter, Outlet } from "react-router";
 import { Home } from "@/pages/Home/Home";
 import { Auth } from "@/pages/Auth/Auth";
-import { Features } from "@/pages/Features/Features";
 import { Dashboard } from "@/pages/Dashboard/Dashboard";
 import { Create } from "@/pages/Create/Create";
 import { Project } from "@/pages/Project/Project";
@@ -17,11 +16,6 @@ const router = createBrowserRouter([
     element: <Home />,
     errorElement: <CrashBoard />,
     loader: authGuard,
-  },
-  {
-    path: "/features",
-    element: <Features />,
-    errorElement: <CrashBoard />,
   },
   {
     path: "/auth",

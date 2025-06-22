@@ -6,8 +6,8 @@
   "scripts": {
     "dev": "vite",
     "build": "tsc -b && vite build",
+    "preemulate": "caddy start",
     "emulate": "firebase emulators:start --import ./.emulatorstate --export-on-exit ./.emulatorstate",
-    "caddy:start": "caddy start",
     "caddy:stop": "caddy stop",
     "lint": "eslint .",
     "preview": "vite preview"
@@ -23,12 +23,13 @@
     "firebase": "^11.3.1",
     "lib0": "^0.2.107",
     "monaco-editor": "^0.52.2",
-    "motion": "^12.4.3",
+    "motion": "^12.18.1",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
     "react-redux": "^9.2.0",
     "react-router": "^7.1.5",
     "socket.io-client": "^4.8.1",
+    "vite-plugin-svgr": "^4.3.0",
     "y-monaco": "^0.1.6",
     "y-protocols": "^1.0.6",
     "yjs": "^13.6.26"

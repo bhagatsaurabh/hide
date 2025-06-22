@@ -5,6 +5,7 @@ import "@xterm/xterm/css/xterm.css";
 import App from "./App.tsx";
 import store from "@/store";
 import "@/config/workers.ts";
+import "@/styles/utils.css";
 
 createRoot(document.getElementById("root")!).render(
   <Provider store={store}>

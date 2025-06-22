@@ -3,7 +3,7 @@ import { Outlet, useNavigate } from "react-router";
 import { useSelector } from "react-redux";
 import { useAppDispatch } from "@/hooks/store";
 import { fetchWorkspaces, selectWorkspaces } from "@/store/workspace";
-import { NotificationBar } from "@/components/NotificationBar/NotificationBar";
+import { NotificationBar } from "@/components/Notifications/Notifications";
 
 export const Dashboard = () => {
   const navigate = useNavigate();
