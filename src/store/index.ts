@@ -3,6 +3,7 @@ import authReducer from "./auth";
 import wsReducer from "./workspace";
 import envReducer from "./env";
 import ntfnsReducer from "./notifications";
+import navReducer from "./navigation";
 
 const store = configureStore({
   reducer: {
@@ -10,6 +11,7 @@ const store = configureStore({
     workspace: wsReducer,
     env: envReducer,
     notifications: ntfnsReducer,
+    navigation: navReducer,
   },
 });
 

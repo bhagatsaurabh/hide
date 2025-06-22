@@ -1,0 +1,9 @@
+.logoname {
+  user-select: none;
+  font-weight: 900;
+  font-style: italic;
+  color: #f4f4f4;
+}
+.logoname.light {
+  color: #3b3b3b;
+}

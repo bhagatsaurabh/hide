@@ -1,0 +1,83 @@
+.button {
+  display: flex;
+  align-items: center;
+  background-color: transparent;
+  padding: 0.5rem 1.5rem;
+  transition: all 0.1s linear;
+  white-space: nowrap;
+  border-radius: var(--border-radius);
+}
+.button.primary {
+  color: rgb(248, 248, 248);
+  text-shadow: 0px 0px 5px #000000;
+  border: 1px solid rgba(196, 196, 196, 0.553);
+}
+.button.secondary {
+  color: #383838;
+  text-shadow: 0px 0px 5px rgb(255, 255, 255);
+}
+.button.fit {
+  padding: 0;
+  border: none;
+  border-radius: 999px;
+}
+
+.button.secondary:disabled {
+  opacity: 0.5;
+  color: #6a6a6a;
+  box-shadow: 2px 2px 5px 0px rgb(226, 226, 226);
+}
+.button.primary:disabled {
+  opacity: 0.5;
+  color: #909090;
+  box-shadow: 2px 2px 5px 0px rgb(27, 27, 27);
+}
+.button.flat.secondary:disabled {
+  box-shadow: 2px 2px 5px 0px rgb(226, 226, 226) inset;
+}
+.button.flat.primary:disabled {
+  box-shadow: 2px 2px 5px 0px rgb(27, 27, 27) inset;
+}
+.button.secondary:active {
+  border: 0px solid rgba(196, 196, 196, 0.553);
+  box-shadow: 0px 0px 0px 0px rgb(226, 226, 226), 4px 4px 10px 0px rgb(226, 226, 226) inset;
+}
+.button.primary:active {
+  border: 0px solid rgba(196, 196, 196, 0.553);
+  box-shadow: 0px 0px 0px 0px rgb(27, 27, 27), 4px 4px 10px 0px rgb(27, 27, 27) inset;
+}
+
+@media (hover: hover) {
+  .button {
+    cursor: pointer;
+  }
+  .button:disabled {
+    cursor: not-allowed;
+  }
+
+  .button.secondary:hover {
+    background-color: rgba(128, 128, 128, 0.5);
+  }
+  .button.primary:hover {
+    background-color: rgba(128, 128, 128, 0.5);
+  }
+  .button:active:hover {
+    background-color: transparent;
+  }
+
+  .button.secondary:disabled:hover {
+    box-shadow: 2px 2px 5px 0px #d4d4d4;
+  }
+  .button.primary:disabled:hover {
+    box-shadow: 2px 2px 5px 0px #2c2c2c;
+  }
+  .button.flat:disabled:hover {
+    background-color: transparent;
+  }
+  .button.flat.secondary:disabled:hover {
+    box-shadow: 2px 2px 5px 0px rgb(226, 226, 226) inset;
+  }
+  .button.flat.primary:disabled:hover {
+    box-shadow: 2px 2px 5px 0px rgb(27, 27, 27) inset;
+  }
+}

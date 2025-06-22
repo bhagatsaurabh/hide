@@ -1,0 +1,162 @@
+.ml-1 {
+  margin-left: 1rem;
+}
+.mr-0p5 {
+  margin-right: 0.5rem;
+}
+.mr-1 {
+  margin-right: 1rem;
+}
+.mr-2 {
+  margin-right: 2rem;
+}
+.mt-2 {
+  margin-top: 2rem;
+}
+.ml-0 {
+  margin-left: 0;
+}
+.ml-1 {
+  margin-left: 1rem;
+}
+.mt-0p5 {
+  margin-top: 0.5rem !important;
+}
+.m-0 {
+  margin: 0;
+}
+.my-0 {
+  margin-top: 0;
+  margin-bottom: 0;
+}
+.mb-0p5 {
+  margin-bottom: 0.5rem;
+}
+.mb-1 {
+  margin-bottom: 1rem;
+}
+.ws-no-wrap {
+  white-space: nowrap;
+}
+.va-text-bottom {
+  vertical-align: text-bottom;
+}
+.fs-0 {
+  font-size: 0 !important;
+}
+.fs-2.fs-2 {
+  font-size: 2rem;
+}
+.fs-1p75.fs-1p75 {
+  font-size: 1.75rem;
+}
+.fs-3 {
+  font-size: 3rem;
+}
+.ff-audiowide {
+  font-family: Audiowide;
+}
+.font-weight-lighter {
+  font-weight: lighter;
+}
+.ta-left {
+  text-align: left;
+}
+.ta-right {
+  text-align: right;
+}
+.o-0p6 {
+  opacity: 0.6;
+}
+.d-flex {
+  display: flex;
+}
+.align-items-end {
+  align-items: end;
+}
+.flex-center {
+  justify-content: center;
+  align-items: center;
+}
+.flex-primary-left {
+  justify-content: left;
+}
+.jc-space-between {
+  justify-content: space-between;
+}
+.p-absolute-centered {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+.minh-75 {
+  min-height: 75%;
+}
+.minw-75 {
+  min-width: 75%;
+}
+.maxh-75 {
+  max-height: 75%;
+}
+.a-reset {
+  color: inherit;
+  text-decoration: inherit;
+}
+.px-1 {
+  padding-left: 1rem;
+  padding-right: 1rem;
+}
+.px-0p75 {
+  padding-left: 0.75rem;
+  padding-right: 0.75rem;
+}
+.py-0p5 {
+  padding-top: 0.5rem;
+  padding-bottom: 0.5rem;
+}
+.p-0p5 {
+  padding: 0.5rem;
+}
+.p-1p5 {
+  padding: 1.5rem;
+}
+.p-1 {
+  padding: 1rem;
+}
+.pointer-events-none {
+  pointer-events: none;
+}
+.pointer-events-all {
+  pointer-events: all;
+}
+
+.absolute-center {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+}
+
+.c-grey {
+  color: grey;
+}
+
+.p-absolute {
+  position: absolute;
+}
+.bottom-0 {
+  bottom: 0;
+}
+.p-0p25.p-0p25 {
+  padding: 0.25rem;
+}
+.fw-100 {
+  font-weight: 100;
+}
+.fw-500.fw-500 {
+  font-weight: 500;
+}
+.mb-n0p5.mb-n0p5 {
+  margin-bottom: -0.5rem;
+}

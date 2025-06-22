@@ -1,0 +1,13 @@
+.section {
+  padding: 1.5rem;
+}
+.section .heading {
+  color: beige;
+  font-size: 3rem;
+  margin: 0;
+  font-weight: 100;
+}
+.section .subheading {
+  color: rgb(233, 233, 233);
+  font-size: 1.2rem;
+}
