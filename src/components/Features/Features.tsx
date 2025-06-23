@@ -1,0 +1,73 @@
+import Image from "../common/Image/Image";
+import classes from "./Features.module.css";
+
+const Features = () => {
+  return (
+    <>
+      <div className={classes.feature}>
+        <div className={classes.iconhighlight}>
+          <Image
+            path="../../../assets/icons/cloud.svg"
+            alt="Cloud icon"
+            className="w-2 h-2 sm:w-7p5 sm:h-6 md:w-10 md:h-8 of-contain"
+            asset
+          />
+        </div>
+        <h3 className={classes.heading}>Anytime, anywhere</h3>
+        <p>A dev platform that provisions on-demand, disposable containers in the cloud.</p>
+      </div>
+      <div className={classes.feature}>
+        <div className={classes.iconhighlight}>
+          <Image
+            path="../../../assets/icons/lock.svg"
+            alt="Lock icon"
+            className="w-2 h-2 sm:w-7p5 sm:h-6 md:w-10 md:h-8 of-contain"
+            asset
+          />
+        </div>
+        <h3 className={classes.heading}>Secure access</h3>
+        <p>Each environment is fully isolated, SSH-accessible, and open only to the members that you add.</p>
+      </div>
+      <div className={classes.feature}>
+        <div className={classes.iconhighlight}>
+          <Image
+            path="../../../assets/icons/refresh.svg"
+            alt="Wrench icon"
+            className="w-2 h-2 sm:w-7p5 sm:h-6 md:w-10 md:h-8 of-contain"
+            asset
+          />
+        </div>
+        <h3 className={classes.heading}>Continue where you left off</h3>
+        <p>
+          With no need for regular snapshots, your environment stays light, fast and uninterruptible with quick resume.
+        </p>
+      </div>
+      <div className={classes.feature}>
+        <div className={classes.iconhighlight}>
+          <Image
+            path="../../../assets/icons/wrench.svg"
+            alt="Wrench icon"
+            className="w-2 h-2 sm:w-7p5 sm:h-6 md:w-10 md:h-8 of-contain"
+            asset
+          />
+        </div>
+        <h3 className={classes.heading}>Customizable</h3>
+        <p>Start with a predefined template and customize the workspace as per your needs.</p>
+      </div>
+      <div className={classes.feature}>
+        <div className={classes.iconhighlight}>
+          <Image
+            path="../../../assets/icons/group.svg"
+            alt="Wrench icon"
+            className="w-2 h-2 sm:w-7p5 sm:h-6 md:w-10 md:h-8 of-contain"
+            asset
+          />
+        </div>
+        <h3 className={classes.heading}>Live collaboration</h3>
+        <p>Seamlessly invite and manage workspace members, collaborate with upto 10 users in real-time.</p>
+      </div>
+    </>
+  );
+};
+
+export default Features;
