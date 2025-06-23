@@ -160,3 +160,52 @@
 .mb-n0p5.mb-n0p5 {
   margin-bottom: -0.5rem;
 }
+
+.of-cover {
+  object-fit: cover;
+}
+.of-contain {
+  object-fit: contain;
+}
+
+.filter-gray {
+  filter: grayscale(1);
+}
+
+.w-5 {
+  width: 5rem;
+}
+.w-2 {
+  width: 2rem;
+}
+.var-w-5 {
+  --item-width: 5rem;
+}
+.h-4 {
+  height: 4rem;
+}
+.h-2 {
+  height: 2rem;
+}
+@media (min-width: 768px) {
+  .sm\:w-7p5 {
+    width: 7.5rem;
+  }
+  .sm\:var-w-7p5 {
+    --item-width: 7.5rem;
+  }
+  .sm\:h-6 {
+    height: 6rem;
+  }
+}
+@media (min-width: 1024px) {
+  .md\:w-10 {
+    width: 10rem;
+  }
+  .md\:var-w-10 {
+    --item-width: 10rem;
+  }
+  .md\:h-8 {
+    height: 8rem;
+  }
+}

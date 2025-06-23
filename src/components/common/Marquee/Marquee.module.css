@@ -1,0 +1,24 @@
+.marquee {
+  position: relative;
+  padding: 2rem;
+  background-color: rgb(241, 241, 241);
+  overflow: hidden;
+}
+.marquee.marquee > * {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  left: max(calc(var(--item-width) * (var(--no-of-items) * var(--spacing))), 100%);
+  animation: scroll 25s linear infinite;
+  animation-delay: calc(
+    (25s / (var(--no-of-items) * var(--spacing))) *
+      ((var(--no-of-items) * var(--spacing)) - var(--item-pos) * var(--spacing)) * -1
+  );
+  opacity: 0.8;
+}
+
+@keyframes scroll {
+  to {
+    left: calc(var(--item-width) * -1);
+  }
+}

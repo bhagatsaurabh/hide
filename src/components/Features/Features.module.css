@@ -1,0 +1,34 @@
+.feature {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  margin-top: 5rem;
+  padding: 0 1.5rem;
+}
+.feature svg {
+  color: #bae8e6;
+}
+.feature h3 {
+  text-align: center;
+  margin: 0;
+  color: #f1f1f1;
+  font-size: 1.25rem;
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+}
+.feature p {
+  text-align: center;
+  margin: 0;
+  font-size: 1rem;
+  color: #aaaaaa;
+}
+
+.feature .iconhighlight {
+  padding: 1.5rem;
+  font-size: 0;
+  border-radius: 999px;
+  border: 1px solid #ffffff45;
+  box-shadow: 7px 7px 20px 0 #0000004f;
+  margin-bottom: 1rem;
+}

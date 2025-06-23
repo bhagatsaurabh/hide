@@ -39,11 +39,11 @@
   box-shadow: 2px 2px 5px 0px rgb(27, 27, 27) inset;
 }
 .button.secondary:active {
-  border: 0px solid rgba(196, 196, 196, 0.553);
+  border: 1px solid transparent;
   box-shadow: 0px 0px 0px 0px rgb(226, 226, 226), 4px 4px 10px 0px rgb(226, 226, 226) inset;
 }
 .button.primary:active {
-  border: 0px solid rgba(196, 196, 196, 0.553);
+  border: 1px solid transparent;
   box-shadow: 0px 0px 0px 0px rgb(27, 27, 27), 4px 4px 10px 0px rgb(27, 27, 27) inset;
 }
 

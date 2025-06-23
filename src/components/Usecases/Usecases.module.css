@@ -1,0 +1,17 @@
+.heading {
+  font-size: 2.5rem;
+  color: #000000b8;
+  text-align: center;
+  padding: 0 1rem;
+  margin: 0;
+  margin-bottom: 1.5rem;
+  font-weight: 100;
+}
+.list {
+}
+.usecase {
+  padding: 1.5rem;
+}
+.usecase h2 {
+  font-size: 1.15rem;
+}

@@ -1,0 +1,30 @@
+[
+  {
+    "path": "../../../assets/icons/deno.svg",
+    "alt": "Deno"
+  },
+  {
+    "path": "../../../assets/icons/go.svg",
+    "alt": "Go"
+  },
+  {
+    "path": "../../../assets/icons/node.svg",
+    "alt": "Node.js"
+  },
+  {
+    "path": "../../../assets/icons/php.svg",
+    "alt": "PHP"
+  },
+  {
+    "path": "../../../assets/icons/rust.svg",
+    "alt": "Rust"
+  },
+  {
+    "path": "../../../assets/icons/nest.svg",
+    "alt": "Nest.js"
+  },
+  {
+    "path": "../../../assets/icons/python.svg",
+    "alt": "Python"
+  }
+]
