@@ -5,22 +5,34 @@ import { motion } from "motion/react";
 import Modal, { ModalRef } from "../common/Modal/Modal";
 import Button from "../common/Button/Button";
 import Link from "../common/Link/Link";
+import { useAppDispatch, useAppSelector } from "@/hooks/store";
+import { AuthStatus, selectStatus, signOut } from "@/store/auth";
+import { useNavigate, Link as RouterLink } from "react-router";
 
 const NavMenu = () => {
   const [isOpen, setIsOpen] = useState(false);
+  const authStatus = useAppSelector(selectStatus);
   const menuRef = useRef<ModalRef>(null);
+  const dispatch = useAppDispatch();
+  const navigate = useNavigate();
 
-  const handleClick = () => {
+  const handleMenuClick = () => {
     if (isOpen) {
       menuRef?.current?.close();
     } else {
       setIsOpen(true);
     }
   };
+  const handleSignIn = () => {
+    navigate("/auth");
+  };
+  const handleSignOut = () => {
+    dispatch(signOut());
+  };
 
   return (
     <>
-      <button className={classes.button} onClick={handleClick}>
+      <button className={classes.button} onClick={handleMenuClick}>
         <motion.div
           initial={false}
           animate={{
@@ -47,7 +59,27 @@ const NavMenu = () => {
       {isOpen && (
         <Modal title="menu" onDismiss={() => setIsOpen(false)} ref={menuRef} className="p-1p5" full ignoreHeader>
           <div className={classes.menu}>
-            <Button size={1.35}>Sign in</Button>
+            {authStatus === AuthStatus.SIGNED_IN && (
+              <>
+                <RouterLink className={classes.link} to="/profile">
+                  Profile
+                </RouterLink>
+                <RouterLink className={classes.link} to="/dashboard">
+                  Dashboard
+                </RouterLink>
+              </>
+            )}
+            <br />
+            {authStatus === AuthStatus.SIGNED_OUT && (
+              <Button size={1.35} onClick={handleSignIn}>
+                Sign in
+              </Button>
+            )}
+            {authStatus === AuthStatus.SIGNED_IN && (
+              <Button size={1.35} onClick={handleSignOut}>
+                Sign out
+              </Button>
+            )}
             <Link
               to="https://github.com/bhagatsaurabh/hide-server"
               icon="github"

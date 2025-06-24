@@ -9,7 +9,7 @@ interface IconProps {
   color?: string;
 }
 
-const Icon = ({ size = 1, name, className, color = "#d5d5d5" }: IconProps) => {
+const Icon = ({ size = 1, name, className, color }: IconProps) => {
   const [Component, setComponent] = useState<React.FC<React.SVGProps<SVGSVGElement>> | null>(null);
   const [error, setError] = useState(false);
 

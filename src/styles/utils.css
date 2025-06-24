@@ -172,8 +172,14 @@
   filter: grayscale(1);
 }
 
+.w-7 {
+  width: 7rem;
+}
 .w-5 {
   width: 5rem;
+}
+.w-3 {
+  width: 3rem;
 }
 .w-2 {
   width: 2rem;
@@ -181,11 +187,20 @@
 .var-w-5 {
   --item-width: 5rem;
 }
+.h-7 {
+  height: 7rem;
+}
 .h-4 {
   height: 4rem;
 }
+.h-3 {
+  height: 3rem;
+}
 .h-2 {
   height: 2rem;
+}
+.h-5 {
+  height: 5rem;
 }
 @media (min-width: 768px) {
   .sm\:w-7p5 {

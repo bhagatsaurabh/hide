@@ -9,6 +9,8 @@ import { Environment } from "@/pages/Environment/Environment";
 import { CrashBoard } from "@/components/common/CrashBoard/CrashBoard";
 import { authGuard, noAuthGuard, workspaceLoader } from "./guards";
 import { CreateProfile } from "@/pages/CreateProfile/CreateProfile";
+import SignIn from "@/components/SignIn/SignIn";
+import Providers from "@/components/Providers/Providers";
 
 const router = createBrowserRouter([
   {
@@ -22,6 +24,20 @@ const router = createBrowserRouter([
     element: <Auth />,
     errorElement: <CrashBoard />,
     loader: noAuthGuard,
+    children: [
+      {
+        path: "",
+        element: <Providers />,
+        errorElement: <CrashBoard />,
+        loader: noAuthGuard,
+      },
+      {
+        path: "signin",
+        element: <SignIn />,
+        errorElement: <CrashBoard />,
+        loader: noAuthGuard,
+      },
+    ],
   },
   {
     path: "/complete-profile",

@@ -9,7 +9,7 @@ interface ButtonProps {
   disabled: boolean;
   onClick: () => void;
   icon: string;
-  iconPosition: "left" | "right";
+  iconProps: { "data-position": "left" | "right"; [key: string]: unknown };
   size: number;
   className: string;
   children: ReactNode;
@@ -22,7 +22,7 @@ const Button = ({
   disabled,
   onClick,
   icon,
-  iconPosition = "left",
+  iconProps = { "data-position": "left" },
   size = 1,
   className,
   children,
@@ -38,18 +38,18 @@ const Button = ({
 
   if (children) {
     content.push(<span style={{ lineHeight: `${size * 1.5}rem` }}>{children}</span>);
-    iconClasses.push(iconPosition === "left" ? "mr-1" : "ml-1");
+    iconClasses.push(iconProps["data-position"] === "left" ? "mr-1" : "ml-1");
   }
   if (icon) {
     content.push(
       !busy ? (
-        <Icon className={iconClasses.join(" ")} size={size} name={icon} />
+        <Icon className={iconClasses.join(" ")} size={size} name={icon} {...iconProps} />
       ) : (
         <Spinner className={iconClasses.join(" ")} size={size} />
       )
     );
 
-    if (iconPosition === "left") {
+    if (iconProps["data-position"] === "left") {
       [content[0], content[1]] = [content[1], content[0]];
     }
   }

@@ -1,11 +1,11 @@
-import { ReactNode, useEffect, useRef, useState } from "react";
+import { ReactNode, RefObject, useEffect, useRef, useState } from "react";
 import classes from "./Header.module.css";
 
 interface HeaderProps {
   left?: ReactNode;
   center?: ReactNode;
   right?: ReactNode;
-  bodyRef: HTMLElement | null;
+  bodyRef: RefObject<HTMLElement | null>;
 }
 
 const Header = ({ left, center, right, bodyRef }: HeaderProps) => {
@@ -16,7 +16,7 @@ const Header = ({ left, center, right, bodyRef }: HeaderProps) => {
   if (shadow) classNames.push(classes.shadow);
 
   useEffect(() => {
-    if (!bodyRef) return;
+    if (!bodyRef.current) return;
 
     const cssdec = getComputedStyle(document.documentElement);
     const baseFontSize = parseFloat(cssdec.fontSize);
@@ -27,7 +27,7 @@ const Header = ({ left, center, right, bodyRef }: HeaderProps) => {
       threshold: 1,
       rootMargin: `-${(headerHeight * baseFontSize) / 2}px 0px 0px 0px`,
     });
-    observer.current.observe(bodyRef);
+    observer.current.observe(bodyRef.current);
   }, [bodyRef]);
 
   useEffect(() => () => observer.current?.disconnect(), []);
