@@ -1,6 +1,3 @@
-import { useNavigate } from "react-router";
-import { useAppDispatch, useAppSelector } from "@/hooks/store";
-import { AuthStatus, selectStatus, signOut } from "@/store/auth";
 import { NotificationBar } from "@/components/Notifications/Notifications";
 import Header from "@/components/common/Header/Header";
 import Footer from "@/components/common/Footer/Footer";
@@ -18,13 +15,7 @@ import Usecases from "@/components/Usecases/Usecases";
 import Templates from "@/components/Templates/Templates";
 
 export const Home = () => {
-  const authStatus = useAppSelector(selectStatus);
-  const dispatch = useAppDispatch();
-  const navigate = useNavigate();
-
-  const handleSignOut = () => dispatch(signOut());
-  const handleDashboard = () => navigate("/dashboard");
-  const bodyRef = useRef<HTMLParagraphElement>(null);
+  const bodyRef = useRef<HTMLElement>(null);
 
   return (
     <>
@@ -36,8 +27,8 @@ export const Home = () => {
             <NavMenu />
           </>
         }
-        bodyRef={bodyRef.current}
-      ></Header>
+        bodyRef={bodyRef}
+      />
       <main>
         <section ref={bodyRef} className={classes.section}>
           <p className={[classes.heading, "mb-n0p5"].join(" ")}>Cloud</p>
@@ -47,7 +38,7 @@ export const Home = () => {
             Provision full-featured environments with your stack, on demand and ready to collaborate live within
             seconds.
           </p>
-          <Button icon="mission" iconPosition="right" className="mt-2" size={1.5}>
+          <Button icon="mission" iconProps={{ "data-position": "right" }} className="mt-2" size={1.5}>
             Get Started
           </Button>
         </section>
@@ -73,16 +64,6 @@ export const Home = () => {
         <section className={classes.templates}>
           <Templates />
         </section>
-        {/*
-        <br />
-        {authStatus === AuthStatus.SIGNED_OUT && <Link to="/auth">Sign In</Link>}
-        {authStatus === AuthStatus.SIGNED_IN && (
-          <>
-            <button onClick={handleSignOut}>Sign Out</button>
-            <button onClick={handleDashboard}>Dashboard</button>
-          </>
-        )}
-        {authStatus === AuthStatus.PENDING && <span>...</span>} */}
       </main>
       <Footer>
         <Logo />

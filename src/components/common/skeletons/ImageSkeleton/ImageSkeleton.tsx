@@ -13,7 +13,7 @@ const ImageSkeleton = ({ className, style = {} }: Partial<ImageSkeletonProps>) =
 
   return (
     <div style={{ ...style }} className={classNames.join(" ")}>
-      <DefaultImageSVG />;
+      <DefaultImageSVG />
     </div>
   );
 };
