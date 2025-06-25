@@ -80,3 +80,4 @@ export const splitUrl = (url: string) => {
   }
 };
 export const getSlug = (title: string) => `#${title.toLowerCase().replace(" ", "-")}`;
+export const checkNetwork = (msg: string) => (!navigator.onLine ? "Network error" : msg);

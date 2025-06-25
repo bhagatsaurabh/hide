@@ -1,0 +1,21 @@
+.pending-profile {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+.pending-profile h2 {
+  text-align: center;
+  color: #ececec;
+  font-size: 2.5rem;
+  margin-bottom: 2rem;
+  font-weight: 200;
+}
+.pending-profile form {
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+}
+.pending-profile form button {
+  margin-top: 2rem;
+}

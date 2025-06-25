@@ -11,7 +11,7 @@ export type NotificationPayload = {
   };
 }[keyof NotificationPayloadMap];
 
-export type NotificationType = "workspace-invite" | "workspace-membership-removed";
+export type NotificationType = "workspace-invite" | "workspace-membership-removed" | "user";
 
 export interface UserNotificationPayload extends InSocketMessagePayload {
   type: NotificationType;
@@ -32,3 +32,11 @@ export interface ExclusionData extends UserNotificationPayload {
 export type NotificationReadDTO = {
   id: string;
 };
+
+export interface InternalNotificationPayload extends UserNotificationPayload {
+  status: InternalNotificationType;
+  title: string;
+  message: string;
+}
+
+export type InternalNotificationType = "info" | "info-warning" | "warning" | "success" | "error";

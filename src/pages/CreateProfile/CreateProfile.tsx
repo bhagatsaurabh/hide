@@ -7,6 +7,8 @@ import { nameRegex, usernameRegex } from "@/utils/constants";
 import { debounce } from "@/utils";
 import { checkUsername } from "@/services/auth";
 import { isAxiosError } from "axios";
+import classes from "./CreateProfile.module.css";
+import Button from "@/components/common/Button/Button";
 
 export const CreateProfile = () => {
   const dispatch = useAppDispatch();
@@ -86,30 +88,39 @@ export const CreateProfile = () => {
   };
 
   return (
-    <>
-      <div>{"Create Profile"}</div>
-      <Input
-        attrs={{ spellCheck: false, autoComplete: "off" }}
-        placeholder="Username"
-        type="text"
-        value={username}
-        onChange={handleUsernameChange}
-        validator={validateName}
-        ref={input}
-      />
-      <span>{usernameCheckState}</span>
-      <Input
-        attrs={{ spellCheck: false, autoComplete: "off" }}
-        placeholder="Name"
-        type="text"
-        value={name}
-        onChange={setName}
-        validator={validateUsername}
-        ref={nameInput}
-      />
-      <div>
-        <button onClick={handleContinue}>{busy ? "..." : "Continue"}</button>
-      </div>
-    </>
+    <div className={classes["pending-profile"]}>
+      <h2>Complete your profile</h2>
+      <form onSubmit={handleContinue}>
+        <Input
+          attrs={{ spellCheck: false, autoComplete: "off" }}
+          placeholder="Username"
+          type="text"
+          value={username}
+          onChange={handleUsernameChange}
+          validator={validateName}
+          ref={input}
+        />
+        <span>{usernameCheckState}</span>
+        <Input
+          attrs={{ spellCheck: false, autoComplete: "off" }}
+          placeholder="Name"
+          type="text"
+          value={name}
+          onChange={setName}
+          validator={validateUsername}
+          ref={nameInput}
+        />
+        <Button
+          busy={busy}
+          disabled={busy}
+          icon="chevron-right"
+          iconProps={{ "data-position": "right" }}
+          size={1.25}
+          onClick={handleContinue}
+        >
+          Continue
+        </Button>
+      </form>
+    </div>
   );
 };

@@ -4,6 +4,8 @@ import type { RootState } from "@/store";
 import { auth, db } from "@/config/firebase";
 import { storeUser } from "@/utils/driver";
 import { collection, doc, getDocs, query, setDoc, where } from "firebase/firestore";
+import { notify } from "./notifications";
+import { checkNetwork } from "@/utils";
 
 export enum AuthStatus {
   PENDING,
@@ -93,7 +95,13 @@ export const signIn = createAsyncThunk<void, { type: AuthType }>("auth/sign-in",
       userCred = await signInAnonymously(auth);
     }
   } catch (error) {
-    // notify.push({ type: "snackbar", status: "warn", message: "Something went wrong, please try again" });
+    dispatch(
+      notify({
+        status: "error",
+        title: "Could not sign in",
+        message: checkNetwork("Something went wrong, please try again"),
+      })
+    );
     dispatch(setStatus(AuthStatus.PENDING));
     console.log(error);
     return;

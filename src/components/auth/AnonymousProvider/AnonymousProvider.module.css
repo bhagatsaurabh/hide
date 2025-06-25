@@ -1,3 +1,25 @@
+.sign-guest {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
 .heading {
   color: beige;
+  text-align: center;
+  margin: 0;
+  margin-bottom: 1.5rem;
+}
+.warning {
+  text-align: center;
+  margin: 0;
+  margin-bottom: 2rem;
+  color: rgb(208, 208, 208);
+}
+.warning p {
+  margin: 0;
+}
+.warning svg {
+  color: rgb(215, 103, 103);
 }

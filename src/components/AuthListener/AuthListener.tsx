@@ -20,7 +20,9 @@ const AuthListener = () => {
       if (usr) {
         sessionStorage.setItem("sessionId", uuid());
         if (status !== AuthStatus.SIGNING_IN) {
+          console.log("doing");
           const profile = await dispatch(fetchProfile()).unwrap();
+          console.log("done", profile);
           if (!profile) {
             dispatch(setStatus(AuthStatus.INCOMPLETE_PROFILE));
           } else {

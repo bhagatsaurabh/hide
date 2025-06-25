@@ -59,7 +59,7 @@ const NavMenu = () => {
       {isOpen && (
         <Modal title="menu" onDismiss={() => setIsOpen(false)} ref={menuRef} className="p-1p5" full ignoreHeader>
           <div className={classes.menu}>
-            {authStatus === AuthStatus.SIGNED_IN && (
+            {(authStatus === AuthStatus.SIGNED_IN || authStatus === AuthStatus.INCOMPLETE_PROFILE) && (
               <>
                 <RouterLink className={classes.link} to="/profile">
                   Profile
@@ -75,7 +75,7 @@ const NavMenu = () => {
                 Sign in
               </Button>
             )}
-            {authStatus === AuthStatus.SIGNED_IN && (
+            {(authStatus === AuthStatus.SIGNED_IN || authStatus === AuthStatus.INCOMPLETE_PROFILE) && (
               <Button size={1.35} onClick={handleSignOut}>
                 Sign out
               </Button>
