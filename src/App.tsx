@@ -5,6 +5,7 @@ import router from "./router";
 import AuthListener from "./components/AuthListener/AuthListener";
 import { openDB } from "./config/database";
 import { Heartbeat } from "./components/Heartbeat/Heartbeat";
+import Toast from "./components/common/Toast/Toast";
 
 function App() {
   const [ready, setReady] = useState(false);
@@ -26,6 +27,7 @@ function App() {
         <>
           <AuthListener />
           <Heartbeat />
+          <Toast />
           <RouterProvider router={router} />
         </>
       )}

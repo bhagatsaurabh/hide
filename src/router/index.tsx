@@ -22,7 +22,7 @@ const router = createBrowserRouter([
   {
     path: "/auth",
     element: <Auth />,
-    errorElement: <CrashBoard />,
+    // errorElement: <CrashBoard />,
     loader: noAuthGuard,
     children: [
       {
@@ -37,13 +37,13 @@ const router = createBrowserRouter([
         errorElement: <CrashBoard />,
         loader: noAuthGuard,
       },
+      {
+        path: "profile",
+        element: <CreateProfile />,
+        // errorElement: <CrashBoard />,
+        loader: authGuard,
+      },
     ],
-  },
-  {
-    path: "/complete-profile",
-    element: <CreateProfile />,
-    errorElement: <CrashBoard />,
-    loader: authGuard,
   },
   {
     path: "/dashboard",

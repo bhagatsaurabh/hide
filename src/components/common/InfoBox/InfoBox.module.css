@@ -1,0 +1,33 @@
+.infobox {
+  position: relative;
+  padding: 1.25rem;
+  background-color: #555555;
+  color: rgb(208, 208, 208);
+  border-radius: 0.75rem;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.icon {
+  background-color: #555555;
+  flex-shrink: 0;
+  border-radius: 0.75rem;
+  width: 1.5rem;
+  height: 1.5rem;
+  margin-right: 0.75rem;
+}
+.icon.info {
+  color: #a7a7ed;
+}
+.icon.info-warning {
+  color: #dc6161;
+}
+.icon.warning {
+  color: #d7d77e;
+}
+.icon.success {
+  color: #649b64;
+}
+.icon.error {
+  color: #dc6161;
+}

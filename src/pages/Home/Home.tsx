@@ -13,9 +13,24 @@ import templates from "@/assets/templates.json";
 import Features from "@/components/Features/Features";
 import Usecases from "@/components/Usecases/Usecases";
 import Templates from "@/components/Templates/Templates";
+import { useAppSelector } from "@/hooks/store";
+import { AuthStatus, selectStatus } from "@/store/auth";
+import { useNavigate } from "react-router";
 
 export const Home = () => {
   const bodyRef = useRef<HTMLElement>(null);
+  const status = useAppSelector(selectStatus);
+  const navigate = useNavigate();
+
+  const handleAction = () => {
+    if (status === AuthStatus.INCOMPLETE_PROFILE) {
+      navigate("/auth/profile");
+    } else if (status === AuthStatus.SIGNED_IN) {
+      navigate("/dashboard");
+    } else {
+      navigate("/auth");
+    }
+  };
 
   return (
     <>
@@ -38,8 +53,14 @@ export const Home = () => {
             Provision full-featured environments with your stack, on demand and ready to collaborate live within
             seconds.
           </p>
-          <Button icon="mission" iconProps={{ "data-position": "right" }} className="mt-2" size={1.5}>
-            Get Started
+          <Button
+            icon="mission"
+            iconProps={{ "data-position": "right" }}
+            className="mt-2"
+            size={1.5}
+            onClick={handleAction}
+          >
+            {status === AuthStatus.SIGNED_OUT ? "Get Started" : "Dashboard"}
           </Button>
         </section>
         <section className={classes.display}>

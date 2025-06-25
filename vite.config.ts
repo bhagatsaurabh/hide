@@ -6,6 +6,9 @@ import SRI from "./plugins/subresource-integrity";
 import path from "path";
 
 export default defineConfig({
+  build: {
+    assetsInlineLimit: 0,
+  },
   plugins: [
     svgr(),
     react(),

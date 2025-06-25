@@ -1,7 +1,6 @@
 import { useNavigate } from "react-router";
 import Button from "../common/Button/Button";
 import classes from "./Providers.module.css";
-import { motion } from "motion/react";
 
 const Providers = () => {
   const navigate = useNavigate();
