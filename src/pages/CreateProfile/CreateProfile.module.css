@@ -8,6 +8,7 @@
   text-align: center;
   color: #ececec;
   font-size: 2.5rem;
+  margin: 0;
   margin-bottom: 2rem;
   font-weight: 200;
 }
@@ -17,5 +18,18 @@
   flex-direction: column;
 }
 .pending-profile form button {
-  margin-top: 2rem;
+  margin-top: 2.5rem;
+}
+.usernamestate {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 2rem;
+  color: white;
+  font-weight: 200;
+  font-size: 0.9rem;
+}
+.usernamestate svg {
+  vertical-align: bottom;
+  margin-right: 0.25rem;
 }

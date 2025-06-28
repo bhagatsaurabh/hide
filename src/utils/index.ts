@@ -1,4 +1,5 @@
 import { FNode } from "@/reducers/explorer";
+import { ReactNode } from "react";
 import { Location } from "react-router";
 
 export const getPath = (node?: FNode) => {
@@ -81,3 +82,5 @@ export const splitUrl = (url: string) => {
 };
 export const getSlug = (title: string) => `#${title.toLowerCase().replace(" ", "-")}`;
 export const checkNetwork = (msg: string) => (!navigator.onLine ? "Network error" : msg);
+export const isText = (children: ReactNode): children is string | number =>
+  typeof children === "string" || typeof children === "number";

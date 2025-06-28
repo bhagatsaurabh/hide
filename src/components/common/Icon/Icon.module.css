@@ -1,0 +1,15 @@
+.info {
+  color: #a7a7ed;
+}
+.info-warning {
+  color: #dc6161;
+}
+.warning {
+  color: #d7d77e;
+}
+.success {
+  color: #649b64;
+}
+.error {
+  color: #dc6161;
+}

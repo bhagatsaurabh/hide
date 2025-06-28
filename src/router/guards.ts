@@ -24,7 +24,6 @@ export const authGuard = async ({ request }: { request: Request }) => {
   ) {
     return redirect("/auth");
   }
-  console.log("here");
   return null;
 };
 

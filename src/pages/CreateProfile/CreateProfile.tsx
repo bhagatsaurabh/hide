@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from "react";
+import { FormEvent, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useNavigate } from "react-router";
 import { Input, InputRef } from "@/components/common/Input/Input";
 import { useAppDispatch, useAppSelector } from "@/hooks/store";
@@ -9,6 +9,9 @@ import { checkUsername } from "@/services/auth";
 import { isAxiosError } from "axios";
 import classes from "./CreateProfile.module.css";
 import Button from "@/components/common/Button/Button";
+import Spinner from "@/components/common/Spinner/Spinner";
+import Icon from "@/components/common/Icon/Icon";
+import { notify } from "@/store/notifications";
 
 export const CreateProfile = () => {
   const dispatch = useAppDispatch();
@@ -19,7 +22,10 @@ export const CreateProfile = () => {
   const [name, setName] = useState("");
   const nameInput = useRef<InputRef>(null);
   const [busy, setBusy] = useState(false);
-  const [usernameCheckState, setUsernameCheckState] = useState("");
+  const [usernameCheckState, setUsernameCheckState] = useState<{
+    msg: string;
+    type: "success" | "warning";
+  } | null>(null);
 
   useEffect(() => {
     if (status === AuthStatus.SIGNED_IN) {
@@ -27,18 +33,14 @@ export const CreateProfile = () => {
     }
   }, [navigate, status]);
 
-  const checkUsernameExistence = useMemo(
-    () => debounce(async (username: string) => await _checkUsernameExistence(username), 1000),
-    []
-  );
-  const _checkUsernameExistence = async (username: string) => {
+  const _checkUsernameExistence = useCallback(async (username: string) => {
     try {
       const res = await checkUsername(username);
       if (!res.data.available) {
-        input.current?.invalidate("Username not available");
-        setUsernameCheckState("");
+        input.current?.invalidate(" ");
+        setUsernameCheckState({ msg: "Username not available", type: "warning" });
       } else {
-        setUsernameCheckState("Username available");
+        setUsernameCheckState({ msg: "Username available", type: "success" });
       }
     } catch (error) {
       if (!isAxiosError(error)) {
@@ -48,17 +50,25 @@ export const CreateProfile = () => {
       if (error.status === 400) {
         input.current?.invalidate("Not a valid username");
       }
-      setUsernameCheckState("");
+      setUsernameCheckState(null);
     }
-  };
+  }, []);
+  const checkUsernameExistence = useMemo(
+    () => debounce(async (username: string) => await _checkUsernameExistence(username), 1000),
+    [_checkUsernameExistence]
+  );
   const handleUsernameChange = (username: string) => {
     setUsername(username);
     if (usernameRegex.test(username)) {
       checkUsernameExistence(username);
-      setUsernameCheckState("...");
+      setUsernameCheckState({ msg: "...", type: "warning" });
+    } else {
+      setUsernameCheckState(null);
     }
   };
-  const handleContinue = async () => {
+  const handleContinue = async (ev: MouseEvent | FormEvent) => {
+    ev.preventDefault();
+
     if (input.current?.validate(username)) return;
     if (nameInput.current?.validate(name)) return;
 
@@ -67,8 +77,7 @@ export const CreateProfile = () => {
     if (success) {
       dispatch(setStatus(AuthStatus.SIGNED_IN));
     } else {
-      console.error("Profile creation failed, try again");
-      // notify.push({ type: "snackbar", status: "warn", message: "Something went wrong, please try again" });
+      dispatch(notify({ message: "Profile creation failed, try again", status: "error", title: "Create profile" }));
     }
     setBusy(false);
   };
@@ -90,18 +99,30 @@ export const CreateProfile = () => {
   return (
     <div className={classes["pending-profile"]}>
       <h2>Complete your profile</h2>
-      <form onSubmit={handleContinue}>
+      <form onSubmit={handleContinue} noValidate={true}>
         <Input
           attrs={{ spellCheck: false, autoComplete: "off" }}
-          placeholder="Username"
           type="text"
+          placeholder="Username"
           value={username}
           onChange={handleUsernameChange}
           validator={validateName}
           ref={input}
         />
-        <span>{usernameCheckState}</span>
+
+        <div className={classes.usernamestate}>
+          {usernameCheckState &&
+            (usernameCheckState.msg === "..." ? (
+              <Spinner size={1.5} />
+            ) : (
+              <>
+                <Icon name={usernameCheckState.type} size={1.1} status />
+                <span>{usernameCheckState.msg}</span>
+              </>
+            ))}
+        </div>
         <Input
+          className="mt-2p5"
           attrs={{ spellCheck: false, autoComplete: "off" }}
           placeholder="Name"
           type="text"
@@ -116,7 +137,7 @@ export const CreateProfile = () => {
           icon="chevron-right"
           iconProps={{ "data-position": "right" }}
           size={1.25}
-          onClick={handleContinue}
+          onClick={(e) => handleContinue(e)}
         >
           Continue
         </Button>

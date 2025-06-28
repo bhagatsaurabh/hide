@@ -1,13 +1,13 @@
-import { CSSProperties, ReactNode } from "react";
+import { CSSProperties, MouseEvent, ReactNode } from "react";
 import classes from "./Button.module.css";
 import Icon from "../Icon/Icon";
 import Spinner from "../Spinner/Spinner";
-import { noop } from "@/utils";
+import { isText, noop } from "@/utils";
 
 interface ButtonProps {
   busy: boolean;
   disabled: boolean;
-  onClick: () => void;
+  onClick: (e: MouseEvent) => unknown;
   icon: string;
   iconProps: { "data-position": "left" | "right"; [key: string]: unknown };
   size: number;
@@ -37,7 +37,7 @@ const Button = ({
   const iconClasses = ["va-text-bottom"];
 
   if (children) {
-    content.push(<span style={{ lineHeight: `${size * 1.5}rem` }}>{children}</span>);
+    content.push(isText(children) ? <span style={{ lineHeight: `${size * 1.5}rem` }}>{children}</span> : children);
     iconClasses.push(iconProps["data-position"] === "left" ? "mr-1" : "ml-1");
   }
   if (icon) {
