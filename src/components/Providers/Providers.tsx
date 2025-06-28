@@ -1,13 +1,21 @@
 import { useNavigate } from "react-router";
 import Button from "../common/Button/Button";
 import classes from "./Providers.module.css";
+import { useAppSelector } from "@/hooks/store";
+import { AuthStatus, selectStatus } from "@/store/auth";
+import Spinner from "../common/Spinner/Spinner";
 
 const Providers = () => {
   const navigate = useNavigate();
+  const authStatus = useAppSelector(selectStatus);
 
   const handleClick = (signInType: string) => {
     navigate("/auth/signin", { state: { signInType } });
   };
+
+  if (authStatus === AuthStatus.INCOMPLETE_PROFILE) {
+    return <Spinner size={2.5} />;
+  }
 
   return (
     <div>

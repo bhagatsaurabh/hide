@@ -1,4 +1,4 @@
-import { ReactNode, Ref, useCallback, useEffect, useImperativeHandle, useRef, useState } from "react";
+import { CSSProperties, ReactNode, Ref, useCallback, useEffect, useImperativeHandle, useRef, useState } from "react";
 
 import Backdrop from "../Backdrop/Backdrop";
 import classes from "./Modal.module.css";
@@ -17,6 +17,8 @@ interface ModalProps {
   ignoreHeader?: boolean;
   full?: boolean;
   className?: string;
+  seethrough?: boolean;
+  style?: CSSProperties;
 }
 export interface ModalRef {
   close: () => void;
@@ -31,6 +33,8 @@ const Modal = ({
   ignoreHeader = false,
   full = false,
   className,
+  seethrough = false,
+  style,
 }: ModalProps) => {
   const layerLevel = layer ?? 0;
 
@@ -106,7 +110,13 @@ const Modal = ({
 
   return (
     <>
-      <Backdrop show={show} onDismiss={handleDismiss} layer={layerLevel} ignoreHeader={ignoreHeader} />
+      <Backdrop
+        show={show}
+        onDismiss={handleDismiss}
+        layer={layerLevel}
+        ignoreHeader={ignoreHeader}
+        clear={seethrough}
+      />
       <AnimatePresence onExitComplete={onDismiss}>
         {show && (
           <motion.div
@@ -122,6 +132,7 @@ const Modal = ({
             }}
             exit={{ opacity: 0, top: "59%" }}
             transition={{ ease: "easeIn", duration: 0.15 }}
+            style={style}
           >
             {children}
           </motion.div>

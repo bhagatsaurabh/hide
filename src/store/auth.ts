@@ -3,9 +3,10 @@ import { getAdditionalUserInfo, signInAnonymously, UserCredential } from "fireba
 import type { RootState } from "@/store";
 import { auth, db } from "@/config/firebase";
 import { storeUser } from "@/utils/driver";
-import { collection, doc, getDocs, query, setDoc, where } from "firebase/firestore";
+import { collection, getDocs, query, where } from "firebase/firestore";
 import { notify } from "./notifications";
 import { checkNetwork } from "@/utils";
+import { register } from "@/services/user";
 
 export enum AuthStatus {
   PENDING,
@@ -57,11 +58,7 @@ export const createProfile = createAsyncThunk<boolean, UserProfile>(
     try {
       await storeUser(auth.currentUser!.uid);
 
-      await setDoc(doc(db, "users", username), {
-        name,
-        username,
-        uid: auth.currentUser!.uid,
-      });
+      await register({ name, username });
 
       dispatch(setName(name));
       dispatch(setUsername(username));

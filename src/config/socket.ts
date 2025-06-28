@@ -35,15 +35,17 @@ export const connectSocket = async () => {
         resolve(socket);
       });
       socket.io.on("error", (err) => reject(err));
-      socket.io.on("close", () => {});
-      socket.io.on("reconnect", (_attempt: number) => {
-        console.log("Reconnect: ", socket?.id);
+      socket.io.on("close", (err) => {
+        console.log("Closed: ", err);
+      });
+      socket.io.on("reconnect", (attempt: number) => {
+        console.log("Reconnect: ", attempt, socket?.id);
       });
       socket.io.on("reconnect_attempt", (attempt: number) => {
         console.log("Reconnect Attempt: ", attempt, socket?.id);
       });
-      socket.io.on("reconnect_error", (_err) => {
-        console.log("Reconnect Error: ", socket?.id);
+      socket.io.on("reconnect_error", (err) => {
+        console.log("Reconnect Error: ", socket?.id, err);
       });
       socket.io.on("reconnect_failed", () => {
         console.log("Reconnect Failed: ", socket?.id);

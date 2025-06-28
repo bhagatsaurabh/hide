@@ -32,7 +32,7 @@ const NavMenu = () => {
 
   return (
     <>
-      <button className={classes.button} onClick={handleMenuClick}>
+      <button className={classes.button} onClick={handleMenuClick} style={{ position: "relative" }}>
         <motion.div
           initial={false}
           animate={{

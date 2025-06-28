@@ -5,6 +5,7 @@ import { AuthStatus, selectStatus } from "@/store/auth";
 import classes from "./Auth.module.css";
 import Image from "@/components/common/Image/Image";
 import { AnimatePresence, motion } from "motion/react";
+import Spinner from "@/components/common/Spinner/Spinner";
 
 export const Auth = () => {
   const navigate = useNavigate();
@@ -32,17 +33,21 @@ export const Auth = () => {
             asset
           />
         </section>
-        <AnimatePresence mode="popLayout">
-          <motion.section
-            key={location.pathname}
-            initial={{ opacity: 0, transform: "scale(0.96)" }}
-            animate={{ opacity: 1, transform: "scale(1)" }}
-            exit={{ opacity: 0, transform: "scale(0.96)" }}
-            transition={{ duration: 0.15 }}
-          >
-            {outlet}
-          </motion.section>
-        </AnimatePresence>
+        {status === AuthStatus.PENDING ? (
+          <Spinner size={2.5} />
+        ) : (
+          <AnimatePresence mode="popLayout">
+            <motion.section
+              key={location.pathname}
+              initial={{ opacity: 0, transform: "scale(0.96)" }}
+              animate={{ opacity: 1, transform: "scale(1)" }}
+              exit={{ opacity: 0, transform: "scale(0.96)" }}
+              transition={{ duration: 0.15 }}
+            >
+              {outlet}
+            </motion.section>
+          </AnimatePresence>
+        )}
         <section></section>
       </main>
     </>

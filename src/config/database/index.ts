@@ -21,7 +21,6 @@ const openDB = async (uid?: string, version?: number) => {
     });
 
     request.addEventListener("blocked", (ev) => {
-      console.log(ev);
       reject(ev);
     });
   });
