@@ -11,6 +11,7 @@ import { authGuard, noAuthGuard, workspaceLoader } from "./guards";
 import { CreateProfile } from "@/pages/CreateProfile/CreateProfile";
 import SignIn from "@/components/SignIn/SignIn";
 import Providers from "@/components/Providers/Providers";
+import { Status } from "@/pages/Status/Status";
 
 const router = createBrowserRouter([
   {
@@ -54,6 +55,11 @@ const router = createBrowserRouter([
       {
         path: "new",
         element: <Create />,
+        errorElement: <CrashBoard />,
+      },
+      {
+        path: "status",
+        element: <Status />,
         errorElement: <CrashBoard />,
       },
       {

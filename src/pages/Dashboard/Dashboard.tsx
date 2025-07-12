@@ -1,8 +1,8 @@
-import { useEffect, useRef } from "react";
-import { Outlet, useNavigate } from "react-router";
+import { useCallback, useEffect, useRef, useState } from "react";
+import { useNavigate, useOutlet } from "react-router";
 import { useSelector } from "react-redux";
 import { useAppDispatch } from "@/hooks/store";
-import { fetchWorkspaces, selectWorkspaces } from "@/store/workspace";
+import { fetchWorkspaces, selectRecent, selectWorkspaces } from "@/store/workspace";
 import { NotificationBar } from "@/components/Notifications/Notifications";
 import Header from "@/components/common/Header/Header";
 import Logo from "@/components/common/Logo/Logo";
@@ -11,22 +11,31 @@ import classes from "./Dashboard.module.css";
 import Avatar from "@/components/common/Avatar/Avatar";
 import Button from "@/components/common/Button/Button";
 import Icon from "@/components/common/Icon/Icon";
+import CardSkeleton from "@/components/common/skeletons/CardSkeleton/CardSkeleton";
+import WorkspaceList from "@/components/WorkspaceList/WorkspaceList";
+import { AnimatePresence, motion } from "motion/react";
 
 export const Dashboard = () => {
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
   const { workspaces, connected } = useSelector(selectWorkspaces);
-  const bodyRef = useRef<HTMLElement>(null);
+  const recent = useSelector(selectRecent);
+  const [busy, setBusy] = useState(true);
+  const bodyRef = useRef<HTMLHeadingElement>(null);
+  const outlet = useOutlet();
+
+  const init = useCallback(async () => {
+    setBusy(true);
+    await dispatch(fetchWorkspaces());
+    setBusy(false);
+  }, [dispatch]);
 
   useEffect(() => {
-    dispatch(fetchWorkspaces());
-  }, [dispatch]);
+    init();
+  }, [init]);
 
   const handleCreate = () => {
     navigate("/dashboard/new");
-  };
-  const handleSelectWorkspace = (uuid: string) => {
-    navigate(`/dashboard/${uuid}`);
   };
 
   return (
@@ -35,7 +44,7 @@ export const Dashboard = () => {
         left={<Logo />}
         right={
           <>
-            <Button className="px-0p5 py-0p25" type="secondary" onClick={handleCreate} size={1.1}>
+            <Button className="px-0p5 py-0p25 mx-0p25" type="secondary" onClick={handleCreate} size={1.1}>
               <div style={{ display: "flex", alignItems: "center", justifyContent: "center" }}>
                 <Icon name="plus" size={1} className="mr-0p25" />
                 <span>New</span>
@@ -47,32 +56,57 @@ export const Dashboard = () => {
         }
         bodyRef={bodyRef}
       />
-      <main>
+      <main className={classes.wrapper}>
         {!connected ? (
-          <section className={[classes.section, classes.wait].join(" ")} ref={bodyRef}>
-            <Spinner size={2} />
+          <section className={[classes.section, classes.wait].join(" ")}>
+            <Spinner ref={bodyRef} size={2} />
           </section>
         ) : (
-          workspaces.map((workspace) => (
-            <div key={workspace.id} onClick={() => handleSelectWorkspace(workspace.uuid)}>
-              <h2>{workspace.name}</h2>
-              <h4>{workspace.uuid}</h4>
-              <h3>{workspace.description}</h3>
-              <h5>{workspace.createdAt}</h5>
-              <ul>
-                {workspace.memberships.map((membership) => (
-                  <li key={membership.userId}>
-                    <h5>
-                      {membership.username}:{membership.role}:{membership.joinedAt}
-                    </h5>
-                  </li>
-                ))}
-              </ul>
-            </div>
-          ))
+          <>
+            {recent.length ? (
+              <section className={classes.wlist}>
+                <h1 ref={bodyRef}>Recently opened</h1>
+                {busy ? (
+                  <CardSkeleton style={{ height: "12rem" }} />
+                ) : (
+                  <WorkspaceList workspaces={recent}>
+                    <h2 className={classes.norecent}>Nothing in recent</h2>
+                  </WorkspaceList>
+                )}
+              </section>
+            ) : null}
+            <section className={classes.wlist}>
+              <h1 ref={!recent.length ? bodyRef : null}>All Workspaces</h1>
+              {busy ? (
+                <CardSkeleton style={{ height: "12rem" }} />
+              ) : (
+                <WorkspaceList workspaces={workspaces}>
+                  <div className={classes.noworkspace}>
+                    <h2>No workspaces</h2>
+                    <Button onClick={handleCreate} icon="plus" size={1.15} type="secondary">
+                      Create your first workspace
+                    </Button>
+                  </div>
+                </WorkspaceList>
+              )}
+            </section>
+          </>
         )}
       </main>
-      <Outlet />
+      <AnimatePresence mode="popLayout">
+        {outlet && (
+          <motion.aside
+            className={classes.popup}
+            key={location.pathname}
+            initial={{ opacity: 0, transform: "scale(0.96)" }}
+            animate={{ opacity: 1, transform: "scale(1)" }}
+            exit={{ opacity: 0, transform: "scale(0.96)" }}
+            transition={{ duration: 0.15 }}
+          >
+            {outlet}
+          </motion.aside>
+        )}
+      </AnimatePresence>
     </>
   );
 };

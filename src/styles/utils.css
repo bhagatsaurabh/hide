@@ -16,6 +16,9 @@
 .mt-2 {
   margin-top: 2rem;
 }
+.mt-1.mt-1 {
+  margin-top: 1rem;
+}
 .mt-2p5 {
   margin-top: 2.5rem;
 }
@@ -28,8 +31,18 @@
 .mt-0p5 {
   margin-top: 0.5rem !important;
 }
+.mt-0 {
+  margin-top: 0;
+}
 .m-0 {
   margin: 0;
+}
+.m-auto {
+  margin: auto;
+}
+.mx-0p25 {
+  margin-left: 0.25rem;
+  margin-right: 0.25rem;
 }
 .my-0 {
   margin-top: 0;
@@ -37,6 +50,9 @@
 }
 .mb-0p5 {
   margin-bottom: 0.5rem;
+}
+.mb-0p25 {
+  margin-bottom: 0.25rem;
 }
 .mb-1 {
   margin-bottom: 1rem;
@@ -135,6 +151,9 @@
 .p-0p5 {
   padding: 0.5rem;
 }
+.p-0p75.p-0p75 {
+  padding: 0.75rem;
+}
 .p-1p5 {
   padding: 1.5rem;
 }
@@ -200,6 +219,12 @@
 }
 .w-2 {
   width: 2rem;
+}
+.w-1p5 {
+  width: 1.5rem;
+}
+.h-1p5 {
+  height: 1.5rem;
 }
 .var-w-5 {
   --item-width: 5rem;

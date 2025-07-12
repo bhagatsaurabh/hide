@@ -1,15 +1,19 @@
-.create {
+.status {
   position: relative;
   z-index: 101;
   padding: 2.5rem;
   background-color: #262626d4;
+  width: 100%;
+  text-align: center;
 }
-.create h2 {
+.status h2 {
   color: beige;
   font-weight: 200;
 }
 .heading {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
+  text-align: center;
+}
+.message {
+  color: beige;
+  font-size: 0.9rem;
 }

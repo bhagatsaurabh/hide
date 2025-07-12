@@ -12,7 +12,7 @@ export const authGuard = async ({ request }: { request: Request }) => {
     state.auth.status === AuthStatus.INCOMPLETE_PROFILE &&
     (path.startsWith("/dashboard") || path.startsWith("/profile") || path.startsWith("/env"))
   ) {
-    return redirect("/auth/profile");
+    throw redirect("/auth/profile");
   }
 
   if (
@@ -22,7 +22,7 @@ export const authGuard = async ({ request }: { request: Request }) => {
       path.startsWith("/env") ||
       path.startsWith("/auth/profile"))
   ) {
-    return redirect("/auth");
+    throw redirect("/auth");
   }
   return null;
 };
@@ -37,12 +37,12 @@ export const noAuthGuard = async () => {
 
 export const workspaceLoader = async ({ params }: { params: Params<"id"> }) => {
   if (!params.id) {
-    return redirect("/dashboard");
+    throw redirect("/dashboard");
   }
   const state = store.getState();
   const workspace = state.workspace.workspaces.find((ws) => ws.uuid === params.id);
   if (!workspace) {
-    return redirect("/dashboard");
+    throw redirect("/dashboard");
   }
   return workspace;
 };

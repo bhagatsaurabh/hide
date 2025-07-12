@@ -115,17 +115,23 @@ export const signIn = createAsyncThunk<void, { type: AuthType }>("auth/sign-in",
     }
   }
 });
-export const signOut = createAsyncThunk("auth/sign-out", async () => {
+export const signOut = createAsyncThunk("auth/sign-out", async (_, { dispatch }) => {
   try {
+    dispatch(setStatus(AuthStatus.PENDING));
     await auth.signOut();
   } catch (error) {
     console.log(error);
-    // notify.push({ type: "snackbar", status: "warn", message: "Something went wrong, please try again" });
+    dispatch(
+      notify({ title: "Couldn't sign you out", status: "error", message: "Something went wrong, please try again" })
+    );
+  } finally {
+    dispatch(setStatus(AuthStatus.SIGNED_OUT));
   }
 });
 
 export const { setStatus, setUsername, setName, setUid } = authSlice.actions;
 
 export const selectStatus = (state: RootState) => state.auth.status;
+export const selectUid = (state: RootState) => state.auth.uid;
 
 export default authSlice.reducer;

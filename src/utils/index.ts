@@ -84,3 +84,29 @@ export const getSlug = (title: string) => `#${title.toLowerCase().replace(" ", "
 export const checkNetwork = (msg: string) => (!navigator.onLine ? "Network error" : msg);
 export const isText = (children: ReactNode): children is string | number =>
   typeof children === "string" || typeof children === "number";
+
+export const timeExpression = (date: Date) => {
+  const rtf = new Intl.RelativeTimeFormat("en", { numeric: "auto" });
+  const now = new Date();
+  const diff = (now.getTime() - date.getTime()) / 1000;
+
+  const ranges = [
+    { unit: "year", seconds: 31536000 },
+    { unit: "month", seconds: 2592000 },
+    { unit: "week", seconds: 604800 },
+    { unit: "day", seconds: 86400 },
+    { unit: "hour", seconds: 3600 },
+    { unit: "minute", seconds: 60 },
+    { unit: "second", seconds: 1 },
+  ];
+
+  for (const { unit, seconds } of ranges) {
+    const value = Math.floor(diff / seconds);
+    if (value >= 1) return rtf.format(-value, unit as Intl.RelativeTimeFormatUnit);
+  }
+
+  return rtf.format(0, "second");
+};
+export const capitalize = (word: string) => {
+  return word.charAt(0).toUpperCase() + word.slice(1).toLowerCase();
+};
