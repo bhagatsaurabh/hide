@@ -1,6 +1,50 @@
+.wrapper {
+}
 .wait {
   height: calc(100vh - var(--header-height));
   display: flex;
   align-items: center;
   justify-content: center;
+}
+.wlist {
+  padding: 1rem;
+  padding-top: 2rem;
+}
+.wlist h1 {
+  font-size: 1.75rem;
+  font-weight: 200;
+  color: beige;
+  margin: 0;
+  margin-bottom: 1rem;
+}
+.noworkspace {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+.noworkspace h2 {
+  font-weight: 100;
+  color: beige;
+  margin: 4rem;
+  text-align: center;
+  opacity: 0.7;
+}
+.norecent {
+  font-weight: 100;
+  color: beige;
+  margin: 4rem;
+  text-align: center;
+  opacity: 0.7;
+}
+.popup {
+  position: fixed;
+  z-index: 10;
+  top: 0;
+  display: flex;
+  left: 0;
+  height: 100%;
+  width: 100%;
+  justify-content: center;
+  align-items: center;
 }

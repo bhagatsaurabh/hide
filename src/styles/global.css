@@ -27,6 +27,7 @@
   -moz-osx-font-smoothing: grayscale;
   -webkit-text-size-adjust: 100%;
 
+  --text: #dddddd;
   --header-height: 3.8rem;
   --footer-height: 3.8rem;
   --scrollbar-width: 5px;

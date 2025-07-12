@@ -1,15 +1,19 @@
 import { useRef, useState } from "react";
-import { useAppSelector } from "@/hooks/store";
-import { AuthStatus, selectStatus } from "@/store/auth";
+import { useAppDispatch, useAppSelector } from "@/hooks/store";
+import { AuthStatus, selectStatus, signOut } from "@/store/auth";
 import classes from "./Avatar.module.css";
 import Modal, { ModalRef } from "../Modal/Modal";
 import Button from "../Button/Button";
 import Icon from "../Icon/Icon";
+import { Link, useNavigate } from "react-router";
 
 export const Avatar = () => {
   const authStatus = useAppSelector(selectStatus);
   const [isOpen, setIsOpen] = useState(false);
   const menuRef = useRef<ModalRef>(null);
+  const modalAnchor = useRef<HTMLButtonElement>(null);
+  const navigate = useNavigate();
+  const dispatch = useAppDispatch();
 
   const handleClick = () => {
     if (isOpen) {
@@ -18,21 +22,50 @@ export const Avatar = () => {
       setIsOpen(true);
     }
   };
+  const handleMenuOption = async (option: string) => {
+    if (option === "signout") {
+      await dispatch(signOut());
+      navigate("/");
+    } else if (option === "profile") {
+      navigate("/profile");
+    }
+  };
 
   return (
     authStatus === AuthStatus.SIGNED_IN && (
       <>
-        <Button icon="guest" size={1.5} onClick={handleClick} className="p-0p25" fit />
+        <Button
+          ref={modalAnchor}
+          icon="guest"
+          size={1.5}
+          onClick={handleClick}
+          className="p-0p25"
+          highlight={isOpen}
+          fit
+        />
         {isOpen && (
-          <Modal title="options" onDismiss={() => setIsOpen(false)} ref={menuRef} className="p-1p5" full seethrough>
-            <ul>
+          <Modal
+            anchor={modalAnchor}
+            title="options"
+            onDismiss={() => setIsOpen(false)}
+            ref={menuRef}
+            className="p-1p5"
+            type="menu"
+            full
+            seethrough
+          >
+            <ul className={classes.menu}>
               <li>
-                <Icon name="profile" size={1.5} />
-                <span>Profile</span>
+                <button role="link" onClick={() => handleMenuOption("profile")}>
+                  <Icon name="profile" size={1.1} />
+                  <span>Profile</span>
+                </button>
               </li>
               <li>
-                <Icon name="sign-out" size={1.5} />
-                <span>Sign out</span>
+                <button onClick={() => handleMenuOption("signout")}>
+                  <Icon name="sign-out" size={1.1} />
+                  <span>Sign out</span>
+                </button>
               </li>
             </ul>
           </Modal>

@@ -1,3 +1,5 @@
+import { InSocketMessagePayload } from "./common";
+
 export interface WorkspaceDTO {
   id: number;
   uuid: string;
@@ -5,6 +7,7 @@ export interface WorkspaceDTO {
   description: string;
   createdAt: string;
   memberships: MembershipDTO[];
+  image: string;
 }
 
 export interface MembershipDTO {
@@ -21,9 +24,35 @@ export interface WorkspaceCreateDTO {
   name: string;
   description: string;
   image: string;
+  uid: string;
+  sessionId: string;
 }
 export interface ProvisionDTO {
   message: string;
   privateKey: string;
   workspace: WorkspaceDTO;
 }
+
+export interface ProvisionStatus extends InSocketMessagePayload {
+  message: string;
+}
+export interface ProvisionError extends InSocketMessagePayload {
+  message: string;
+}
+export interface ProvisionSuccess extends InSocketMessagePayload {
+  message: string;
+  privateKey: string;
+  workspace: WorkspaceDTO;
+}
+
+export type ProvisionResponseMap = {
+  status: ProvisionStatus;
+  error: ProvisionError;
+  success: ProvisionSuccess;
+};
+export type ProvisionPayload = {
+  [K in keyof ProvisionResponseMap]: {
+    action: K;
+    payload: ProvisionResponseMap[K];
+  };
+}[keyof ProvisionResponseMap];

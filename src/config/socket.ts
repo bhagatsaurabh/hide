@@ -8,6 +8,7 @@ export type InSocketEventsMap = {
   fs: (msg: InSocketMessage<"fs">) => void;
   notification: (msg: InSocketMessage<"notification">) => void;
   env: (msg: InSocketMessage<"env">) => void;
+  provision: (msg: InSocketMessage<"provision">) => void;
 } & {
   [key: string]: (msg: InSocketMessage<string>) => void;
 };
@@ -34,7 +35,10 @@ export const connectSocket = async () => {
       socket.on("connect", () => {
         resolve(socket);
       });
-      socket.io.on("error", (err) => reject(err));
+      socket.io.on("error", (err) => {
+        console.log(err);
+        reject(err);
+      });
       socket.io.on("close", (err) => {
         console.log("Closed: ", err);
       });
@@ -51,6 +55,7 @@ export const connectSocket = async () => {
         console.log("Reconnect Failed: ", socket?.id);
       });
     } catch (error) {
+      console.log(error);
       reject(error);
     }
   });

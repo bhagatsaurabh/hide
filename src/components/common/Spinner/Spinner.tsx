@@ -1,13 +1,14 @@
-import { ReactNode } from "react";
+import { ReactNode, Ref } from "react";
 import classes from "./Spinner.module.css";
 
 interface SpinnerProps {
   size: number;
   children: ReactNode;
   className: string;
+  ref: Ref<HTMLDivElement>;
 }
 
-const Spinner = ({ size, className, children }: Partial<SpinnerProps>) => {
+const Spinner = ({ size, className, children, ref }: Partial<SpinnerProps>) => {
   size = size ?? 1;
   const classNames = [classes.spinner];
   if (className) {
@@ -16,7 +17,7 @@ const Spinner = ({ size, className, children }: Partial<SpinnerProps>) => {
 
   return (
     <>
-      <div style={{ width: `${size}rem`, height: `${size}rem` }} className={classNames.join(" ")}>
+      <div ref={ref} style={{ width: `${size}rem`, height: `${size}rem` }} className={classNames.join(" ")}>
         <div className={[classes.bar, classes.bar1].join(" ")}></div>
       </div>
       {children && (

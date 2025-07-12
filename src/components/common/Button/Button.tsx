@@ -1,8 +1,9 @@
-import { CSSProperties, MouseEvent, ReactNode } from "react";
+import { CSSProperties, MouseEvent, ReactNode, RefObject } from "react";
 import classes from "./Button.module.css";
 import Icon from "../Icon/Icon";
 import Spinner from "../Spinner/Spinner";
 import { isText, noop } from "@/utils";
+import { Null } from "@/utils/types";
 
 interface ButtonProps {
   busy: boolean;
@@ -15,6 +16,8 @@ interface ButtonProps {
   children: ReactNode;
   fit: boolean;
   type: "primary" | "secondary";
+  ref: RefObject<Null<HTMLButtonElement>>;
+  highlight: boolean;
 }
 
 const Button = ({
@@ -28,11 +31,14 @@ const Button = ({
   children,
   fit,
   type = "primary",
+  ref,
+  highlight = false,
 }: Partial<ButtonProps>) => {
   const classNames = [classes.button, classes[type]];
   if (disabled) classNames.push(classes.disabled);
   if (fit) classNames.push(classes.fit);
   if (className) classNames.push(className);
+  if (highlight) classNames.push(classes["highlight"]);
   const content = [];
   const iconClasses = ["va-text-bottom"];
 
@@ -56,6 +62,7 @@ const Button = ({
 
   return (
     <button
+      ref={ref}
       disabled={disabled}
       className={classNames.join(" ")}
       style={{ fontSize: `${size * 0.8}rem`, "--border-radius": `${size * 0.4}rem` } as CSSProperties}

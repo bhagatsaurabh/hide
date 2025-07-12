@@ -1,0 +1,32 @@
+.project {
+  position: relative;
+  z-index: 101;
+  padding: 2.5rem;
+  background-color: #262626d4;
+  color: beige;
+}
+.heading {
+  padding-bottom: 1rem;
+  border-bottom: 1px solid beige;
+  margin-bottom: 2rem;
+}
+.heading .name {
+  font-weight: 300;
+}
+.heading .desc {
+  font-weight: 300;
+  font-size: 0.95rem;
+  color: #f2f2dce6;
+}
+.heading .creation {
+  font-size: 0.85rem;
+  color: #f5f5dc87;
+}
+.memberlist {
+}
+.memberlist .heading {
+  font-weight: 200;
+  border: none;
+  margin: 0;
+  padding: 0;
+}

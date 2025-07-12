@@ -3,12 +3,14 @@ import { FSClose, FSDirEntries, FSFile, FSNoop, FSOpen, FSPayload, FSSyncOut } f
 import { NotificationPayload } from "./notification";
 import { OutSocketMessagePresence, PresencePing } from "./presence";
 import { SSHClose, SSHData, SSHPayload, SSHRequest } from "./ssh";
+import { ProvisionPayload } from "./workspace";
 
 export type InSocketMessageActionMap = {
   ssh: SSHPayload;
   fs: FSPayload;
   notification: NotificationPayload;
   env: EnvPayload;
+  provision: ProvisionPayload;
 } & {
   [key: string]: { action: "success" | "error"; payload: FSDirEntries | FSFile | FSNoop | InSocketMessagePayload };
 };

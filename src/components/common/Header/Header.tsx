@@ -18,15 +18,23 @@ const Header = ({ left, center, right, bodyRef }: HeaderProps) => {
   useEffect(() => {
     if (!bodyRef.current) return;
 
+    observer.current?.disconnect();
+    setShadow(false);
+
     const cssdec = getComputedStyle(document.documentElement);
     const baseFontSize = parseFloat(cssdec.fontSize);
     const headerHeight = parseFloat(cssdec.getPropertyValue("--header-height"));
 
-    observer.current = new IntersectionObserver(([entry]) => setShadow(!entry.isIntersecting), {
-      root: null,
-      threshold: 1,
-      rootMargin: `-${(headerHeight * baseFontSize) / 2}px 0px 0px 0px`,
-    });
+    observer.current = new IntersectionObserver(
+      ([entry]) => {
+        setShadow(!entry.isIntersecting);
+      },
+      {
+        root: null,
+        threshold: 1,
+        rootMargin: `-${(headerHeight * baseFontSize) / 2}px 0px 0px 0px`,
+      }
+    );
     observer.current.observe(bodyRef.current);
   }, [bodyRef]);
 

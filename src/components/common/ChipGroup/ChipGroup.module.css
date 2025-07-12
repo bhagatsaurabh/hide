@@ -1,0 +1,54 @@
+.chipgroup {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  padding: 0;
+  margin: 2rem 0 1rem 0;
+  border: none;
+}
+.chipgroup legend {
+  visibility: hidden;
+  position: absolute;
+  pointer-events: none;
+}
+.chip {
+  cursor: pointer;
+  position: relative;
+}
+.input {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+}
+.wrapper {
+  padding: 6px 12px;
+  border-radius: 9999px;
+  border: 1px solid #ccc;
+  background-color: #f1f1f1;
+  color: #333;
+  font-size: 14px;
+  transition: background-color 0.2s ease, color 0.2s ease;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.wrapper svg {
+  margin-right: 0.5rem;
+}
+
+.input:checked + .wrapper {
+  background-color: #7291d5;
+  color: #fff;
+  border-color: #7291d5;
+}
+
+.input:focus + .wrapper {
+  outline: 2px solid #7291d5;
+  outline-offset: 2px;
+}
+
+@media (hover: hover) {
+  .wrapper:hover {
+    background-color: #e0e7ff;
+  }
+}

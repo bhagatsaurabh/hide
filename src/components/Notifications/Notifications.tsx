@@ -35,7 +35,7 @@ export const NotificationBar = () => {
   return (
     authStatus === AuthStatus.SIGNED_IN && (
       <>
-        <Button icon="notifications" size={1.5} onClick={handleClick} className="p-0p25" fit />
+        <Button icon="notifications" size={1.5} onClick={handleClick} className="p-0p25" highlight={isOpen} fit />
         {isOpen && (
           <Modal
             title="notifications"
