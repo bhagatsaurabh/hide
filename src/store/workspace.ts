@@ -1,7 +1,7 @@
 import { createAsyncThunk, createSlice, PayloadAction } from "@reduxjs/toolkit";
 
-import { WorkspaceCreateDTO, WorkspaceDTO } from "@/models/workspace";
-import { createWorkspace, getAllWorkspaces } from "@/services/workspace";
+import { WorkspaceCreateDTO, WorkspaceDTO, WorkspaceUpdateDTO } from "@/models/workspace";
+import { createWorkspace, getAllWorkspaces, updateWorkspace } from "@/services/workspace";
 import { RootState } from ".";
 import { auth } from "@/config/firebase";
 import { storeSSHKey } from "@/utils/driver";
@@ -62,8 +62,19 @@ export const processNewWorkspace = createAsyncThunk<void, { workspace: Workspace
   "workspace/process",
   async ({ workspace, privateKey }, { dispatch }) => {
     try {
+      console.log(workspace);
       await storeSSHKey(auth.currentUser!.uid, workspace.uuid, privateKey);
       dispatch(addWorkspace(workspace));
+    } catch (error) {
+      console.log(error);
+    }
+  }
+);
+export const updateExistingWorkspace = createAsyncThunk<void, WorkspaceUpdateDTO>(
+  "workspace/update",
+  async (data) => {
+    try {
+      await updateWorkspace(data);
     } catch (error) {
       console.log(error);
     }

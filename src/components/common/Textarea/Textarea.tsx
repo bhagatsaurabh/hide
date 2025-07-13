@@ -1,7 +1,7 @@
 import { CSSProperties, ReactNode, RefObject, useEffect, useImperativeHandle, useRef, useState } from "react";
 import { AnimatePresence, motion } from "motion/react";
 import { Null } from "@/utils/types";
-import classes from "./Input.module.css";
+import classes from "./Textarea.module.css";
 import classNames from "classnames";
 import { noop } from "@/utils";
 
@@ -10,14 +10,14 @@ interface Attrs {
   spellCheck?: boolean;
   autoComplete?: string;
 }
-export interface InputRef {
-  native: HTMLInputElement;
+export interface TextareaRef {
+  native: HTMLTextAreaElement;
   validate: (val: string) => string;
   invalidate: (msg: string) => void;
   focus: () => void;
   err: string;
 }
-export interface InputProps {
+export interface TextareaProps {
   type?: string;
   placeholder?: string;
   attrs?: Attrs;
@@ -28,14 +28,13 @@ export interface InputProps {
   value: string;
   onChange: (val: string) => void;
   onBlur?: () => void;
-  ref?: RefObject<Null<InputRef>>;
+  ref?: RefObject<Null<TextareaRef>>;
   className?: string;
   style?: CSSProperties;
   children?: ReactNode;
 }
 
-export const Input = ({
-  type = "text",
+export const Textarea = ({
   placeholder = undefined,
   attrs = {},
   noTitle = false,
@@ -49,8 +48,8 @@ export const Input = ({
   className,
   style = {},
   children,
-}: InputProps) => {
-  const native = useRef<Null<HTMLInputElement>>(null);
+}: TextareaProps) => {
+  const native = useRef<Null<HTMLTextAreaElement>>(null);
   const [err, setErr] = useState<string>("");
 
   useEffect(() => {
@@ -64,7 +63,7 @@ export const Input = ({
     err,
   }));
 
-  const handleInput = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleInput = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     onChange(e.target.value);
     if (validation === "Eager") validate(e.target.value);
     else {
@@ -97,12 +96,11 @@ export const Input = ({
         data-placeholder={placeholder}
         style={style}
       >
-        <input
+        <textarea
           className={className ?? ""}
           ref={native}
           value={value}
           onInput={handleInput}
-          type={type}
           placeholder={noTitle ? placeholder : undefined}
           name={placeholder}
           onBlur={onBlur}

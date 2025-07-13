@@ -1,9 +1,10 @@
 .project {
   position: relative;
   z-index: 101;
-  padding: 2.5rem;
+  padding: 1.5rem;
   background-color: #262626d4;
   color: beige;
+  width: 100%;
 }
 .heading {
   padding-bottom: 1rem;
@@ -23,10 +24,12 @@
   color: #f5f5dc87;
 }
 .memberlist {
+  margin-bottom: 2rem;
 }
 .memberlist .heading {
   font-weight: 200;
   border: none;
   margin: 0;
   padding: 0;
+  margin-bottom: 1rem;
 }

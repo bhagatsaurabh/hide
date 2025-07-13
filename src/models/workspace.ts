@@ -13,7 +13,7 @@ export interface WorkspaceDTO {
 export interface MembershipDTO {
   workspaceId: number;
   userId: string;
-  role: string;
+  role: "owner" | "member";
   joinedAt: string;
   name: string;
   username: string;
@@ -27,6 +27,13 @@ export interface WorkspaceCreateDTO {
   uid: string;
   sessionId: string;
 }
+export interface WorkspaceUpdateDTO {
+  id: number;
+  name: string;
+  description: string;
+  members: string[];
+}
+
 export interface ProvisionDTO {
   message: string;
   privateKey: string;

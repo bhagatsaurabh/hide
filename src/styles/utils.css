@@ -19,6 +19,12 @@
 .mt-1.mt-1 {
   margin-top: 1rem;
 }
+.mt-1p5 {
+  margin-top: 1.5rem;
+}
+.mb-1p5 {
+  margin-bottom: 1.5rem;
+}
 .mt-2p5 {
   margin-top: 2.5rem;
 }
@@ -82,11 +88,23 @@
 .fs-3 {
   font-size: 3rem;
 }
+.fs-1p5.fs-1p5 {
+  font-size: 1.5rem;
+}
+.fs-0p85.fs-0p85 {
+  font-size: 0.85rem;
+}
 .ff-audiowide {
   font-family: Audiowide;
 }
 .font-weight-lighter {
   font-weight: lighter;
+}
+.c-inherit.c-inherit {
+  color: inherit;
+}
+.flex-1-1-auto {
+  flex: 1 1 auto;
 }
 .ta-left {
   text-align: left;
@@ -112,6 +130,9 @@
 }
 .jc-space-between {
   justify-content: space-between;
+}
+.p-absolute {
+  position: absolute;
 }
 .p-absolute-centered {
   position: absolute;
@@ -187,6 +208,21 @@
 .p-0p25.p-0p25 {
   padding: 0.25rem;
 }
+.p-0p35.p-0p35 {
+  padding: 0.35rem;
+}
+.p-0p45.p-0p45 {
+  padding: 0.45rem;
+}
+.float-right {
+  float: right;
+}
+.gap-1 {
+  gap: 1rem;
+}
+.justify-content-end {
+  justify-content: flex-end;
+}
 .fw-100 {
   font-weight: 100;
 }
@@ -220,6 +256,9 @@
 .w-2 {
   width: 2rem;
 }
+.w-2p5 {
+  width: 2.5rem;
+}
 .w-1p5 {
   width: 1.5rem;
 }
@@ -241,9 +280,17 @@
 .h-2 {
   height: 2rem;
 }
+.h-2p5 {
+  height: 2.5rem;
+}
 .h-5 {
   height: 5rem;
 }
+
+.br-5t {
+  border-radius: 50%;
+}
+
 @media (min-width: 768px) {
   .sm\:w-7p5 {
     width: 7.5rem;
