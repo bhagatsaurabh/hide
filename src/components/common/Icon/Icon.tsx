@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { CSSProperties, useEffect, useState } from "react";
 import PointSkeleton from "../skeletons/PointSkeleton/PointSkeleton";
 import DefaultSVG from "../../../assets/icons/default.svg?react";
 import classes from "./Icon.module.css";
@@ -9,9 +9,10 @@ interface IconProps {
   className?: string;
   color?: string;
   status?: boolean;
+  style?: CSSProperties;
 }
 
-const Icon = ({ size = 1, name, className, color, status = false }: IconProps) => {
+const Icon = ({ size = 1, name, className, color, status = false, style = {} }: IconProps) => {
   const [Component, setComponent] = useState<React.FC<React.SVGProps<SVGSVGElement>> | null>(null);
   const [error, setError] = useState(false);
 
@@ -40,19 +41,19 @@ const Icon = ({ size = 1, name, className, color, status = false }: IconProps) =
         className={className}
         width={`${size}rem`}
         height={`${size}rem`}
-        style={{ fill: color, stroke: color }}
+        style={{ fill: color, stroke: color, ...style }}
       />
     );
   }
   if (!Component) {
-    return <PointSkeleton className={className} size={size} />;
+    return <PointSkeleton className={className} style={style} size={size} />;
   }
   return (
     <Component
       className={[className, status ? classes[name] : ""].join(" ")}
       width={`${size}rem`}
       height={`${size}rem`}
-      style={{ fill: color, stroke: color }}
+      style={{ fill: color, stroke: color, ...style }}
     />
   );
 };

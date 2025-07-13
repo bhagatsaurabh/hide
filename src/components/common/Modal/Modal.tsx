@@ -84,7 +84,7 @@ const Modal = ({
     exit = { opacity: 0 };
   } else {
     initial = { opacity: 0, transform: "scale(0.95)" };
-    animate = { opacity: 1, transform: "scale(1)" };
+    animate = { opacity: 1, transform: "translateY(-50%) scale(1)" };
     exit = { opacity: 0, transform: "scale(0.95)" };
   }
 

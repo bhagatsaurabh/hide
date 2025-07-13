@@ -1,0 +1,20 @@
+.editable {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.editable .displayname {
+  left: 0px;
+  top: calc(-4px + 0.5rem);
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  overflow: hidden;
+  width: 100%;
+}
+.action {
+  margin-left: 1rem;
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+  color: #b3b3b3;
+}

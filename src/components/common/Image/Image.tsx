@@ -12,7 +12,7 @@ interface ImageProps {
 }
 
 const Image = ({ path, alt, asset = false, className, style = {} }: ImageProps) => {
-  const [src, setSrc] = useState<string | null>(null);
+  const [isLoaded, setIsLoaded] = useState(false);
   const [Svg, setSvg] = useState<React.FC<React.SVGProps<SVGSVGElement>> | null>(null);
   const [error, setError] = useState(false);
   const classNames = [classes.image, className ?? ""];
@@ -27,13 +27,13 @@ const Image = ({ path, alt, asset = false, className, style = {} }: ImageProps) 
           if (importPath.endsWith("?react")) {
             setSvg(() => module.default);
           } else {
-            setSrc(() => module.default);
+            setIsLoaded(true);
           }
           setError(false);
         }
       })
       .catch(() => {
-        setSrc(null);
+        setIsLoaded(false);
         setError(true);
       });
 
@@ -42,25 +42,35 @@ const Image = ({ path, alt, asset = false, className, style = {} }: ImageProps) 
     };
   }, [asset, path]);
 
-  let image;
+  let cover;
   if (error) {
-    image = <DefaultSVG className={className} style={{ fill: "beige", stroke: "beige", ...style }} />;
+    cover = <DefaultSVG className={className} style={{ fill: "beige", stroke: "beige", ...style }} />;
   }
-  if (!src && !Svg) {
-    image = <ImageSkeleton className={className} style={{ ...style }} />;
+  if (!isLoaded && !Svg) {
+    cover = <ImageSkeleton className={className} style={{ ...style }} />;
   }
 
+  const assetImage = Svg ? (
+    <Svg style={{ ...style }} className={classNames.join(" ")} />
+  ) : (
+    <img style={{ ...style }} className={classNames.join(" ")} src={path} alt={alt} />
+  );
+
+  const nonAssetImage = (
+    <img
+      style={{ ...style, display: isLoaded ? "block" : "none" }}
+      className={classNames.join(" ")}
+      src={path}
+      alt={alt}
+      onLoad={() => setIsLoaded(true)}
+    />
+  );
+
   return (
-    image ??
-    (asset ? (
-      Svg ? (
-        <Svg style={{ ...style }} className={classNames.join(" ")} />
-      ) : (
-        <img style={{ ...style }} className={classNames.join(" ")} src={src!} alt={alt} />
-      )
-    ) : (
-      <img style={{ ...style }} className={classNames.join(" ")} src={path} alt={alt} onLoad={() => setSrc("#")} />
-    ))
+    <>
+      {cover}
+      {asset ? assetImage : nonAssetImage}
+    </>
   );
 };
 

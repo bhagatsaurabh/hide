@@ -9,7 +9,7 @@
 .input.no-title::before {
   display: none;
 }
-.input input {
+.input textarea {
   height: 100%;
   width: 100%;
   font-size: 1rem;
@@ -62,7 +62,7 @@
   top: 75%;
   font-size: 0.75rem;
 }
-.input input:focus {
+.input textarea:focus {
   outline: none;
 }
 .errormsg {
