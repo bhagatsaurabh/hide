@@ -31,7 +31,7 @@ export interface WorkspaceUpdateDTO {
   id: number;
   name: string;
   description: string;
-  members: string[];
+  members?: string[];
 }
 
 export interface ProvisionDTO {

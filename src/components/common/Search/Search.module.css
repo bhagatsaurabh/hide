@@ -1,0 +1,32 @@
+.search {
+  width: 100%;
+  position: relative;
+}
+.search input {
+  background-color: transparent;
+  border: none;
+  width: 100%;
+  padding: 0.5rem 0.5rem;
+  padding-left: 2rem;
+  font-size: 1.25rem;
+  color: #fcfceac4;
+}
+.hr {
+  width: 100%;
+  height: 2px;
+  background-color: #80ccbf;
+  transition: height 0.1s linear;
+  position: absolute;
+}
+.search form:focus-within .hr {
+  height: 4px;
+}
+.search input:focus {
+  outline: none;
+}
+.search svg {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  margin-left: 0.25rem;
+}

@@ -5,7 +5,7 @@
   width: 80%;
   transform: translateX(-50%);
   padding-bottom: 1.5rem;
-  z-index: 5;
+  z-index: 100;
 }
 .toast ul {
   list-style: none;
@@ -37,6 +37,9 @@
   margin: 0;
   font-weight: 500;
   margin-right: 0.75rem;
+}
+.heading.heading button {
+  color: grey;
 }
 .toast.toast ul li button {
   margin-left: auto;

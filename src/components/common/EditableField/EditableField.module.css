@@ -6,10 +6,13 @@
 .editable .displayname {
   left: 0px;
   top: calc(-4px + 0.5rem);
-  white-space: nowrap;
   text-overflow: ellipsis;
   overflow: hidden;
   width: 100%;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 3;
+  line-clamp: 3;
+  display: -webkit-box;
 }
 .action {
   margin-left: 1rem;

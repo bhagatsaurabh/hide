@@ -21,7 +21,7 @@ const Image = ({ path, alt, asset = false, className, style = {} }: ImageProps) 
     if (!asset) return;
     let isMounted = true;
     const importPath = path.endsWith(".svg") ? path + "?react" : path;
-    import(importPath)
+    import(/* @vite-ignore */ importPath)
       .then((module) => {
         if (isMounted) {
           if (importPath.endsWith("?react")) {

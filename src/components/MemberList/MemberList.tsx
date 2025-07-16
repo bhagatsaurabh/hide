@@ -12,7 +12,7 @@ interface MemberListProps {
 
 const MemberList = ({ members, onRemove, role }: MemberListProps) => {
   return (
-    <ul className={classes.memberlist}>
+    <ul className={[classes.memberlist, "scroll-shadows"].join(" ")}>
       {members.map((member) => (
         <li key={member.userId} className={classes.memberitem}>
           <div className={classes.info}>

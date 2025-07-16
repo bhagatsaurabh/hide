@@ -5,6 +5,7 @@ import { createWorkspace, getAllWorkspaces, updateWorkspace } from "@/services/w
 import { RootState } from ".";
 import { auth } from "@/config/firebase";
 import { storeSSHKey } from "@/utils/driver";
+import { notify } from "./notifications";
 
 type WorkspaceState = {
   workspaces: WorkspaceDTO[];
@@ -51,31 +52,55 @@ export const fetchWorkspaces = createAsyncThunk("workspace/get-all", async (_, {
   }
 });
 
-export const createNewWorkspace = createAsyncThunk<void, WorkspaceCreateDTO>("workspace/create", async (data) => {
-  try {
-    await createWorkspace(data);
-  } catch (error) {
-    console.log(error);
+export const createNewWorkspace = createAsyncThunk<void, WorkspaceCreateDTO>(
+  "workspace/create",
+  async (data, { dispatch }) => {
+    try {
+      await createWorkspace(data);
+    } catch (error) {
+      dispatch(
+        notify({
+          title: "Failed to create new workspace",
+          message: "Something went wrong when creating new workspace, please try again later",
+          status: "error",
+        })
+      );
+      console.log(error);
+    }
   }
-});
+);
 export const processNewWorkspace = createAsyncThunk<void, { workspace: WorkspaceDTO; privateKey: string }>(
   "workspace/process",
   async ({ workspace, privateKey }, { dispatch }) => {
     try {
-      console.log(workspace);
       await storeSSHKey(auth.currentUser!.uid, workspace.uuid, privateKey);
       dispatch(addWorkspace(workspace));
     } catch (error) {
+      dispatch(
+        notify({
+          title: "Failed to create new workspace",
+          message: "Something went wrong when creating new workspace, please try again later.",
+          status: "error",
+        })
+      );
       console.log(error);
     }
   }
 );
 export const updateExistingWorkspace = createAsyncThunk<void, WorkspaceUpdateDTO>(
   "workspace/update",
-  async (data) => {
+  async (data, { dispatch }) => {
     try {
       await updateWorkspace(data);
+      await dispatch(fetchWorkspaces());
     } catch (error) {
+      dispatch(
+        notify({
+          title: "Failed to update workspace",
+          message: "Something went wrong when updating the workspace, please try again later.",
+          status: "error",
+        })
+      );
       console.log(error);
     }
   }
@@ -88,6 +113,9 @@ export const selectWorkspaces = (state: RootState) => state.workspace;
 export const selectRecent = (state: RootState) => state.workspace.recent;
 export const selectWorkspace = (state: RootState, uuid: string) => {
   return state.workspace.workspaces.find((workspace) => workspace.uuid === uuid);
+};
+export const selectWorkspaceById = (state: RootState, id: number) => {
+  return state.workspace.workspaces.find((workspace) => workspace.id === id);
 };
 
 export default wsSlice.reducer;
