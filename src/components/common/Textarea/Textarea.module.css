@@ -19,6 +19,7 @@
   background-color: transparent;
   color: #ececec;
   font-family: Inter;
+  resize: none;
 }
 .input::before {
   content: attr(data-placeholder);
@@ -53,7 +54,7 @@
 }
 .input:focus-within::after {
   background-color: #80ccbf;
-  height: 4px;
+  height: 1px;
 }
 .input.invalid:focus-within::after {
   background-color: #ed7b7b;

@@ -67,7 +67,7 @@ export const CreateProfile = () => {
     }
   };
   const handleContinue = async (ev: MouseEvent | FormEvent) => {
-    ev.preventDefault();
+    ev?.preventDefault();
 
     if (input.current?.validate(username)) return;
     if (nameInput.current?.validate(name)) return;
@@ -122,7 +122,6 @@ export const CreateProfile = () => {
             ))}
         </div>
         <Input
-          className="mt-2p5"
           attrs={{ spellCheck: false, autoComplete: "off" }}
           placeholder="Name"
           type="text"

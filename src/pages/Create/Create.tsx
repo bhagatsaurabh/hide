@@ -119,7 +119,6 @@ export const Create = () => {
         />
         <Input
           attrs={{ spellCheck: false, autoComplete: "off" }}
-          className="mt-2"
           placeholder="Description"
           type="text"
           value={description}

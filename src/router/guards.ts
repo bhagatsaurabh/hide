@@ -44,5 +44,5 @@ export const workspaceLoader = async ({ params }: { params: Params<"id"> }) => {
   if (!workspace) {
     throw redirect("/dashboard");
   }
-  return workspace;
+  return workspace.id;
 };

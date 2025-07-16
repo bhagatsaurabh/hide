@@ -1,9 +1,14 @@
-import { useEffect, useRef, useState } from "react";
+import { RefObject, useEffect, useImperativeHandle, useRef, useState } from "react";
 import { Input, InputRef } from "../Input/Input";
 import classes from "./EditableField.module.css";
 import Button from "../Button/Button";
 import Icon from "../Icon/Icon";
 import { Textarea, TextareaRef } from "../Textarea/Textarea";
+import { Null } from "@/utils/types";
+
+export interface EditableFieldRef {
+  input: RefObject<Null<InputRef & TextareaRef>>;
+}
 
 interface EditableFieldProps {
   validator: (val: string) => string;
@@ -14,6 +19,7 @@ interface EditableFieldProps {
   inputClassName?: string;
   value: string;
   onChange: (val: string) => void;
+  ref: RefObject<Null<EditableFieldRef>>;
 }
 
 const EditableField = ({
@@ -25,6 +31,7 @@ const EditableField = ({
   inputClassName = "",
   value,
   onChange,
+  ref,
 }: EditableFieldProps) => {
   const inputRef = useRef<InputRef & TextareaRef>(null);
   const [isEditing, setIsEditing] = useState(false);
@@ -38,6 +45,10 @@ const EditableField = ({
     }
     setIsEditing(false);
   };
+
+  useImperativeHandle(ref, () => ({
+    input: inputRef,
+  }));
 
   useEffect(() => {
     if (isEditing) {

@@ -125,6 +125,9 @@
   justify-content: center;
   align-items: center;
 }
+.flex-column {
+  flex-direction: column;
+}
 .flex-primary-left {
   justify-content: left;
 }
@@ -289,6 +292,18 @@
 
 .br-5t {
   border-radius: 50%;
+}
+
+.scroll-shadows {
+  /* max-height: 200px; */
+  overflow: auto;
+  background: linear-gradient(var(--scroll-back-color) 30%, rgba(255, 255, 255, 0)) center top,
+    linear-gradient(rgba(255, 255, 255, 0), var(--scroll-back-color) 70%) center bottom,
+    radial-gradient(farthest-side at 50% 0, rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0)) center top,
+    radial-gradient(farthest-side at 50% 100%, rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0)) center bottom;
+  background-repeat: no-repeat;
+  background-size: 100% 40px, 100% 40px, 100% 14px, 100% 14px;
+  background-attachment: local, local, scroll, scroll;
 }
 
 @media (min-width: 768px) {

@@ -1,0 +1,20 @@
+.pillgroup {
+  display: flex;
+  gap: 0.5rem;
+  padding: 0;
+  border: none;
+}
+.pill {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 2rem;
+  background-color: #80808045;
+}
+.pill > svg {
+  background-color: #8080804f;
+}
+.text {
+  font-size: 0.9rem;
+  margin: 0 0.5rem;
+}
