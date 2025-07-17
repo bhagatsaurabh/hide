@@ -9,6 +9,7 @@ export type InSocketEventsMap = {
   notification: (msg: InSocketMessage<"notification">) => void;
   env: (msg: InSocketMessage<"env">) => void;
   provision: (msg: InSocketMessage<"provision">) => void;
+  workspace: (msg: InSocketMessage<"workspace">) => void;
 } & {
   [key: string]: (msg: InSocketMessage<string>) => void;
 };

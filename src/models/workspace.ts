@@ -63,3 +63,26 @@ export type ProvisionPayload = {
     payload: ProvisionResponseMap[K];
   };
 }[keyof ProvisionResponseMap];
+
+export type InvitationAcceptDTO = {
+  id: string;
+  token: string;
+};
+export type InvitationIgnoreDTO = {
+  id: string;
+  token: string;
+};
+
+export interface WorkspaceMembersModified extends InSocketMessagePayload {
+  uuid: string;
+}
+
+export type WorkspaceResponseMap = {
+  "members.modified": WorkspaceMembersModified;
+};
+export type WorkspacePayload = {
+  [K in keyof WorkspaceResponseMap]: {
+    action: K;
+    payload: WorkspaceResponseMap[K];
+  };
+}[keyof WorkspaceResponseMap];

@@ -35,6 +35,7 @@ export const Project = () => {
   const descRef = useRef<EditableFieldRef>(null);
   const [showAdd, setShowAdd] = useState(false);
   const addDiagRef = useRef<ModalRef>(null);
+  const membership = workspace.memberships.find((member) => member.userId === auth.currentUser!.uid)!;
 
   const trapFocus = useCallback((event: KeyboardEvent) => {
     if (event.key === "Tab") {
@@ -77,7 +78,7 @@ export const Project = () => {
     if (show) {
       window.removeEventListener("keydown", trapFocus);
       setShow(false);
-      navigate(-1);
+      navigate("/dashboard");
     }
   };
   const handleRemoveClick = (user: MembershipDTO) => {
@@ -165,7 +166,7 @@ export const Project = () => {
           <MemberList
             members={workspace.memberships}
             onRemove={handleRemoveClick}
-            role={workspace.memberships.find((member) => member.userId === auth.currentUser!.uid)?.role ?? "member"}
+            role={membership.role}
           />
         </div>
         <Button
@@ -176,9 +177,11 @@ export const Project = () => {
         >
           Open
         </Button>
-        <Button className="float-right mr-1" onClick={() => setShowAdd(true)} busy={updateBusy}>
-          Add Members
-        </Button>
+        {membership.role === "owner" && (
+          <Button className="float-right mr-1" onClick={() => setShowAdd(true)} busy={updateBusy}>
+            Add Members
+          </Button>
+        )}
         {(newName !== workspace.name || newDesc !== workspace.description) && (
           <Button className="float-right mr-1" onClick={handleUpdate} busy={updateBusy}>
             Update

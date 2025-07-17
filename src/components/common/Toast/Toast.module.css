@@ -73,3 +73,18 @@
 .icon.error {
   color: #dc6161;
 }
+.mark {
+  background-color: #80808047;
+  padding: 0.25rem 0.5rem;
+  border-radius: 1rem;
+}
+.controls {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 1rem;
+  margin-top: 1rem;
+}
+.controls.controls.controls button {
+  margin-left: 0;
+}

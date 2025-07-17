@@ -40,7 +40,7 @@
 .mt-0 {
   margin-top: 0;
 }
-.m-0 {
+.m-0.m-0 {
   margin: 0;
 }
 .m-auto {
@@ -172,7 +172,7 @@
   padding-top: 0.25rem;
   padding-bottom: 0.25rem;
 }
-.p-0p5 {
+.p-0p5.p-0p5 {
   padding: 0.5rem;
 }
 .p-0p75.p-0p75 {

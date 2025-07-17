@@ -14,6 +14,8 @@ import Icon from "@/components/common/Icon/Icon";
 import CardSkeleton from "@/components/common/skeletons/CardSkeleton/CardSkeleton";
 import WorkspaceList from "@/components/WorkspaceList/WorkspaceList";
 import { AnimatePresence, motion } from "motion/react";
+import { socket } from "@/config/socket";
+import { WorkspaceMembersModified } from "@/models/workspace";
 
 export const Dashboard = () => {
   const navigate = useNavigate();
@@ -31,11 +33,27 @@ export const Dashboard = () => {
   }, [dispatch]);
 
   useEffect(() => {
+    socket?.on("workspace", (msg) => {
+      if (msg.action === "members.modified") {
+        handleMembersModified(msg.payload);
+      }
+    });
+
+    return () => {
+      socket?.off("workspace");
+    };
+  }, []);
+
+  useEffect(() => {
     init();
   }, [init]);
 
   const handleCreate = () => {
     navigate("/dashboard/new");
+  };
+  const handleMembersModified = async (_data: WorkspaceMembersModified) => {
+    console.log(_data);
+    await dispatch(fetchWorkspaces());
   };
 
   return (

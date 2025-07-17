@@ -16,6 +16,8 @@ export type NotificationType = "workspace-invite" | "workspace-membership-remove
 export interface UserNotificationPayload extends InSocketMessagePayload {
   type: NotificationType;
   id: string;
+  createdOn: string;
+  actedOn?: string;
 }
 
 export interface WorkspaceInvite extends UserNotificationPayload {
@@ -27,6 +29,7 @@ export interface WorkspaceInvite extends UserNotificationPayload {
 export interface ExclusionData extends UserNotificationPayload {
   actorId: string;
   workspaceUUID: string;
+  name: string;
 }
 
 export type NotificationReadDTO = {
