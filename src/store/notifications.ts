@@ -19,7 +19,14 @@ export const ntfnsSlice = createSlice({
   initialState,
   reducers: {
     setPending: (state, action: PayloadAction<UserNotificationPayload[]>) => {
-      state.pending = action.payload;
+      const map = new Map<string, UserNotificationPayload>();
+      for (const ntfn of state.pending) {
+        map.set(ntfn.id, ntfn);
+      }
+      for (const ntfn of action.payload) {
+        map.set(ntfn.id, ntfn);
+      }
+      state.pending = [...map.values()];
     },
     pushNotification: (state, action: PayloadAction<UserNotificationPayload>) => {
       const newActive = [...state.active];
@@ -30,11 +37,33 @@ export const ntfnsSlice = createSlice({
       state.active = newActive;
     },
     dismissNotification: (state, action: PayloadAction<string>) => {
-      const idx = state.active.findIndex((ntfn) => ntfn.id === action.payload);
-      if (idx < 0) return;
+      const ntfn = state.active.find((ntfn) => ntfn.id === action.payload);
+      if (!ntfn) return;
       const newActive = [...state.active];
-      newActive.splice(idx, 1);
+      newActive.splice(state.active.indexOf(ntfn), 1);
       state.active = newActive;
+      const newPending = [ntfn, ...state.pending];
+      state.pending = newPending;
+    },
+    removeNotification: (state, action: PayloadAction<string>) => {
+      let ntfn = state.pending.find((ntfn) => ntfn.id === action.payload);
+      if (ntfn) {
+        const updatedPending = [...state.pending];
+        updatedPending.splice(
+          state.pending.findIndex((ntfn) => ntfn.id === action.payload),
+          1
+        );
+        state.pending = updatedPending;
+      }
+      ntfn = state.active.find((ntfn) => ntfn.id === action.payload);
+      if (ntfn) {
+        const updatedActive = [...state.active];
+        updatedActive.splice(
+          state.active.findIndex((ntfn) => ntfn.id === action.payload),
+          1
+        );
+        state.active = updatedActive;
+      }
     },
   },
 });
@@ -56,10 +85,12 @@ export const notify = createAsyncThunk<
     message: string;
   }
 >("notifications/notify", async ({ status, message, title }, { dispatch }) => {
-  dispatch(pushNotification({ id: uuid(), type: "user", message, status, title }));
+  dispatch(
+    pushNotification({ id: uuid(), type: "user", message, status, title, createdOn: new Date().toISOString() })
+  );
 });
 
-export const { setPending, pushNotification, dismissNotification } = ntfnsSlice.actions;
+export const { setPending, pushNotification, dismissNotification, removeNotification } = ntfnsSlice.actions;
 
 export const selectNotifications = (state: RootState) => state.notifications.pending;
 export const selectActiveNotifications = (state: RootState) => state.notifications.active;

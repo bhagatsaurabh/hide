@@ -1,11 +1,18 @@
 import { createAsyncThunk, createSlice, PayloadAction } from "@reduxjs/toolkit";
 
 import { WorkspaceCreateDTO, WorkspaceDTO, WorkspaceUpdateDTO } from "@/models/workspace";
-import { createWorkspace, getAllWorkspaces, updateWorkspace } from "@/services/workspace";
+import {
+  acceptInvitation,
+  createWorkspace,
+  getAllWorkspaces,
+  ignoreInvitation,
+  updateWorkspace,
+} from "@/services/workspace";
 import { RootState } from ".";
 import { auth } from "@/config/firebase";
 import { storeSSHKey } from "@/utils/driver";
-import { notify } from "./notifications";
+import { notify, removeNotification } from "./notifications";
+import { WorkspaceInvite } from "@/models/notification";
 
 type WorkspaceState = {
   workspaces: WorkspaceDTO[];
@@ -87,17 +94,43 @@ export const processNewWorkspace = createAsyncThunk<void, { workspace: Workspace
     }
   }
 );
-export const updateExistingWorkspace = createAsyncThunk<void, WorkspaceUpdateDTO>(
+export const updateExistingWorkspace = createAsyncThunk<boolean, WorkspaceUpdateDTO>(
   "workspace/update",
   async (data, { dispatch }) => {
     try {
       await updateWorkspace(data);
       await dispatch(fetchWorkspaces());
+      return true;
     } catch (error) {
       dispatch(
         notify({
           title: "Failed to update workspace",
           message: "Something went wrong when updating the workspace, please try again later.",
+          status: "error",
+        })
+      );
+      console.log(error);
+    }
+    return false;
+  }
+);
+export const respondToInvitation = createAsyncThunk<void, { accept: boolean; ntfn: WorkspaceInvite }>(
+  "workspace/respond-invite",
+  async ({ accept, ntfn }, { dispatch }) => {
+    try {
+      if (accept) {
+        await acceptInvitation({ id: ntfn.id, token: ntfn.token });
+        await dispatch(fetchWorkspaces());
+      } else {
+        await ignoreInvitation({ id: ntfn.id, token: ntfn.token });
+      }
+      dispatch(removeNotification(ntfn.id));
+    } catch (error) {
+      if (!accept) return;
+      dispatch(
+        notify({
+          title: "Failed to accept invitation",
+          message: "Something went wrong while accepting the invitation, please try again.",
           status: "error",
         })
       );

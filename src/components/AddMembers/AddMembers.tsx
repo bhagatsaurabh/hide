@@ -10,8 +10,7 @@ import Image from "../common/Image/Image";
 import { WorkspaceDTO } from "@/models/workspace";
 import Button from "../common/Button/Button";
 import PillGroup, { Pill } from "../common/PillGroup/PillGroup";
-import { updateWorkspace } from "@/services/workspace";
-import { fetchWorkspaces } from "@/store/workspace";
+import { updateExistingWorkspace } from "@/store/workspace";
 
 interface AddMembersProps {
   workspace: WorkspaceDTO;
@@ -62,13 +61,19 @@ const AddMembers = ({ workspace, onBack }: AddMembersProps) => {
     setInvBusy(true);
     const updatedMembers = new Set(workspace.memberships.map((member) => member.userId));
     added.forEach((member) => updatedMembers.add(member.id as string));
-    await updateWorkspace({
-      id: workspace.id,
-      description: workspace.description,
-      name: workspace.name,
-      members: [...updatedMembers],
-    });
-    await dispatch(fetchWorkspaces());
+    const res = await dispatch(
+      updateExistingWorkspace({
+        id: workspace.id,
+        description: workspace.description,
+        name: workspace.name,
+        members: [...updatedMembers],
+      })
+    );
+    if (res.payload) {
+      dispatch(
+        notify({ title: "Invitation sent", message: `${added.size} member(s) have been invited`, status: "success" })
+      );
+    }
     setInvBusy(false);
     onBack();
   };

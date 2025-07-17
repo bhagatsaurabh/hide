@@ -7,8 +7,15 @@ import error from "@/assets/icons/error.svg?react";
 import { useAppDispatch, useAppSelector } from "@/hooks/store";
 import { dismissNotification, selectActiveNotifications } from "@/store/notifications";
 import { AnimatePresence, motion } from "motion/react";
-import { InternalNotificationType } from "@/models/notification";
+import {
+  ExclusionData,
+  InternalNotificationPayload,
+  InternalNotificationType,
+  UserNotificationPayload,
+  WorkspaceInvite,
+} from "@/models/notification";
 import Button from "../Button/Button";
+import { respondToInvitation } from "@/store/workspace";
 
 const iconMap = {
   info,
@@ -31,13 +38,73 @@ const Toast = ({ className }: ToastProps) => {
   const handleDismiss = (id: string) => {
     dispatch(dismissNotification(id));
   };
+  const handleInvitation = async(ntfn: WorkspaceInvite, accept: boolean) => {
+    await dispatch(respondToInvitation({ accept, ntfn }));
+  };
+
+  const getNtfn = (notification: UserNotificationPayload) => {
+    switch (notification.type) {
+      case "user": {
+        const Icon = iconMap[notification.status as InternalNotificationType];
+        const ntfn = notification as InternalNotificationPayload;
+        return (
+          <>
+            <div className={classes.heading}>
+              <Icon className={[classes.icon, classes[ntfn.status as InternalNotificationType]].join(" ")} />
+              <h3>{ntfn.title as string}</h3>
+              <Button icon="close" onClick={() => handleDismiss(ntfn.id)} fit />
+            </div>
+            <span className={classes.msg}>{ntfn.message as ReactNode}</span>
+          </>
+        );
+      }
+      case "workspace-invite": {
+        const ntfn = notification as WorkspaceInvite;
+        const Icon = iconMap["info"];
+        return (
+          <>
+            <div className={classes.heading}>
+              <Icon className={[classes.icon, classes.info].join(" ")} />
+              <h3>Workspace invitation</h3>
+              <Button icon="close" onClick={() => handleDismiss(ntfn.id)} fit />
+            </div>
+            <span className={classes.msg}>
+              You've been invited by <span className={classes.mark}>{ntfn.inviterName as string}</span> to collaborate
+              on their workspace
+            </span>
+            <div className={classes.controls}>
+              <Button type="secondary" className="m-0 m-0" onClick={() => handleInvitation(ntfn, true)}>
+                Accept
+              </Button>
+              <Button type="tertiary" className="m-0" onClick={() => handleInvitation(ntfn, false)}>
+                Ignore
+              </Button>
+            </div>
+          </>
+        );
+      }
+      case "workspace-membership-removed": {
+        const Icon = iconMap["info"];
+        const ntfn = notification as ExclusionData;
+        return (
+          <>
+            <div className={classes.heading}>
+              <Icon className={[classes.icon, classes.info].join(" ")} />
+              <h3>Membership removed</h3>
+              <Button icon="close" onClick={() => handleDismiss(ntfn.id)} fit />
+            </div>
+            <span className={classes.msg}>You've been removed from workspace: {ntfn.name}</span>
+          </>
+        );
+      }
+    }
+  };
 
   return (
     <aside className={classNames.join(" ")}>
       <ul>
         <AnimatePresence mode="popLayout">
           {notifications.map((ntfn) => {
-            const Icon = iconMap[ntfn.status as InternalNotificationType];
             return (
               <motion.li
                 key={ntfn.id}
@@ -47,12 +114,7 @@ const Toast = ({ className }: ToastProps) => {
                 transition={{ type: "spring", duration: 0.2 }}
                 layout
               >
-                <div className={classes.heading}>
-                  <Icon className={[classes.icon, classes[ntfn.status as InternalNotificationType]].join(" ")} />
-                  <h3>{ntfn.title as string}</h3>
-                  <Button icon="close" onClick={() => handleDismiss(ntfn.id)} fit />
-                </div>
-                <span className={classes.msg}>{ntfn.message as ReactNode}</span>
+                {getNtfn(ntfn)}
               </motion.li>
             );
           })}

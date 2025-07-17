@@ -27,7 +27,7 @@ const PillGroup = ({ pills, onRemove }: PillGroupProps) => {
             asset={!pill.image}
           />
           <span className={classes.text}>{pill.text}</span>
-          <Button icon="close" size={1.2} onClick={() => onRemove(pill)} fit />
+          <Button className="p-0p5" icon="close" size={1.2} onClick={() => onRemove(pill)} fit />
         </div>
       ))}
     </div>

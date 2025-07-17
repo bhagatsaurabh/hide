@@ -1,11 +1,14 @@
 import { useEffect, useRef, useState } from "react";
 import { useAppDispatch, useAppSelector } from "@/hooks/store";
 import { AuthStatus, selectStatus } from "@/store/auth";
-import { fetchNotifications, selectNotifications } from "@/store/notifications";
+import { fetchNotifications, pushNotification, selectNotifications, setPending } from "@/store/notifications";
 import { readNotification } from "@/services/notifications";
 import Modal, { ModalRef } from "../common/Modal/Modal";
 import classes from "./Notifications.module.css";
 import Button from "../common/Button/Button";
+import { socket } from "@/config/socket";
+import { UserNotificationPayload, WorkspaceInvite } from "@/models/notification";
+import { getDetails } from "@/services/user";
 
 export const NotificationBar = () => {
   const authStatus = useAppSelector(selectStatus);
@@ -17,8 +20,45 @@ export const NotificationBar = () => {
   useEffect(() => {
     if (authStatus === AuthStatus.SIGNED_IN) {
       dispatch(fetchNotifications());
+
+      socket?.on("notification", (msg) => {
+        switch (msg.action) {
+          case "pending": {
+            handlePendingNotifications(msg.payload);
+            break;
+          }
+          case "new": {
+            handleNewNotification(msg.payload);
+            break;
+          }
+          default:
+            break;
+        }
+      });
     }
+
+    return () => {
+      socket?.off("notification");
+    };
   }, [authStatus, dispatch]);
+
+  const handlePendingNotifications = (notifications: UserNotificationPayload[]) => {
+    dispatch(setPending(notifications));
+  };
+  const handleNewNotification = async (notification: UserNotificationPayload) => {
+    if (notification.type === "workspace-invite") {
+      try {
+        const res = await getDetails((notification as WorkspaceInvite).inviterId);
+        notification.inviterName = res.data.name;
+        notification.inviterUsername = res.data.username;
+      } catch (error) {
+        console.log(error);
+        notification.inviterName = "Unknown";
+        notification.inviterUsername = "Unknown";
+      }
+    }
+    dispatch(pushNotification(notification));
+  };
 
   const handleClick = () => {
     if (isOpen) {
@@ -48,7 +88,7 @@ export const NotificationBar = () => {
             <div className={classes.list}>{ntfns.length}</div>
             <ul>
               {ntfns.map((ntfn) => (
-                <li>
+                <li key={ntfn.id}>
                   {ntfn.type}
                   <button onClick={() => handleNotificationRead(ntfn.id)}></button>
                 </li>
