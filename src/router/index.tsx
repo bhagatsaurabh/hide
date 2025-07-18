@@ -4,7 +4,6 @@ import { Auth } from "@/pages/Auth/Auth";
 import { Dashboard } from "@/pages/Dashboard/Dashboard";
 import { Create } from "@/pages/Create/Create";
 import { Project } from "@/pages/Project/Project";
-import { User } from "@/pages/User/User";
 import { Environment } from "@/pages/Environment/Environment";
 import { CrashBoard } from "@/components/common/CrashBoard/CrashBoard";
 import { authGuard, noAuthGuard, workspaceLoader } from "./guards";
@@ -12,6 +11,7 @@ import { CreateProfile } from "@/pages/CreateProfile/CreateProfile";
 import SignIn from "@/components/SignIn/SignIn";
 import Providers from "@/components/Providers/Providers";
 import { Status } from "@/pages/Status/Status";
+import User from "@/pages/User/User";
 
 const router = createBrowserRouter([
   {
