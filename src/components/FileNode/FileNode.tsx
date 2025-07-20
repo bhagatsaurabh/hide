@@ -1,5 +1,5 @@
 import { useContext } from "react";
-import { EnvContext } from "@/pages/Environment/context";
+import { EnvContext } from "@/context/env/env.context";
 import { FNode } from "@/reducers/explorer";
 import { getPath } from "@/utils";
 

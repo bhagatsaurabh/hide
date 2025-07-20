@@ -1,20 +1,26 @@
-import { useCallback, useEffect, useMemo, useReducer } from "react";
+import { useCallback, useEffect, useMemo, useReducer, useState } from "react";
 import { FNode, FNodeOf, fileTreeReducer } from "@/reducers/explorer";
 import { Doc } from "yjs";
 import { editor } from "monaco-editor";
 import { MonacoBinding } from "y-monaco";
-import { FileNode } from "../FileNode/FileNode";
+import { FileNode } from "../../FileNode/FileNode";
 import { socket } from "@/config/socket";
-import { EnvContext } from "@/pages/Environment/context";
+import { EnvContext } from "@/context/env/env.context";
 import { WebsocketProvider } from "@/lib/y-websocket";
 import { InSocketMessage } from "@/models/common";
+import classes from "./Explorer.module.css";
 
 interface ExplorerProps {
   uuid: string;
 }
 
-export const Explorer = ({ uuid }: ExplorerProps) => {
-  const root: FNodeOf<"dir"> = useMemo(
+const Explorer = (/* { uuid }: ExplorerProps */) => {
+  useEffect(() => {
+    console.log("Mounted: Explorer");
+    return () => console.log("Unmounted: Explorer");
+  }, []);
+
+  /* const root: FNodeOf<"dir"> = useMemo(
     () => ({
       id: 0,
       name: "",
@@ -33,9 +39,9 @@ export const Explorer = ({ uuid }: ExplorerProps) => {
 
   const init = useCallback(async () => {
     try {
-      /* const res = await openDir(uuid, "/");
-      const nodes = res.data as unknown as FNode[];
-      fsDispatch({ type: "LOAD", payload: { path: "/", nodes } }); */
+      // const res = await openDir(uuid, "/");
+      // const nodes = res.data as unknown as FNode[];
+      // fsDispatch({ type: "LOAD", payload: { path: "/", nodes } });
     } catch (error) {
       console.log(error);
     }
@@ -63,15 +69,15 @@ export const Explorer = ({ uuid }: ExplorerProps) => {
     // await Promise.all(fs.stalePaths.map((pathPair) => closeDir(uuid, pathPair[0])));
     // Watch all new "moved" paths
     const newPaths = fs.stalePaths.filter((pathPair) => !!pathPair[1]).map((pathPair) => pathPair[1]!);
-    /* const resps = await Promise.all(newPaths.map((newPath) => openDir(uuid, newPath)));
-    newPaths.forEach((newPath, idx) => {
-      if (resps?.[idx]?.data) {
-        fsDispatch({
-          type: "LOAD",
-          payload: { path: newPath, nodes: resps[idx].data as unknown as FNode[], forceOpen: true },
-        });
-      }
-    }); */
+    // const resps = await Promise.all(newPaths.map((newPath) => openDir(uuid, newPath)));
+    // newPaths.forEach((newPath, idx) => {
+    //   if (resps?.[idx]?.data) {
+    //     fsDispatch({
+    //       type: "LOAD",
+    //       payload: { path: newPath, nodes: resps[idx].data as unknown as FNode[], forceOpen: true },
+    //     });
+    //   }
+    // });
     fsDispatch({ type: "CLEAR_STALE", payload: null });
   }, [fs.stalePaths, uuid]);
 
@@ -91,9 +97,9 @@ export const Explorer = ({ uuid }: ExplorerProps) => {
   const open = async (path: string, isDir: boolean) => {
     if (isDir) {
       try {
-        /* const res = await openDir(uuid, path);
-        const nodes = res.data as unknown as FNode[];
-        fsDispatch({ type: "LOAD", payload: { path, nodes } }); */
+        // const res = await openDir(uuid, path);
+        // const nodes = res.data as unknown as FNode[];
+        // fsDispatch({ type: "LOAD", payload: { path, nodes } });
       } catch (error) {
         console.log(error);
       }
@@ -154,5 +160,17 @@ export const Explorer = ({ uuid }: ExplorerProps) => {
       </EnvContext.Provider>
       <div id="editor" style={{ height: "40vh" }}></div>
     </>
+  ); */
+
+  const [count, setCount] = useState(0);
+
+  return (
+    <div style={{ border: "1px solid purple", padding: "10px" }}>
+      <h4>View B</h4>
+      <p>Internal Count: {count}</p>
+      <button onClick={() => setCount((c) => c + 1)}>Increment B</button>
+    </div>
   );
 };
+
+export default Explorer;

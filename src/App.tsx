@@ -29,6 +29,12 @@ function App() {
           <Heartbeat />
           <Toast />
           <RouterProvider router={router} />
+          <div style={{ display: "none" }} id="default-title"></div>
+          <div style={{ display: "none" }} id="default-activity"></div>
+          <div style={{ display: "none" }} id="default-explorer"></div>
+          <div style={{ display: "none" }} id="default-tabgroup"></div>
+          <div style={{ display: "none" }} id="default-terminal"></div>
+          <div style={{ display: "none" }} id="default-status"></div>
         </>
       )}
     </>

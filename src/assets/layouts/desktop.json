@@ -1,0 +1,67 @@
+{
+  "id": "root",
+  "direction": "column",
+  "type": "panel",
+  "children": [
+    {
+      "id": "title",
+      "type": "view",
+      "resizable": false,
+      "collapsible": false,
+      "viewId": "title"
+    },
+    {
+      "id": "w1",
+      "type": "panel",
+      "direction": "row",
+      "resizable": false,
+      "collapsible": false,
+      "children": [
+        {
+          "id": "activity",
+          "type": "view",
+          "resizable": false,
+          "collapsible": false,
+          "viewId": "activity"
+        },
+        {
+          "id": "explorer",
+          "type": "view",
+          "resizable": true,
+          "collapsible": false,
+          "viewId": "explorer"
+        },
+        {
+          "id": "w2",
+          "direction": "column",
+          "type": "panel",
+          "resizable": true,
+          "collapsible": false,
+          "children": [
+            {
+              "id": "tabgroup",
+              "type": "view",
+              "resizable": true,
+              "collapsible": false,
+              "viewId": "tabgroup"
+            },
+            {
+              "id": "terminal",
+              "type": "view",
+              "resizable": true,
+              "collapsible": false,
+              "viewId": "terminal"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "status",
+      "type": "view",
+      "resizable": false,
+      "collapsible": false,
+      "viewId": "status"
+    }
+  ]
+}
