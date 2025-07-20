@@ -1,20 +1,46 @@
 import { useLoaderData } from "react-router";
 
+import classes from "./Environment.module.css";
 import { workspaceLoader } from "@/router/guards";
 import { useAppSelector } from "@/hooks/store";
 import { selectWorkspaceById } from "@/store/workspace";
 import { useMediaQuery } from "@/hooks/media-query";
-import HDE from "@/components/environment";
-import classes from "./Environment.module.css";
-import { Explorer } from "@/components/Explorer/Explorer";
+import { ViewProvider } from "@/context/view/ViewProvider";
+import TitleBar from "@/components/env/TitleBar/TitleBar";
+import ActivityBar from "@/components/env/ActivityBar/ActivityBar";
+import TabGroup from "@/components/env/TabGroup/TabGroup";
+import TerminalGroup from "@/components/env/TerminalGroup/TerminalGroup";
+import StatusBar from "@/components/env/StatusBar/StatusBar";
+import Explorer from "@/components/env/Explorer/Explorer";
+
+import { useEffect } from "react";
+
+import layoutDesktop from "@/assets/layouts/desktop.json";
+import layoutMobile from "@/assets/layouts/mobile.json";
+import { Panel, PanelSchema } from "@/components/common/Panel/Panel";
+import { View } from "@/components/common/View/View";
+const schemaMobile = layoutMobile as PanelSchema;
+const schemaDesktop = layoutDesktop as PanelSchema;
+
+const views = {
+  title: <TitleBar />,
+  activity: <ActivityBar />,
+  explorer: <Explorer />,
+  tabgroup: <TabGroup />,
+  terminal: <TerminalGroup />,
+  status: <StatusBar />,
+};
 
 export const Environment = () => {
   const workspaceId = useLoaderData<typeof workspaceLoader>();
   const workspace = useAppSelector((state) => selectWorkspaceById(state, workspaceId))!;
-  const isLight = useMediaQuery("(max-width: 767px)");
-  /* const term = useRef<Terminal>(null);
-  const termEl = useRef<HTMLDivElement>(null);
-  const [sessionId, setSessionId] = useState(""); */
+  const isMobile = useMediaQuery("(max-width: 767px)");
+  const schema = isMobile ? schemaMobile : schemaDesktop;
+
+  useEffect(() => {
+    console.log("Mounted: Environment");
+    return () => console.log("Unmounted: Environment");
+  }, []);
 
   /* useEffect(() => {
     return () => {
@@ -113,31 +139,16 @@ export const Environment = () => {
   }; */
 
   return (
-    <>
-      <TitleBar />
-      <main>
-        <ActivityBar />
-        <div className={classes.panel}>
-          <Explorer uuid={workspace.uuid} />
-          <div className={classes.view} ref={}></div>
-        </div>
-        <div className={classes.panel}>
-          <TabGroup />
-          <div className={classes.view} ref={}></div>
-        </div>
-        <TerminalGroup targetRef={moveToA ? containerARef : containerBRef} />
-      </main>
-      <StatusBar />
-      {/* <div>
-        <h2>{workspace.name}</h2>
-        <h4>{workspace.uuid}</h4>
-        <h3>{workspace.description}</h3>
-        <h5>{workspace.createdAt}</h5>
-      </div> */}
-      {/* {isLight ? <HDE.Light /> : <HDE.Full />} */}
-      {/* <button onClick={handleNewTerminal}>Connect</button>
-      {sessionId && <button onClick={handleCloseTerminal}>Close</button>}
-      <div ref={termEl} style={{ width: "100%", height: "20rem", textAlign: "left" }}></div> */}
-    </>
+    <ViewProvider>
+      <div style={{ display: "flex", height: "100vh", color: "beige" }}>
+        <Panel schema={schema} />
+
+        {Object.entries(views).map(([viewId, view]) => (
+          <View key={viewId} viewId={viewId}>
+            {view}
+          </View>
+        ))}
+      </div>
+    </ViewProvider>
   );
 };
