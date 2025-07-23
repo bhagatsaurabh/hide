@@ -48,7 +48,8 @@ export const rng = (min: number, max: number) => {
 };
 export const denormalize = (norm: number, min: number, max: number) => norm * (max - min) + min;
 export const normalize = (val: number, min: number, max: number) => (val - min) / (max - min);
-export const clamp = (val: number, min: number, max: number) => Math.min(Math.max(val, min), max);
+export const clamp = (val: number, min = Number.MIN_SAFE_INTEGER, max = Number.MAX_SAFE_INTEGER) =>
+  Math.min(Math.max(val, min), max);
 export const noop = () => {};
 export const trapBetween = (root: Node) => {
   if (!root) return { first: null, last: null };
@@ -109,4 +110,15 @@ export const timeExpression = (date: Date) => {
 };
 export const capitalize = (word: string) => {
   return word.charAt(0).toUpperCase() + word.slice(1).toLowerCase();
+};
+
+export const parseSizetoPx = (value: string) => {
+  const el = document.createElement("div");
+  el.style.position = "absolute";
+  el.style.visibility = "hidden";
+  el.style.width = value;
+  document.documentElement.appendChild(el);
+  const pixels = el.offsetWidth;
+  document.documentElement.removeChild(el);
+  return pixels;
 };

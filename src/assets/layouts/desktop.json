@@ -1,55 +1,55 @@
 {
   "id": "root",
-  "direction": "column",
   "type": "panel",
+  "direction": "column",
+  "size": 1,
   "children": [
     {
       "id": "title",
       "type": "view",
-      "resizable": false,
-      "collapsible": false,
+      "size": "2.25rem",
       "viewId": "title"
     },
     {
       "id": "w1",
       "type": "panel",
+      "size": 1,
       "direction": "row",
-      "resizable": false,
-      "collapsible": false,
       "children": [
         {
           "id": "activity",
           "type": "view",
-          "resizable": false,
-          "collapsible": false,
+          "size": "3rem",
           "viewId": "activity"
         },
         {
           "id": "explorer",
           "type": "view",
-          "resizable": true,
-          "collapsible": false,
-          "viewId": "explorer"
+          "size": "16.25rem",
+          "minSize": "10.625rem",
+          "viewId": "explorer",
+          "resizable": true
         },
         {
           "id": "w2",
-          "direction": "column",
           "type": "panel",
-          "resizable": true,
-          "collapsible": false,
+          "size": 1,
+          "minSize": "18.75rem",
+          "direction": "column",
           "children": [
             {
               "id": "tabgroup",
               "type": "view",
-              "resizable": true,
-              "collapsible": false,
-              "viewId": "tabgroup"
+              "size": 1,
+              "minSize": "8.125rem",
+              "viewId": "tabgroup",
+              "resizable": true
             },
             {
               "id": "terminal",
               "type": "view",
-              "resizable": true,
-              "collapsible": false,
+              "size": "13.8rem",
+              "minSize": "7.25rem",
               "viewId": "terminal"
             }
           ]
@@ -59,8 +59,7 @@
     {
       "id": "status",
       "type": "view",
-      "resizable": false,
-      "collapsible": false,
+      "size": "1.4rem",
       "viewId": "status"
     }
   ]

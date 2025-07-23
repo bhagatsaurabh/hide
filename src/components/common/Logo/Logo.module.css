@@ -7,3 +7,8 @@
 .logoname.light {
   color: #3b3b3b;
 }
+.logo {
+  display: flex;
+  width: min-content;
+  white-space: nowrap;
+}
