@@ -1,18 +1,18 @@
-import { useEffect, useState } from "react";
+import { useContext } from "react";
 import classes from "./TitleBar.module.css";
+import Logo from "@/components/common/Logo/Logo";
+import { ViewContext } from "@/context/view/view.context";
 
 const TitleBar = () => {
-  useEffect(() => {
-    console.log("Mounted: TitleBar");
-    return () => console.log("Unmounted: TitleBar");
-  }, []);
-  const [count, setCount] = useState(0);
+  const { workspace } = useContext(ViewContext)!;
 
   return (
-    <div style={{ border: "1px solid purple", padding: "10px" }}>
-      <h4>View A</h4>
-      <p>Internal Count: {count}</p>
-      <button onClick={() => setCount((c) => c + 1)}>Increment A</button>
+    <div className={classes.titlebar}>
+      <div className={classes.logo}>
+        <Logo size={0.6} light />
+      </div>
+      <div className={classes.title}>{workspace.name}</div>
+      <div className={classes.online}>Online Members</div>
     </div>
   );
 };

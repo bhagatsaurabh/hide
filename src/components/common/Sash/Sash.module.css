@@ -1,0 +1,19 @@
+.sash {
+  background: transparent;
+  z-index: 10;
+  user-select: none;
+  position: absolute;
+}
+.sash.row {
+  cursor: col-resize;
+  width: 0.25rem;
+  height: 100%;
+}
+.sash.column {
+  cursor: row-resize;
+  width: 100%;
+  height: 0.25rem;
+}
+.sash.active {
+  background: #aaa;
+}

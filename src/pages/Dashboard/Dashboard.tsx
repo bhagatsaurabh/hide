@@ -52,7 +52,6 @@ export const Dashboard = () => {
     navigate("/dashboard/new");
   };
   const handleMembersModified = async (_data: WorkspaceMembersModified) => {
-    console.log(_data);
     await dispatch(fetchWorkspaces());
   };
 

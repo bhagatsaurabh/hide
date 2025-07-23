@@ -12,7 +12,7 @@ const Logo = ({ light, size }: Partial<LogoProps>) => {
     classNames.push(classes.light);
   }
   return (
-    <a href="/">
+    <a className={classes.logo} href="/">
       <span style={{ fontSize: `${size}rem` }} className={classNames.join(" ")}>
         // H-IDE
       </span>

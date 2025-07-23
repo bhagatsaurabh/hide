@@ -1,3 +1,4 @@
 .panel {
-  color: beige;
+  display: flex;
+  position: absolute;
 }

@@ -5,7 +5,6 @@ import { workspaceLoader } from "@/router/guards";
 import { useAppSelector } from "@/hooks/store";
 import { selectWorkspaceById } from "@/store/workspace";
 import { useMediaQuery } from "@/hooks/media-query";
-import { ViewProvider } from "@/context/view/ViewProvider";
 import TitleBar from "@/components/env/TitleBar/TitleBar";
 import ActivityBar from "@/components/env/ActivityBar/ActivityBar";
 import TabGroup from "@/components/env/TabGroup/TabGroup";
@@ -13,13 +12,14 @@ import TerminalGroup from "@/components/env/TerminalGroup/TerminalGroup";
 import StatusBar from "@/components/env/StatusBar/StatusBar";
 import Explorer from "@/components/env/Explorer/Explorer";
 
-import { useEffect } from "react";
+import { useEffect, useRef, useState } from "react";
 
 import layoutDesktop from "@/assets/layouts/desktop.json";
 import layoutMobile from "@/assets/layouts/mobile.json";
 import { Panel, PanelSchema } from "@/components/common/Panel/Panel";
-import { View } from "@/components/common/View/View";
-const schemaMobile = layoutMobile as PanelSchema;
+import { createHtmlPortalNode, InPortal } from "react-reverse-portal";
+import { ViewContext } from "@/context/view/view.context";
+// const schemaMobile = layoutMobile as PanelSchema;
 const schemaDesktop = layoutDesktop as PanelSchema;
 
 const views = {
@@ -35,11 +35,15 @@ export const Environment = () => {
   const workspaceId = useLoaderData<typeof workspaceLoader>();
   const workspace = useAppSelector((state) => selectWorkspaceById(state, workspaceId))!;
   const isMobile = useMediaQuery("(max-width: 767px)");
-  const schema = isMobile ? schemaMobile : schemaDesktop;
+  const schema = isMobile ? /* schemaMobile */ schemaDesktop : schemaDesktop;
+  const [dimension, setDimension] = useState({ width: window.innerWidth, height: window.innerHeight });
+  const containerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    console.log("Mounted: Environment");
-    return () => console.log("Unmounted: Environment");
+    if (containerRef.current) {
+      const rect = containerRef.current.getBoundingClientRect();
+      setDimension({ width: rect.width, height: rect.height });
+    }
   }, []);
 
   /* useEffect(() => {
@@ -137,18 +141,31 @@ export const Environment = () => {
     setSessionId("");
     term.current?.dispose();
   }; */
+  const nodes = useRef(new Map<string, ReturnType<typeof createHtmlPortalNode>>());
+
+  const getNode = (viewId: string) => {
+    if (!nodes.current.has(viewId)) {
+      nodes.current.set(viewId, createHtmlPortalNode({ attributes: { class: classes.wrapper } }));
+    }
+    return nodes.current.get(viewId)!;
+  };
 
   return (
-    <ViewProvider>
-      <div style={{ display: "flex", height: "100vh", color: "beige" }}>
-        <Panel schema={schema} />
+    <ViewContext.Provider value={{ getNode, workspace }}>
+      <div ref={containerRef} className={classes.environment}>
+        <Panel
+          style={{ width: "100%", height: "100%" }}
+          dimension={dimension}
+          position={{ top: 0, left: 0 }}
+          schema={schema}
+        />
 
         {Object.entries(views).map(([viewId, view]) => (
-          <View key={viewId} viewId={viewId}>
+          <InPortal key={viewId} node={getNode(viewId)}>
             {view}
-          </View>
+          </InPortal>
         ))}
       </div>
-    </ViewProvider>
+    </ViewContext.Provider>
   );
 };

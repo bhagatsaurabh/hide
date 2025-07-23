@@ -1,0 +1,10 @@
+.environment {
+  display: flex;
+  height: 100vh;
+  color: beige;
+  position: relative;
+}
+.wrapper {
+  width: 100%;
+  height: 100%;
+}

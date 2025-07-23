@@ -15,11 +15,6 @@ interface ExplorerProps {
 }
 
 const Explorer = (/* { uuid }: ExplorerProps */) => {
-  useEffect(() => {
-    console.log("Mounted: Explorer");
-    return () => console.log("Unmounted: Explorer");
-  }, []);
-
   /* const root: FNodeOf<"dir"> = useMemo(
     () => ({
       id: 0,
@@ -164,13 +159,7 @@ const Explorer = (/* { uuid }: ExplorerProps */) => {
 
   const [count, setCount] = useState(0);
 
-  return (
-    <div style={{ border: "1px solid purple", padding: "10px" }}>
-      <h4>View B</h4>
-      <p>Internal Count: {count}</p>
-      <button onClick={() => setCount((c) => c + 1)}>Increment B</button>
-    </div>
-  );
+  return <div className={classes.explorer}>Explorer</div>;
 };
 
 export default Explorer;
