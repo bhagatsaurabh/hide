@@ -1,5 +1,6 @@
-import { CSSProperties, useRef } from "react";
+import { CSSProperties, useRef, useState } from "react";
 import classes from "./Sash.module.css";
+import classNames from "classnames";
 
 interface SashProps {
   direction: "row" | "column";
@@ -10,13 +11,15 @@ interface SashProps {
 }
 
 const Sash = ({ direction, onDrag, onDragStart, active, style = {} }: SashProps) => {
-  const dragging = useRef(false);
+  const [dragging, setDragging] = useState(false);
+  const _dragging = useRef(false);
   const lastPos = useRef(0);
   const startPos = useRef(0);
 
   const onMouseDown = (e: React.MouseEvent) => {
     if (!active) return;
-    dragging.current = true;
+    _dragging.current = true;
+    setDragging(true);
     startPos.current = direction === "row" ? e.clientX : e.clientY;
     lastPos.current = startPos.current;
     window.addEventListener("mousemove", onMouseMove);
@@ -25,22 +28,27 @@ const Sash = ({ direction, onDrag, onDragStart, active, style = {} }: SashProps)
   };
 
   const onMouseMove = (e: MouseEvent) => {
-    if (!dragging.current) return;
+    if (!_dragging.current) return;
     const current = direction === "row" ? e.clientX : e.clientY;
     lastPos.current = current;
     onDrag(startPos.current, current);
   };
 
   const onMouseUp = () => {
-    dragging.current = false;
+    _dragging.current = false;
+    setDragging(false);
     window.removeEventListener("mousemove", onMouseMove);
     window.removeEventListener("mouseup", onMouseUp);
   };
-
   return (
     <div
       style={style}
-      className={[classes.sash, classes[direction], active ? classes.active : ""].join(" ")}
+      className={classNames({
+        [classes.sash]: true,
+        [classes[direction]]: true,
+        [classes.active]: active,
+        [classes.dragging]: dragging,
+      })}
       onMouseDown={onMouseDown}
     />
   );

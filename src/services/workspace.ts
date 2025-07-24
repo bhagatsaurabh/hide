@@ -6,6 +6,7 @@ import {
   WorkspaceCreateDTO,
   WorkspaceDTO,
   WorkspaceUpdateDTO,
+  WorkspaceWaitDTO,
 } from "@/models/workspace";
 
 export const getAllWorkspaces = async () => {
@@ -13,7 +14,7 @@ export const getAllWorkspaces = async () => {
 };
 
 export const createWorkspace = async (data: WorkspaceCreateDTO) => {
-  return await api.post<ProvisionDTO>("/provisioner/provision", data);
+  return await api.post<WorkspaceWaitDTO>("/provisioner/provision", data);
 };
 
 export const updateWorkspace = async (data: WorkspaceUpdateDTO) => {

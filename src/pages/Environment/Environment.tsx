@@ -1,8 +1,8 @@
-import { useLoaderData } from "react-router";
+import { useLoaderData, useNavigate } from "react-router";
 
 import classes from "./Environment.module.css";
 import { workspaceLoader } from "@/router/guards";
-import { useAppSelector } from "@/hooks/store";
+import { useAppDispatch, useAppSelector } from "@/hooks/store";
 import { selectWorkspaceById } from "@/store/workspace";
 import { useMediaQuery } from "@/hooks/media-query";
 import TitleBar from "@/components/env/TitleBar/TitleBar";
@@ -19,6 +19,9 @@ import layoutMobile from "@/assets/layouts/mobile.json";
 import { Panel, PanelSchema } from "@/components/common/Panel/Panel";
 import { createHtmlPortalNode, InPortal } from "react-reverse-portal";
 import { ViewContext } from "@/context/view/view.context";
+import { closeEnv, openEnv, setUuid } from "@/store/env";
+import Spinner from "@/components/common/Spinner/Spinner";
+import { notify } from "@/store/notifications";
 // const schemaMobile = layoutMobile as PanelSchema;
 const schemaDesktop = layoutDesktop as PanelSchema;
 
@@ -38,12 +41,37 @@ export const Environment = () => {
   const schema = isMobile ? /* schemaMobile */ schemaDesktop : schemaDesktop;
   const [dimension, setDimension] = useState({ width: window.innerWidth, height: window.innerHeight });
   const containerRef = useRef<HTMLDivElement>(null);
+  const dispatch = useAppDispatch();
+  const [busy, setBusy] = useState(true);
+  const navigate = useNavigate();
 
+  const init = async (sessionId: string) => {
+    const res = await dispatch(openEnv({ uuid: workspace.uuid, sessionId }));
+    if (res.payload) {
+      setBusy(false);
+      dispatch(setUuid(workspace.uuid));
+    } else {
+      navigate(-1);
+    }
+  };
   useEffect(() => {
+    const sessionId = sessionStorage.getItem("sessionId");
+    if (!sessionId) {
+      dispatch(notify({ title: "No session", message: "Session inactive", status: "warning" }));
+      navigate(-1);
+      return;
+    }
+    init(sessionId);
+
     if (containerRef.current) {
       const rect = containerRef.current.getBoundingClientRect();
       setDimension({ width: rect.width, height: rect.height });
     }
+
+    return () => {
+      console.log("Closing");
+      dispatch(closeEnv({ uuid: workspace.uuid, sessionId }));
+    };
   }, []);
 
   /* useEffect(() => {
@@ -150,7 +178,11 @@ export const Environment = () => {
     return nodes.current.get(viewId)!;
   };
 
-  return (
+  return busy ? (
+    <div className={classes.wait}>
+      <Spinner size={2}>Connecting to workspace...</Spinner>
+    </div>
+  ) : (
     <ViewContext.Provider value={{ getNode, workspace }}>
       <div ref={containerRef} className={classes.environment}>
         <Panel

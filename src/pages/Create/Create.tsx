@@ -69,7 +69,7 @@ export const Create = () => {
     if (nameInput.current?.validate(name)) return;
 
     setBusy(true);
-    await dispatch(
+    const res = await dispatch(
       createNewWorkspace({
         name,
         description,
@@ -78,7 +78,10 @@ export const Create = () => {
         sessionId: sessionStorage.getItem("sessionId")!,
       })
     );
-    navigate("/dashboard/status", { state: { workspaceName: name } });
+    const { success } = res.payload as { success: boolean; wait?: boolean };
+    if (success) {
+      navigate("/dashboard/status", { state: { workspaceName: name } });
+    }
     setBusy(false);
   };
 

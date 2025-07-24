@@ -41,6 +41,7 @@ type FNodeMap = {
 export type FNode = {
   [K in keyof FNodeMap]: {
     name: string;
+    path: string;
     type: K;
     id: number;
     isOpen: boolean;
@@ -145,6 +146,7 @@ export function fileTreeReducer(state: ExplorerState, action: FTAction): Explore
             id: event.data.ino!,
             name: event.data.path.substring(event.data.path.lastIndexOf("/") + 1),
             parent: dirNode,
+            path: event.data.path,
           };
           let node: FNode;
           if (event.data.type === "dir") {
