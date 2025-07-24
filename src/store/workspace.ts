@@ -59,11 +59,12 @@ export const fetchWorkspaces = createAsyncThunk("workspace/get-all", async (_, {
   }
 });
 
-export const createNewWorkspace = createAsyncThunk<void, WorkspaceCreateDTO>(
+export const createNewWorkspace = createAsyncThunk<{ success: boolean; wait?: boolean }, WorkspaceCreateDTO>(
   "workspace/create",
   async (data, { dispatch }) => {
     try {
-      await createWorkspace(data);
+      const res = await createWorkspace(data);
+      return { success: true, wait: res.data.wait };
     } catch (error) {
       dispatch(
         notify({
@@ -74,6 +75,7 @@ export const createNewWorkspace = createAsyncThunk<void, WorkspaceCreateDTO>(
       );
       console.log(error);
     }
+    return { success: false };
   }
 );
 export const processNewWorkspace = createAsyncThunk<void, { workspace: WorkspaceDTO; privateKey: string }>(

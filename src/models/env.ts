@@ -31,3 +31,12 @@ export type EnvPayload = {
     payload: EnvResponseMap[K];
   };
 }[keyof EnvResponseMap];
+
+export interface EnvOpenDTO {
+  uuid: string;
+  sessionId: string;
+}
+export interface EnvCloseDTO {
+  uuid: string;
+  sessionId: string;
+}

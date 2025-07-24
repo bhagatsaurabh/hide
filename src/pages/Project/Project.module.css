@@ -32,4 +32,25 @@
   margin: 0;
   padding: 0;
   margin-bottom: 1rem;
+  margin-top: 1rem;
+}
+.actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 1rem;
+}
+.status {
+  margin: 1rem 0;
+  display: flex;
+  align-items: center;
+  font-weight: 300;
+  font-size: 0.95rem;
+  margin-bottom: 1.5rem;
+}
+.status .stattext {
+  font-weight: 200;
+}
+.status h4 {
+  margin: 0;
+  font-size: 0.9rem;
 }

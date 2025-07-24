@@ -3,17 +3,29 @@
   z-index: 10;
   user-select: none;
   position: absolute;
+  opacity: 0;
+  transition: opacity 0.15s linear;
+  transition-delay: 0.2s;
 }
 .sash.row {
-  cursor: col-resize;
+  cursor: ew-resize;
   width: 0.25rem;
   height: 100%;
 }
 .sash.column {
-  cursor: row-resize;
+  cursor: ns-resize;
   width: 100%;
   height: 0.25rem;
 }
 .sash.active {
   background: #aaa;
+}
+.sash.dragging {
+  opacity: 1;
+}
+
+@media (hover: hover) {
+  .sash:hover {
+    opacity: 1;
+  }
 }

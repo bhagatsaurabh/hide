@@ -9,12 +9,14 @@ import MemberList from "@/components/MemberList/MemberList";
 import Modal, { ModalRef } from "@/components/common/Modal/Modal";
 import Button from "@/components/common/Button/Button";
 import { auth } from "@/config/firebase";
-import { MembershipDTO } from "@/models/workspace";
+import { MembershipDTO, WorkspaceStatus } from "@/models/workspace";
 import { useAppDispatch, useAppSelector } from "@/hooks/store";
 import EditableField, { EditableFieldRef } from "@/components/common/EditableField/EditableField";
 import { validateDesc, validateName } from "@/utils/validators";
 import { selectWorkspaceById, updateExistingWorkspace } from "@/store/workspace";
 import AddMembers from "@/components/AddMembers/AddMembers";
+import Spinner from "@/components/common/Spinner/Spinner";
+import Icon from "@/components/common/Icon/Icon";
 
 export const Project = () => {
   const workspaceId = useLoaderData<typeof workspaceLoader>();
@@ -99,6 +101,8 @@ export const Project = () => {
     diagRef.current?.close();
   };
 
+  const isReady = workspace.status === WorkspaceStatus.READY || workspace.status === WorkspaceStatus.COLD;
+
   return (
     <>
       {toRemove && (
@@ -163,30 +167,34 @@ export const Project = () => {
         </div>
         <div className={classes.memberlist}>
           <h3 className={classes.heading}>Members</h3>
-          <MemberList
-            members={workspace.memberships}
-            onRemove={handleRemoveClick}
-            role={membership.role}
-          />
+          <MemberList members={workspace.memberships} onRemove={handleRemoveClick} role={membership.role} />
         </div>
-        <Button
-          className="float-right"
-          icon="chevron-right"
-          iconProps={{ "data-position": "right" }}
-          onClick={handleOpen}
-        >
-          Open
-        </Button>
-        {membership.role === "owner" && (
-          <Button className="float-right mr-1" onClick={() => setShowAdd(true)} busy={updateBusy}>
-            Add Members
+        <div className={classes.status}>
+          <span>Status:&nbsp;</span>
+          <span className={classes.stattext}>{isReady ? "Ready" : "Not Ready"}&nbsp;</span>
+          {isReady ? <Icon name="success" status size={1} /> : <Spinner size={1} />}
+        </div>
+        <div className={classes.actions}>
+          {(newName !== workspace.name || newDesc !== workspace.description) && (
+            <Button className="px-1" onClick={handleUpdate} busy={updateBusy}>
+              Save
+            </Button>
+          )}
+          {membership.role === "owner" && (
+            <Button className="px-1" onClick={() => setShowAdd(true)} busy={updateBusy}>
+              Add Members
+            </Button>
+          )}
+          <Button
+            disabled={!isReady}
+            className="px-1"
+            icon="chevron-right"
+            iconProps={{ "data-position": "right" }}
+            onClick={handleOpen}
+          >
+            Open
           </Button>
-        )}
-        {(newName !== workspace.name || newDesc !== workspace.description) && (
-          <Button className="float-right mr-1" onClick={handleUpdate} busy={updateBusy}>
-            Update
-          </Button>
-        )}
+        </div>
       </div>
     </>
   );

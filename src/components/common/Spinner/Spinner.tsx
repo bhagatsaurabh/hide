@@ -1,11 +1,11 @@
-import { ReactNode, Ref } from "react";
+import { ReactNode, RefObject, useEffect, useRef } from "react";
 import classes from "./Spinner.module.css";
 
 interface SpinnerProps {
   size: number;
   children: ReactNode;
   className: string;
-  ref: Ref<HTMLDivElement>;
+  ref: RefObject<HTMLDivElement>;
 }
 
 const Spinner = ({ size, className, children, ref }: Partial<SpinnerProps>) => {
@@ -14,6 +14,11 @@ const Spinner = ({ size, className, children, ref }: Partial<SpinnerProps>) => {
   if (className) {
     classNames.push(className);
   }
+  const textRef = useRef<HTMLHeadingElement>(null);
+
+  useEffect(() => {
+    textRef.current?.style.setProperty("--size", `${size / 2}rem`);
+  }, [ref, size]);
 
   return (
     <>
@@ -21,7 +26,7 @@ const Spinner = ({ size, className, children, ref }: Partial<SpinnerProps>) => {
         <div className={[classes.bar, classes.bar1].join(" ")}></div>
       </div>
       {children && (
-        <h4 style={{ fontSize: `${size / 2}rem` }} className={classes["spinner-text"]}>
+        <h4 ref={textRef} className={classes["spinner-text"]}>
           {children}
         </h4>
       )}

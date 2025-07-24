@@ -1,5 +1,17 @@
 import { InSocketMessagePayload } from "./common";
 
+export enum WorkspaceStatus {
+  PROVISIONING = "PROVISIONING",
+  READY = "READY",
+  DEPROVISIONING = "DEPROVISIONING",
+  COLD = "COLD",
+  DELETING = "DELETING",
+}
+
+export interface WorkspaceWaitDTO {
+  wait: boolean;
+}
+
 export interface WorkspaceDTO {
   id: number;
   uuid: string;
@@ -8,6 +20,7 @@ export interface WorkspaceDTO {
   createdAt: string;
   memberships: MembershipDTO[];
   image: string;
+  status: WorkspaceStatus;
 }
 
 export interface MembershipDTO {
@@ -51,11 +64,15 @@ export interface ProvisionSuccess extends InSocketMessagePayload {
   privateKey: string;
   workspace: WorkspaceDTO;
 }
+export interface ProvisionReady extends InSocketMessagePayload {
+  message: string;
+}
 
 export type ProvisionResponseMap = {
   status: ProvisionStatus;
   error: ProvisionError;
   success: ProvisionSuccess;
+  ready: ProvisionReady;
 };
 export type ProvisionPayload = {
   [K in keyof ProvisionResponseMap]: {

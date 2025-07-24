@@ -1,14 +1,14 @@
 import api from "@/config/axios";
 import { socket } from "@/config/socket";
 import { InSocketMessage, InSocketMessagePayload } from "@/models/common";
-import { FSOpenDTO } from "@/models/filesystem";
+import { EnvCloseDTO, EnvOpenDTO } from "@/models/env";
 import { uuidv4 as uuid } from "lib0/random.js";
 
-export const open = async (wsUuid: string) => {
-  return await api.post<FSOpenDTO[]>(`/env/open`, { uuid: wsUuid });
+export const open = async (data: EnvOpenDTO) => {
+  await api.post<unknown, unknown, EnvOpenDTO>(`/env/open`, data);
 };
-export const close = async (wsUuid: string) => {
-  return await api.post<FSOpenDTO[]>(`/env/close`, { uuid: wsUuid });
+export const close = async (data: EnvCloseDTO) => {
+  await api.post<unknown, unknown, EnvCloseDTO>(`/env/close`, data);
 };
 export const openPath = async <T extends InSocketMessagePayload>(wsUuid: string, path: string) =>
   new Promise<T>((res, rej) => {
