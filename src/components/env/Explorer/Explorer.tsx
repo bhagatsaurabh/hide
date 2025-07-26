@@ -35,7 +35,7 @@ const Explorer = () => {
 
   const init = useCallback(async () => {
     try {
-      const { entries } = await openPath<FSDirEntries>(workspace.uuid, "/home/devuser/workspace");
+      const { entries } = await openPath<FSDirEntries>(workspace.uuid, "/");
       const nodes: FNode[] = entries.map(
         (entry) =>
           ({

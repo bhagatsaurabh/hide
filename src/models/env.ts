@@ -12,17 +12,15 @@ export interface EnvPing extends OutSocketMessageEnv {
 
 ////////////
 
-export type EnvWorkspaceOpened = InSocketMessagePayload;
-export type EnvWorkspaceOpenWait = InSocketMessagePayload;
-export type EnvSessionLost = InSocketMessagePayload;
+export interface EnvDisconnect extends InSocketMessagePayload {
+  code: string;
+}
 export interface EnvError extends InSocketMessagePayload {
   code: string;
 }
 
 export type EnvResponseMap = {
-  "session.lost": EnvSessionLost;
-  "workspace.opened": EnvWorkspaceOpened;
-  "workspace.open.wait": EnvWorkspaceOpenWait;
+  disconnect: EnvDisconnect;
   error: EnvError;
 };
 export type EnvPayload = {

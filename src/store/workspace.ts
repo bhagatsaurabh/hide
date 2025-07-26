@@ -4,6 +4,7 @@ import { WorkspaceCreateDTO, WorkspaceDTO, WorkspaceUpdateDTO } from "@/models/w
 import {
   acceptInvitation,
   createWorkspace,
+  deleteWorkspace,
   getAllWorkspaces,
   ignoreInvitation,
   updateWorkspace,
@@ -108,6 +109,25 @@ export const updateExistingWorkspace = createAsyncThunk<boolean, WorkspaceUpdate
         notify({
           title: "Failed to update workspace",
           message: "Something went wrong when updating the workspace, please try again later.",
+          status: "error",
+        })
+      );
+      console.log(error);
+    }
+    return false;
+  }
+);
+export const deleteExistingWorkspace = createAsyncThunk<boolean, string>(
+  "workspace/delete",
+  async (uuid: string, { dispatch }) => {
+    try {
+      await deleteWorkspace(uuid);
+      return true;
+    } catch (error) {
+      dispatch(
+        notify({
+          title: "Failed to delete workspace",
+          message: "Something went wrong when deleting the workspace, please try again later.",
           status: "error",
         })
       );

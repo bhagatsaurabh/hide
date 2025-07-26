@@ -2,7 +2,6 @@ import api from "@/config/axios";
 import {
   InvitationAcceptDTO,
   InvitationIgnoreDTO,
-  ProvisionDTO,
   WorkspaceCreateDTO,
   WorkspaceDTO,
   WorkspaceUpdateDTO,
@@ -27,4 +26,8 @@ export const acceptInvitation = async (data: InvitationAcceptDTO) => {
 
 export const ignoreInvitation = async (data: InvitationIgnoreDTO) => {
   return await api.post("/workspace/ignore", data);
+};
+
+export const deleteWorkspace = async (uuid: string) => {
+  return await api.delete(`/workspace/${uuid}/delete`);
 };

@@ -10,7 +10,7 @@ interface ButtonProps {
   disabled: boolean;
   onClick: (e: MouseEvent) => unknown;
   icon: string;
-  iconProps: { "data-position": "left" | "right"; [key: string]: unknown };
+  iconProps: { "data-position"?: "left" | "right"; [key: string]: unknown; color?: string };
   size: number;
   className: string;
   children: ReactNode;

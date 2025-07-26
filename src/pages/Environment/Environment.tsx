@@ -22,6 +22,8 @@ import { ViewContext } from "@/context/view/view.context";
 import { closeEnv, openEnv, setUuid } from "@/store/env";
 import Spinner from "@/components/common/Spinner/Spinner";
 import { notify } from "@/store/notifications";
+import { ProvisionPayload } from "@/models/workspace";
+import { socket } from "@/config/socket";
 // const schemaMobile = layoutMobile as PanelSchema;
 const schemaDesktop = layoutDesktop as PanelSchema;
 
@@ -43,13 +45,43 @@ export const Environment = () => {
   const containerRef = useRef<HTMLDivElement>(null);
   const dispatch = useAppDispatch();
   const [busy, setBusy] = useState(true);
+  const [waitMsg, setWaitMsg] = useState("Connecting to workspace...");
+  const [provStatus, setProvStatus] = useState<ProvisionPayload | null>(null);
   const navigate = useNavigate();
 
-  const init = async (sessionId: string) => {
-    const res = await dispatch(openEnv({ uuid: workspace.uuid, sessionId }));
-    if (res.payload) {
-      setBusy(false);
+  useEffect(() => {
+    console.log(provStatus);
+    if (provStatus?.action === "error") {
+      dispatch(
+        notify({
+          title: "Could not connect to workspace",
+          status: "error",
+          message: "Something went wrong while connecting to your workspace, please try again later",
+        })
+      );
+      navigate(-1);
+      socket?.off("provision");
+    } else if (provStatus?.action === "success" || provStatus?.action === "ready") {
       dispatch(setUuid(workspace.uuid));
+      socket?.off("provision");
+      setBusy(false);
+    } else {
+      if (!provStatus) return;
+      setWaitMsg(provStatus.payload.message);
+    }
+  }, [dispatch, navigate, provStatus, workspace.uuid]);
+
+  const init = async (sessionId: string) => {
+    socket?.on("provision", (msg) => setProvStatus(msg));
+    const res = await dispatch(openEnv({ uuid: workspace.uuid, sessionId }));
+    const { success, wait } = res.payload as { success: boolean; wait?: boolean };
+    console.log(success, wait);
+    if (success) {
+      if (wait) return;
+
+      socket?.off("provision");
+      dispatch(setUuid(workspace.uuid));
+      setBusy(false);
     } else {
       navigate(-1);
     }
@@ -68,8 +100,15 @@ export const Environment = () => {
       setDimension({ width: rect.width, height: rect.height });
     }
 
+    socket.on("env", (msg) => {
+      if (msg.action === "disconnect") {
+        navigate(-1);
+      }
+    });
+
     return () => {
       console.log("Closing");
+      socket?.off("env");
       dispatch(closeEnv({ uuid: workspace.uuid, sessionId }));
     };
   }, []);
@@ -180,7 +219,7 @@ export const Environment = () => {
 
   return busy ? (
     <div className={classes.wait}>
-      <Spinner size={2}>Connecting to workspace...</Spinner>
+      <Spinner size={2}>{waitMsg}</Spinner>
     </div>
   ) : (
     <ViewContext.Provider value={{ getNode, workspace }}>

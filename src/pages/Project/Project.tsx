@@ -13,7 +13,12 @@ import { MembershipDTO, WorkspaceStatus } from "@/models/workspace";
 import { useAppDispatch, useAppSelector } from "@/hooks/store";
 import EditableField, { EditableFieldRef } from "@/components/common/EditableField/EditableField";
 import { validateDesc, validateName } from "@/utils/validators";
-import { selectWorkspaceById, updateExistingWorkspace } from "@/store/workspace";
+import {
+  deleteExistingWorkspace,
+  fetchWorkspaces,
+  selectWorkspaceById,
+  updateExistingWorkspace,
+} from "@/store/workspace";
 import AddMembers from "@/components/AddMembers/AddMembers";
 import Spinner from "@/components/common/Spinner/Spinner";
 import Icon from "@/components/common/Icon/Icon";
@@ -21,18 +26,21 @@ import Icon from "@/components/common/Icon/Icon";
 export const Project = () => {
   const workspaceId = useLoaderData<typeof workspaceLoader>();
   const wrspc = useAppSelector((state) => selectWorkspaceById(state, workspaceId))!;
-  const workspace = usePrevious(wrspc);
+  const workspace = usePrevious(wrspc, true);
   const navigate = useNavigate();
   const [show, setShow] = useState(true);
   const node = useRef<Node>(null);
   const bound = useRef<{ first: HTMLElement | null; last: HTMLElement | null }>(null);
   const [toRemove, setToRemove] = useState<MembershipDTO | null>(null);
+  const [toDelete, setToDelete] = useState(false);
   const diagRef = useRef<ModalRef>(null);
+  const diagDelRef = useRef<ModalRef>(null);
   const dispatch = useAppDispatch();
   const [newName, setNewName] = useState(workspace.name);
   const [newDesc, setNewDesc] = useState(workspace.description);
-  const [busy, setBusy] = useState(false);
   const [updateBusy, setUpdateBusy] = useState(false);
+  const [removeBusy, setRemoveBusy] = useState(false);
+  const [deleteBusy, setDeleteBusy] = useState(false);
   const nameRef = useRef<EditableFieldRef>(null);
   const descRef = useRef<EditableFieldRef>(null);
   const [showAdd, setShowAdd] = useState(false);
@@ -93,12 +101,21 @@ export const Project = () => {
       newMembers.findIndex((uid) => toRemove.userId === uid),
       1
     );
-    setBusy(true);
+    setRemoveBusy(true);
     await dispatch(
       updateExistingWorkspace({ name: newName, description: newDesc, id: workspace.id, members: newMembers })
     );
-    setBusy(false);
+    setRemoveBusy(false);
     diagRef.current?.close();
+  };
+  const handleWorkspaceDelete = async () => {
+    if (!toDelete) return;
+    setDeleteBusy(true);
+    await dispatch(deleteExistingWorkspace(workspace.uuid));
+    await dispatch(fetchWorkspaces());
+    setDeleteBusy(false);
+    diagDelRef.current?.close();
+    navigate("/dashboard");
   };
 
   const isReady = workspace.status === WorkspaceStatus.READY || workspace.status === WorkspaceStatus.COLD;
@@ -119,10 +136,31 @@ export const Project = () => {
             Do you want to remove user @{toRemove.username} from {workspace.name} workspace ?
           </p>
           <div className="d-flex justify-content-end gap-1">
-            <Button onClick={handleMemberRemove} busy={busy}>
+            <Button onClick={handleMemberRemove} busy={removeBusy}>
               Yes
             </Button>
-            <Button type="secondary" onClick={() => diagRef?.current?.close()} disabled={busy}>
+            <Button type="secondary" onClick={() => diagRef?.current?.close()} disabled={removeBusy}>
+              Cancel
+            </Button>
+          </div>
+        </Modal>
+      )}
+      {toDelete && (
+        <Modal
+          title="delete"
+          type="pop"
+          onDismiss={() => setToDelete(false)}
+          ref={diagDelRef}
+          layer={2}
+          className="p-1p5"
+        >
+          <h2>Are you sure ?</h2>
+          <p>Do you want to delete this workspace ?</p>
+          <div className="d-flex justify-content-end gap-1">
+            <Button onClick={handleWorkspaceDelete} busy={deleteBusy}>
+              Yes
+            </Button>
+            <Button type="secondary" onClick={() => diagDelRef?.current?.close()} disabled={deleteBusy}>
               Cancel
             </Button>
           </div>
@@ -175,6 +213,13 @@ export const Project = () => {
           {isReady ? <Icon name="success" status size={1} /> : <Spinner size={1} />}
         </div>
         <div className={classes.actions}>
+          <Button
+            onClick={() => setToDelete(true)}
+            className="px-0p75"
+            icon="bin"
+            iconProps={{ color: "#f79393" }}
+            size={1.8}
+          />
           {(newName !== workspace.name || newDesc !== workspace.description) && (
             <Button className="px-1" onClick={handleUpdate} busy={updateBusy}>
               Save

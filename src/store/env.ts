@@ -25,22 +25,25 @@ export const envSlice = createSlice({
   },
 });
 
-export const openEnv = createAsyncThunk<boolean, EnvOpenDTO>("env/open", async (data, { dispatch }) => {
-  try {
-    await open(data);
-    return true;
-  } catch (error) {
-    console.log(error);
-    dispatch(
-      notify({
-        title: "Failed to open workspace",
-        message: "Could not open workspace, please try again later",
-        status: "error",
-      })
-    );
+export const openEnv = createAsyncThunk<{ success: boolean; wait?: boolean }, EnvOpenDTO>(
+  "env/open",
+  async (data, { dispatch }) => {
+    try {
+      const res = await open(data);
+      return { success: true, wait: res.data.wait };
+    } catch (error) {
+      console.log(error);
+      dispatch(
+        notify({
+          title: "Failed to open workspace",
+          message: "Could not open workspace, please try again later",
+          status: "error",
+        })
+      );
+    }
+    return { success: false };
   }
-  return false;
-});
+);
 export const closeEnv = createAsyncThunk<void, EnvCloseDTO>("env/close", async (data) => {
   try {
     await close(data);
