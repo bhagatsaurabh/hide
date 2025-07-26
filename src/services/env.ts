@@ -2,13 +2,14 @@ import api from "@/config/axios";
 import { socket } from "@/config/socket";
 import { InSocketMessage, InSocketMessagePayload } from "@/models/common";
 import { EnvCloseDTO, EnvOpenDTO } from "@/models/env";
+import { WorkspaceWaitDTO } from "@/models/workspace";
 import { uuidv4 as uuid } from "lib0/random.js";
 
 export const open = async (data: EnvOpenDTO) => {
-  await api.post<unknown, unknown, EnvOpenDTO>(`/env/open`, data);
+  return await api.post<WorkspaceWaitDTO>(`/env/open`, data);
 };
 export const close = async (data: EnvCloseDTO) => {
-  await api.post<unknown, unknown, EnvCloseDTO>(`/env/close`, data);
+  return await api.post<WorkspaceWaitDTO>(`/env/close`, data);
 };
 export const openPath = async <T extends InSocketMessagePayload>(wsUuid: string, path: string) =>
   new Promise<T>((res, rej) => {
