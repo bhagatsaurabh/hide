@@ -1,0 +1,11 @@
+.provider {
+  position: fixed;
+  z-index: 100;
+  pointer-events: none;
+  padding: 0.5rem;
+  background-color: #f3f3f3;
+  font-size: 0.75rem;
+  border-radius: 0.25rem;
+  color: #000000b0;
+  padding: 0.15rem 0.5rem;
+}

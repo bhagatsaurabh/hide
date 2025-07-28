@@ -18,6 +18,8 @@ interface ButtonProps {
   type: "primary" | "secondary" | "tertiary";
   ref: RefObject<Null<HTMLButtonElement>>;
   highlight: boolean;
+  onMouseEnter?: (e: MouseEvent) => void;
+  onMouseLeave?: () => void;
 }
 
 const Button = ({
@@ -33,6 +35,8 @@ const Button = ({
   type = "primary",
   ref,
   highlight = false,
+  onMouseEnter = noop,
+  onMouseLeave = noop,
 }: Partial<ButtonProps>) => {
   const classNames = [classes.button, classes[type]];
   if (disabled) classNames.push(classes.disabled);
@@ -81,6 +85,8 @@ const Button = ({
         } as CSSProperties
       }
       onClick={!disabled ? onClick : noop}
+      onMouseEnter={onMouseEnter}
+      onMouseLeave={onMouseLeave}
     >
       {...content}
     </button>

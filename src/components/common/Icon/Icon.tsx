@@ -10,22 +10,40 @@ interface IconProps {
   color?: string;
   status?: boolean;
   style?: CSSProperties;
+  strokeWidth?: number;
+  fs?: boolean;
 }
 
-const Icon = ({ size = 1, name, className, color, status = false, style = {} }: IconProps) => {
+const Icon = ({
+  strokeWidth = 1,
+  size = 1,
+  name,
+  className,
+  color,
+  status = false,
+  style = {},
+  fs = false,
+}: IconProps) => {
   const [Component, setComponent] = useState<React.FC<React.SVGProps<SVGSVGElement>> | null>(null);
   const [error, setError] = useState(false);
 
   useEffect(() => {
     let isMounted = true;
-    import(`../../../assets/icons/${name}.svg?react`)
+    let promise;
+    if (fs) {
+      promise = import(`../../../assets/icons/editor/${name}.svg?react`);
+    } else {
+      promise = import(`../../../assets/icons/${name}.svg?react`);
+    }
+    promise
       .then((module) => {
         if (isMounted) {
           setComponent(() => module.default);
           setError(false);
         }
       })
-      .catch(() => {
+      .catch((err) => {
+        console.log(err);
         setComponent(null);
         setError(true);
       });
@@ -33,7 +51,7 @@ const Icon = ({ size = 1, name, className, color, status = false, style = {} }: 
     return () => {
       isMounted = false;
     };
-  }, [name]);
+  }, [fs, name]);
 
   if (error) {
     return (
@@ -53,7 +71,7 @@ const Icon = ({ size = 1, name, className, color, status = false, style = {} }: 
       className={[className, status ? classes[name] : ""].join(" ")}
       width={`${size}rem`}
       height={`${size}rem`}
-      style={{ fill: color, stroke: color, ...style }}
+      style={{ fill: color, stroke: color, strokeWidth, ...style }}
     />
   );
 };

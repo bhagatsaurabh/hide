@@ -122,3 +122,8 @@ export const parseSizetoPx = (value: string) => {
   document.documentElement.removeChild(el);
   return pixels;
 };
+
+export const getExt = (name: string) => {
+  if (name.lastIndexOf(".") === -1) return "default";
+  return name.substring(name.lastIndexOf(".") + 1);
+};
