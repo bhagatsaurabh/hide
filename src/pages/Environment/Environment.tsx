@@ -50,7 +50,6 @@ export const Environment = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    console.log(provStatus);
     if (provStatus?.action === "error") {
       dispatch(
         notify({
@@ -75,7 +74,6 @@ export const Environment = () => {
     socket?.on("provision", (msg) => setProvStatus(msg));
     const res = await dispatch(openEnv({ uuid: workspace.uuid, sessionId }));
     const { success, wait } = res.payload as { success: boolean; wait?: boolean };
-    console.log(success, wait);
     if (success) {
       if (wait) return;
 
@@ -107,107 +105,11 @@ export const Environment = () => {
     });
 
     return () => {
-      console.log("Closing");
       socket?.off("env");
       dispatch(closeEnv({ uuid: workspace.uuid, sessionId }));
     };
   }, []);
 
-  /* useEffect(() => {
-    return () => {
-      socket.emit("msg", {
-        service: "env",
-        action: "ssh.close",
-        payload: {
-          uuid: workspace.uuid,
-          sessionId: "#all",
-        },
-      });
-      term.current?.dispose();
-      socket.off("ssh");
-    };
-  }, [dispatch, workspace.uuid]); */
-
-  /* const handleNewTerminal = async () => {
-    const privateKey = await getSSHKey(auth.currentUser!.uid, workspace.uuid);
-
-    socket.on("ssh", (msg) => {
-      switch (msg.action) {
-        case "open": {
-          handleSSHOpen(msg.payload);
-          break;
-        }
-        case "output": {
-          handleSSHOutput(msg.payload);
-          break;
-        }
-        case "error": {
-          handleSSHError(msg.payload);
-          break;
-        }
-        case "closed": {
-          handleSSHClosed(msg.payload);
-          break;
-        }
-        default:
-          break;
-      }
-    });
-
-    socket.emit("msg", {
-      service: "env",
-      action: "ssh.request",
-      payload: {
-        uuid: workspace.uuid,
-        privateKey,
-      },
-    });
-  };
-  const handleSSHOpen = (payload: SSHOpen) => {
-    setSessionId(payload.sessionId);
-
-    term.current = new Terminal();
-    const fitAddon = new FitAddon();
-    const clipboardAddon = new ClipboardAddon();
-    term.current.loadAddon(fitAddon);
-    term.current.loadAddon(clipboardAddon);
-    term.current.loadAddon(new WebLinksAddon());
-
-    term.current.open(termEl.current!);
-    fitAddon.fit();
-    term.current.write("Connecting...");
-    term.current.onData((data) =>
-      socket.emit("msg", {
-        service: "env",
-        action: "ssh.data",
-        payload: {
-          uuid: workspace.uuid,
-          sessionId: payload.sessionId,
-          input: data,
-        },
-      })
-    );
-  };
-  const handleSSHOutput = (payload: SSHOutput) => {
-    term.current!.write(payload.output);
-  };
-  const handleSSHError = (payload: SSHError) => {
-    if (payload.sessionId) {
-      term.current?.write(payload.message);
-    } else {
-      console.error(payload);
-    }
-  };
-  const handleSSHClosed = (payload: SSHClosed) => {
-    term.current?.write(`Disconnected: ${payload.sessionId}`);
-    term.current?.dispose();
-  };
-
-  const handleCloseTerminal = () => {
-    socket.emit("msg", { service: "env", action: "ssh.close", payload: { uuid: workspace.uuid, sessionId } });
-    setSessionId("");
-    term.current?.dispose();
-  }; */
   const nodes = useRef(new Map<string, ReturnType<typeof createHtmlPortalNode>>());
 
   const getNode = (viewId: string) => {

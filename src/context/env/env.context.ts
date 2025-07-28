@@ -1,9 +1,10 @@
+import { FNode } from "@/reducers/explorer";
 import { createContext } from "react";
 
 type Env = {
-  open: (path: string, isDir: boolean) => Promise<void>;
-  close: (path: string, isDir: boolean) => void;
-  save: (path: string) => void;
+  open: (fnode: FNode) => Promise<boolean>;
+  close: (fnode: FNode) => void;
+  save: (fnode: FNode) => void;
 };
 
 export const EnvContext = createContext<Env | undefined>(undefined);

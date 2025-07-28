@@ -331,3 +331,32 @@
     height: 8rem;
   }
 }
+
+.visible {
+  visibility: visible;
+}
+.hidden {
+  visibility: hidden;
+}
+
+.p-0p25 {
+  padding: 0.25rem;
+}
+.p-0p2 {
+  padding: 0.2rem;
+}
+.p-0p15 {
+  padding: 0.15rem;
+}
+.p-0p1 {
+  padding: 0.1rem;
+}
+.ml-0p5 {
+  margin-left: 0.5rem;
+}
+.ml-0p75 {
+  margin-left: 0.75rem;
+}
+.flex-shrink-0 {
+  flex-shrink: 0;
+}

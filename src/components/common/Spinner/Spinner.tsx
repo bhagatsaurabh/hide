@@ -10,7 +10,7 @@ interface SpinnerProps {
 
 const Spinner = ({ size, className, children, ref }: Partial<SpinnerProps>) => {
   size = size ?? 1;
-  const classNames = [classes.spinner];
+  const classNames = [classes.spinner, "type-spinner"];
   if (className) {
     classNames.push(className);
   }

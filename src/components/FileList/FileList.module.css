@@ -1,0 +1,34 @@
+.fslist {
+  width: 100%;
+  height: 100%;
+}
+.fsitem {
+  display: flex;
+  padding: 0.2rem 0.25rem;
+  align-items: center;
+}
+.fsitem.selected {
+  background-color: rgb(234, 234, 210);
+}
+.fsitem.disabled {
+  opacity: 0.75;
+}
+.fsitem :global(.type-spinner) {
+  --color: #4a4a4a;
+}
+.name {
+  font-size: 0.8rem;
+  font-weight: 400;
+  color: #383838;
+  margin-left: 0.4rem;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  overflow: hidden;
+}
+
+@media (hover: hover) {
+  .fsitem:hover {
+    background-color: rgb(245, 245, 220);
+    cursor: pointer;
+  }
+}
