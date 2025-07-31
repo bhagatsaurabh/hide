@@ -1,9 +1,9 @@
 import Icon from "@/components/common/Icon/Icon";
 import classes from "./TerminalGroup.module.css";
-import { MouseEvent, useContext, useEffect, useState } from "react";
+import { MouseEvent, useContext, useEffect, useRef, useState } from "react";
 import { TooltipContext } from "@/context/tooltip/tooltip.context";
 import classNames from "classnames";
-import Terminal from "@/components/Terminal/Terminal";
+import Terminal, { TerminalRef } from "@/components/Terminal/Terminal";
 import { socket } from "@/config/socket";
 import { ViewContext } from "@/context/view/view.context";
 import { uuidv4 as uuid } from "lib0/random.js";
@@ -13,31 +13,51 @@ const TerminalGroup = () => {
   const [terms, setTerms] = useState<string[]>([]);
   const [activeId, setActiveId] = useState("");
   const { workspace } = useContext(ViewContext)!;
+  const termRefs = useRef<Record<string, TerminalRef>>({});
+  const termMap = useRef<Map<string, string>>(new Map());
 
   const handleNewTerminal = () => {
-    setTerms((prev) => [...prev, uuid()]);
+    const id = uuid();
+    setTerms((prev) => [...prev, id]);
+    setActiveId(id);
   };
-  const handleRemoveTerminal = (id: string) => {
+  const handleRemoveTerminal = (termId: string) => {
     setTerms((prev) => {
+      let idx = prev.findIndex((id) => id === termId);
+      const activeId = prev[idx - 1] ?? prev[idx + 1];
+      if (idx >= 0) {
+        idx -= 1;
+        if (idx < 0) idx += 2;
+      }
       const updated = new Set(prev);
-      updated.delete(id);
+      updated.delete(termId);
+      delete termRefs.current[termId];
+      if (activeId) setActiveId(activeId);
       return [...updated];
     });
   };
 
-  useEffect(
-    () => () => {
+  useEffect(() => {
+    socket.on("ssh", (msg) => {
+      if (msg.action === "open") {
+        termMap.current?.set(msg.payload.sshSessionId, msg.payload.clientId);
+      }
+
+      termRefs.current?.[termMap.current.get(msg.payload.sshSessionId as string) as string]?.handleSSHMessage(msg);
+    });
+
+    return () => {
+      socket?.off("ssh");
       socket?.emit("msg", {
         service: "env",
         action: "ssh.close",
         payload: {
           uuid: workspace.uuid,
-          sessionId: "#all",
+          sshSessionId: "#all",
         },
       });
-    },
-    [workspace.uuid]
-  );
+    };
+  }, []);
 
   return (
     <div className={classes.termgroup}>
@@ -59,7 +79,16 @@ const TerminalGroup = () => {
       <div className={classes.content}>
         <div className={classes.terminal}>
           {terms.map((termId) => (
-            <Terminal show={termId === activeId} key={termId} id={termId} onClose={handleRemoveTerminal} />
+            <Terminal
+              ref={(termRef) => {
+                if (!termRef) delete termRefs.current[termId];
+                else termRefs.current[termId] = termRef;
+              }}
+              show={termId === activeId}
+              key={termId}
+              id={termId}
+              onClose={handleRemoveTerminal}
+            />
           ))}
         </div>
         <ul className={classes.list}>

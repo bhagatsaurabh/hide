@@ -125,7 +125,7 @@ export const Environment = () => {
     </div>
   ) : (
     <ViewContext.Provider value={{ getNode, workspace }}>
-      <div ref={containerRef} className={classes.environment}>
+      <div ref={containerRef} className={[classes.environment, "scrollbar"].join(" ")}>
         <Panel
           style={{ width: "100%", height: "100%" }}
           dimension={dimension}

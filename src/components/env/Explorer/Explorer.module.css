@@ -6,6 +6,7 @@
   color: #000;
   display: flex;
   flex-direction: column;
+  border-right: 1px solid rgb(199, 199, 199);
 }
 .heading {
   font-size: 0.64rem;

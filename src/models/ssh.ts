@@ -5,14 +5,16 @@ export interface SSHError extends InSocketMessagePayload {
   message: string;
 }
 export interface SSHOpen extends InSocketMessagePayload {
-  sessionId: string;
+  sshSessionId: string;
+  clientId: string;
 }
 export interface SSHOutput extends InSocketMessagePayload {
-  sessionId: string;
+  sshSessionId: string;
   output: string;
 }
 export interface SSHClosed extends InSocketMessagePayload {
-  sessionId: string;
+  sshSessionId: string;
+  all?: boolean;
 }
 
 export type SSHResponseMap = {
@@ -34,11 +36,12 @@ export type SSHAction = "ssh.request" | "ssh.data" | "ssh.close" | "ssh.closeall
 
 export interface SSHRequest extends OutSocketMessageEnv {
   privateKey: string;
+  clientId: string;
 }
 export interface SSHData extends OutSocketMessageEnv {
-  sessionId: string;
+  sshSessionId: string;
   input: string;
 }
 export interface SSHClose extends OutSocketMessageEnv {
-  sessionId: "#all" | string;
+  sshSessionId: "#all" | string;
 }

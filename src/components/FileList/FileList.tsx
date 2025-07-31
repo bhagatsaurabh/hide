@@ -3,7 +3,7 @@ import classes from "./FileList.module.css";
 import { FNode } from "@/reducers/explorer";
 import Spinner from "../common/Spinner/Spinner";
 import Icon from "../common/Icon/Icon";
-import { getExt } from "@/utils";
+import { getExt, getFileIcon } from "@/utils";
 import classNames from "classnames";
 import iconMapping from "@/assets/icon-map.json";
 import { TooltipContext } from "@/context/tooltip/tooltip.context";
@@ -83,9 +83,6 @@ const FileList = ({ root, open, close }: FileListProps) => {
       updated.delete(fnode.id);
       return updated;
     });
-  };
-  const getFileIcon = (name: string) => {
-    return iconMap.fileNames[name] ?? `${iconMap.fileExtensions[getExt(name)]}`;
   };
 
   return (
