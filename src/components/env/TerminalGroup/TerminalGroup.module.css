@@ -1,5 +1,5 @@
 .termgroup {
-  background-color: #f2f2de;
+  background-color: #f9f9e6;
   width: 100%;
   height: 100%;
   display: flex;
@@ -8,6 +8,7 @@
 .heading {
   height: 2.25rem;
   border-bottom: 1px solid rgb(199, 199, 199);
+  border-top: 1px solid rgb(199, 199, 199);
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -21,6 +22,7 @@
 }
 .terminal {
   position: relative;
+  /* padding: 1rem; */
 }
 .title {
   font-size: 0.64rem;

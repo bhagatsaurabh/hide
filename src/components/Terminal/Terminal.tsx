@@ -1,30 +1,34 @@
 import classNames from "classnames";
 import classes from "./Terminal.module.css";
-import { useContext, useEffect, useRef, useState } from "react";
+import { Ref, useContext, useEffect, useImperativeHandle, useRef, useState } from "react";
 import { socket } from "@/config/socket";
 import { getSSHKey } from "@/utils/driver";
 import { auth } from "@/config/firebase";
 import { ViewContext } from "@/context/view/view.context";
-import { useAppDispatch } from "@/hooks/store";
 import { SSHClosed, SSHError, SSHOpen, SSHOutput } from "@/models/ssh";
 import { InSocketMessage } from "@/models/common";
 import { Terminal as XTerm } from "@xterm/xterm";
 import { FitAddon } from "@xterm/addon-fit";
 import { ClipboardAddon } from "@xterm/addon-clipboard";
 import { WebLinksAddon } from "@xterm/addon-web-links";
+import Spinner from "../common/Spinner/Spinner";
 
+export interface TerminalRef {
+  handleSSHMessage: (msg: InSocketMessage<"ssh">) => void;
+}
 interface TerminalProps {
   id: string;
   show: boolean;
+  ref?: Ref<TerminalRef | null>;
   onClose: (guid: string) => void;
 }
 
-const Terminal = ({ id: guid, show, onClose }: TerminalProps) => {
+const Terminal = ({ id: guid, show, ref, onClose }: TerminalProps) => {
   const { workspace } = useContext(ViewContext)!;
-  const dispatch = useAppDispatch();
-  const [sshSessId, setSSHSessId] = useState("");
+  const sshSessionId = useRef("");
   const term = useRef<XTerm>(null);
   const wrapperEl = useRef<HTMLDivElement>(null);
+  const [busy, setBusy] = useState(true);
 
   useEffect(() => {
     init();
@@ -33,14 +37,16 @@ const Terminal = ({ id: guid, show, onClose }: TerminalProps) => {
       socket.emit("msg", {
         service: "env",
         action: "ssh.close",
-        payload: { uuid: workspace.uuid, sessionId: sshSessId },
+        payload: { uuid: workspace.uuid, sshSessionId: sshSessionId.current },
       });
-      setSSHSessId("");
       term.current?.dispose();
     };
-  }, [dispatch, workspace.uuid]);
+  }, []);
+  useImperativeHandle(ref, () => ({
+    handleSSHMessage,
+  }));
 
-  const sshMsgHandler = (msg: InSocketMessage<"ssh">) => {
+  const handleSSHMessage = (msg: InSocketMessage<"ssh">) => {
     switch (msg.action) {
       case "open": {
         handleSSHOpen(msg.payload);
@@ -63,23 +69,14 @@ const Terminal = ({ id: guid, show, onClose }: TerminalProps) => {
     }
   };
   const init = async () => {
-    const privateKey = await getSSHKey(auth.currentUser!.uid, workspace.uuid);
-
-    socket.on("ssh", sshMsgHandler);
-
-    socket.emit("msg", {
-      service: "env",
-      action: "ssh.request",
-      payload: {
-        uuid: workspace.uuid,
-        privateKey,
+    term.current = new XTerm({
+      theme: {
+        background: "#f9f9e6",
+        foreground: "#303030ff",
+        cursor: "#000000",
+        selectionBackground: "#b3b3b3ff",
       },
     });
-  };
-  const handleSSHOpen = (payload: SSHOpen) => {
-    setSSHSessId(payload.sessionId);
-
-    term.current = new XTerm();
     const fitAddon = new FitAddon();
     const clipboardAddon = new ClipboardAddon();
     term.current.loadAddon(fitAddon);
@@ -89,17 +86,33 @@ const Terminal = ({ id: guid, show, onClose }: TerminalProps) => {
     term.current.open(wrapperEl.current!);
     fitAddon.fit();
     term.current.write("Connecting...");
-    term.current.onData((data) =>
+    term.current.onData((data) => {
       socket.emit("msg", {
         service: "env",
         action: "ssh.data",
         payload: {
           uuid: workspace.uuid,
-          sessionId: payload.sessionId,
+          sshSessionId: sshSessionId.current,
           input: data,
         },
-      })
-    );
+      });
+    });
+
+    const privateKey = await getSSHKey(auth.currentUser!.uid, workspace.uuid);
+
+    socket.emit("msg", {
+      service: "env",
+      action: "ssh.request",
+      payload: {
+        uuid: workspace.uuid,
+        privateKey,
+        clientId: guid,
+      },
+    });
+  };
+  const handleSSHOpen = (payload: SSHOpen) => {
+    sshSessionId.current = payload.sshSessionId;
+    setBusy(false);
   };
   const handleSSHOutput = (payload: SSHOutput) => {
     term.current!.write(payload.output);
@@ -112,19 +125,31 @@ const Terminal = ({ id: guid, show, onClose }: TerminalProps) => {
     }
   };
   const handleSSHClosed = (payload: SSHClosed) => {
-    term.current?.write(`Disconnected: ${payload.sessionId}`);
+    term.current?.write(`Disconnected: ${payload.sshSessionId}`);
     term.current?.dispose();
     onClose(guid);
   };
 
   return (
-    <div
-      ref={wrapperEl}
-      className={classNames({
-        [classes.term]: true,
-        [classes.active]: show,
-      })}
-    ></div>
+    <>
+      {busy && (
+        <div
+          className={classNames({
+            [classes.wait]: true,
+            [classes.active]: show,
+          })}
+        >
+          <Spinner size={1.5}>Connecting</Spinner>
+        </div>
+      )}
+      <div
+        ref={wrapperEl}
+        className={classNames({
+          [classes.term]: true,
+          [classes.active]: show,
+        })}
+      ></div>
+    </>
   );
 };
 

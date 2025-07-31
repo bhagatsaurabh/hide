@@ -57,7 +57,6 @@ const Explorer = () => {
     }
   }, [workspace.uuid]);
   const handleFSMessage = (msg: InSocketMessage<"fs">) => {
-    console.log(msg);
     switch (msg.action) {
       case "batch": {
         fsDispatch({ type: "BATCH", payload: { events: msg.payload.events } });

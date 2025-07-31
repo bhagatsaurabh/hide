@@ -1,8 +1,33 @@
 .term {
   width: 100%;
   height: 100%;
+  position: absolute;
+  top: 0;
+  left: 0;
   display: none;
 }
 .term.active {
   display: block;
+}
+.wait {
+  z-index: 10;
+  width: 100%;
+  height: 100%;
+  position: absolute;
+  top: 0;
+  left: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  background-color: #f9f9e6;
+  --color: #5d5d5d;
+}
+.wait h4 {
+  color: #000;
+}
+
+:global(.xterm) {
+  padding: 1rem;
+  height: 100%;
 }

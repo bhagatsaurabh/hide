@@ -1,6 +1,14 @@
 import { FNode } from "@/reducers/explorer";
 import { ReactNode } from "react";
 import { Location } from "react-router";
+import iconMapping from "@/assets/icon-map.json";
+
+type IconMap = {
+  fileNames: Record<string, string>;
+  fileExtensions: Record<string, string>;
+  languageIds: Record<string, string>;
+};
+const iconMap = iconMapping as IconMap;
 
 export const getPath = (node?: FNode) => {
   const path = [];
@@ -126,4 +134,8 @@ export const parseSizetoPx = (value: string) => {
 export const getExt = (name: string) => {
   if (name.lastIndexOf(".") === -1) return "default";
   return name.substring(name.lastIndexOf(".") + 1);
+};
+export const getFileIcon = (name: string) => {
+  const ext = getExt(name);
+  return iconMap.fileNames[name] ?? iconMap.fileExtensions[ext] ?? iconMap.languageIds[ext] ?? "document";
 };
