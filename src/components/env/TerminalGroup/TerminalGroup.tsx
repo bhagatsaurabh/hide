@@ -46,6 +46,8 @@ const TerminalGroup = () => {
       termRefs.current?.[termMap.current.get(msg.payload.sshSessionId as string) as string]?.handleSSHMessage(msg);
     });
 
+    handleNewTerminal();
+
     return () => {
       socket?.off("ssh");
       socket?.emit("msg", {
