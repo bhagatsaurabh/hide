@@ -3,18 +3,13 @@ import classes from "./FileList.module.css";
 import { FNode } from "@/reducers/explorer";
 import Spinner from "../common/Spinner/Spinner";
 import Icon from "../common/Icon/Icon";
-import { getExt, getFileIcon } from "@/utils";
+import { getFileIcon } from "@/utils";
 import classNames from "classnames";
-import iconMapping from "@/assets/icon-map.json";
 import { TooltipContext } from "@/context/tooltip/tooltip.context";
 
 type FlatNode = {
   fnode: FNode;
   depth: number;
-};
-type IconMap = {
-  fileNames: Record<string, string>;
-  fileExtensions: Record<string, string>;
 };
 
 interface FileListProps {
@@ -22,8 +17,6 @@ interface FileListProps {
   open: (fnode: FNode) => Promise<boolean>;
   close: (fnode: FNode) => void;
 }
-
-const iconMap = iconMapping as IconMap;
 
 const FileList = ({ root, open, close }: FileListProps) => {
   const [expandedDirs, setExpandedDirs] = useState(new Set());
@@ -97,23 +90,23 @@ const FileList = ({ root, open, close }: FileListProps) => {
           })}
           style={{ paddingLeft: `${depth * 0.5}rem` }}
           onClick={() => handleClick(fnode)}
-          onMouseEnter={(e: MouseEvent) => showTooltip(fnode.path.substring(23), e.clientX, e.clientY)}
+          onMouseEnter={(e: MouseEvent) => showTooltip(fnode.path.substring(10), e.clientX, e.clientY)}
           onMouseLeave={hideTooltip}
         >
-          {fnode.type === "file" && <Icon className="ml-0p5 flex-shrink-0" name={getFileIcon(fnode.name)} size={0.8} fs />}
-          {fnode.type === "dir" &&
-            (busy.has(fnode.id) ? (
-              <Spinner size={0.8} className="ml-0p5 flex-shrink-0" />
-            ) : (
-              <Icon
-                className="ml-0p5 flex-shrink-0"
-                color="#505050"
-                strokeWidth={1.5}
-                size={0.8}
-                style={{ transform: `rotateZ(${expandedDirs.has(fnode.path) ? 90 : 0}deg)` }}
-                name="chevron-right"
-              />
-            ))}
+          {busy.has(fnode.id) ? (
+            <Spinner size={0.8} className="ml-0p5 flex-shrink-0" />
+          ) : fnode.type === "file" ? (
+            <Icon className="ml-0p5 flex-shrink-0" name={getFileIcon(fnode.name)} size={0.8} fs />
+          ) : (
+            <Icon
+              className="ml-0p5 flex-shrink-0"
+              color="#505050"
+              strokeWidth={1.5}
+              size={0.8}
+              style={{ transform: `rotateZ(${expandedDirs.has(fnode.path) ? 90 : 0}deg)` }}
+              name="chevron-right"
+            />
+          )}
           <span className={classes.name}>{fnode.name}</span>
         </div>
       ))}

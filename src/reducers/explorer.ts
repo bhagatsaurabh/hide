@@ -57,9 +57,29 @@ export type ExplorerState = {
   stalePaths: PathPair<string>[];
 };
 
+interface FSCoalescedCreateEvent {
+  watchedPath: string;
+  path: string;
+  ino: number;
+  timestamp: number;
+  type: "file" | "dir";
+}
+interface FSCoalescedModifyEvent {
+  watchedPath: string;
+  path: string;
+  ino: number;
+  timestamp: number;
+  type: "file" | "dir";
+}
+interface FSCoalescedRemoveEvent {
+  watchedPath: string;
+  path: string;
+  timestamp: number;
+  type: "file" | "dir";
+}
 interface FSCoalescedEventMap {
-  create: { watchedPath: string; path: string; ino: number; timestamp: number; type: "file" | "dir" };
-  modify: { watchedPath: string; path: string; ino: number; timestamp: number; type: "file" | "dir" };
+  create: FSCoalescedCreateEvent;
+  modify: FSCoalescedModifyEvent;
   move: {
     from: string;
     to?: string;
@@ -69,7 +89,7 @@ interface FSCoalescedEventMap {
     timestamp: number;
     type: "file" | "dir";
   };
-  remove: { watchedPath: string; path: string; timestamp: number; type: "file" | "dir" };
+  remove: FSCoalescedRemoveEvent;
 }
 export type FSCoalescedEvent = {
   [K in keyof FSCoalescedEventMap]: {
@@ -137,6 +157,13 @@ export function fileTreeReducer(state: ExplorerState, action: FTAction): Explore
     }
     case "BATCH": {
       const events = coalescer(action.payload.events);
+      events.forEach((event) => {
+        if ((event.data as FSCoalescedCreateEvent).watchedPath) {
+          const ev = event.data as FSCoalescedCreateEvent;
+          ev.watchedPath = ev.watchedPath.replace("/workspace", "");
+        }
+      });
+      console.log(events);
       const stalePaths: PathPair<string>[] = [];
       for (const event of events) {
         if (event.action === "create") {
@@ -154,7 +181,7 @@ export function fileTreeReducer(state: ExplorerState, action: FTAction): Explore
           } else {
             node = { ...common, type: "file", isOpen: false };
           }
-          dirNode.children.push(node);
+          dirNode.children = [...dirNode.children, node];
           state.pathMap.set(`${getPath(dirNode)}/${node.name}`, node);
         } else if (event.action === "move") {
           const oldDirNode = state.pathMap.get(event.data.from);

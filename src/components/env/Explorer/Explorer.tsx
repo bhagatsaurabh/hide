@@ -57,6 +57,7 @@ const Explorer = () => {
     }
   }, [workspace.uuid]);
   const handleFSMessage = (msg: InSocketMessage<"fs">) => {
+    console.log(msg);
     switch (msg.action) {
       case "batch": {
         fsDispatch({ type: "BATCH", payload: { events: msg.payload.events } });
@@ -113,7 +114,7 @@ const Explorer = () => {
   const open = async (fnode: FNode) => {
     if (fnode.type === "dir") {
       try {
-        const { entries } = await openPath<FSDirEntries>(workspace.uuid, fnode.path.substring(23));
+        const { entries } = await openPath<FSDirEntries>(workspace.uuid, fnode.path.substring(10));
         const nodes = entries.map(
           (entry) =>
             ({
@@ -135,7 +136,7 @@ const Explorer = () => {
       if (!node || node.isOpen) return true;
 
       try {
-        const { content } = await openPath<FSFile>(workspace.uuid, fnode.path);
+        const { content } = await openPath<FSFile>(workspace.uuid, fnode.path.substring(10));
         const codeEditor = editor.create(document.getElementById("editor")!, {
           value: "",
           language: "javascript",
