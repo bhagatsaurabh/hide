@@ -1,5 +1,9 @@
+import { WebsocketProvider } from "@/lib/y-websocket";
 import { InSocketMessagePayload } from "./common";
 import { OutSocketMessageEnv } from "./env";
+import { MonacoBinding } from "y-monaco";
+import { editor } from "monaco-editor";
+import { Doc } from "yjs";
 
 export interface FSOpenDTO {
   name: string;
@@ -74,3 +78,92 @@ export interface FSSyncOut extends OutSocketMessageEnv {
 export interface FSClose extends OutSocketMessageEnv {
   path: string;
 }
+
+//////////////////
+
+export interface FSCoalescedCreateEvent {
+  watchedPath: string;
+  path: string;
+  ino: number;
+  timestamp: number;
+  type: "file" | "dir";
+}
+export interface FSCoalescedModifyEvent {
+  watchedPath: string;
+  path: string;
+  ino: number;
+  timestamp: number;
+  type: "file" | "dir";
+}
+export interface FSCoalescedRemoveEvent {
+  watchedPath: string;
+  path: string;
+  timestamp: number;
+  type: "file" | "dir";
+}
+interface FSCoalescedEventMap {
+  create: FSCoalescedCreateEvent;
+  modify: FSCoalescedModifyEvent;
+  move: {
+    from: string;
+    to?: string;
+    oldPath: string;
+    newPath?: string;
+    ino?: number;
+    timestamp: number;
+    type: "file" | "dir";
+  };
+  remove: FSCoalescedRemoveEvent;
+}
+export type FSCoalescedEvent = {
+  [K in keyof FSCoalescedEventMap]: {
+    action: K;
+    data: FSCoalescedEventMap[K];
+  };
+}[keyof FSCoalescedEventMap];
+
+interface FTActionMap {
+  _INDEX: { root: FNode };
+  LOAD: { path: string; nodes: FNode[]; forceOpen?: boolean };
+  UNLOAD: { path: string; forceClose?: boolean };
+  OPEN_FILE: {
+    path: string;
+    doc: Doc;
+    provider: WebsocketProvider;
+    binding: MonacoBinding;
+    editor: editor.IStandaloneCodeEditor;
+  };
+  CLOSE_FILE: { path: string };
+  CLEAR_STALE: unknown;
+  BATCH: { events: FSEvent[] };
+  RESUME: { path: string };
+  BLOCK: { path: string };
+}
+export type FTAction = {
+  [K in keyof FTActionMap]: {
+    type: K;
+    payload: FTActionMap[K];
+  };
+}[keyof FTActionMap];
+
+type FNodeMap = {
+  file: {
+    isDirty?: boolean;
+    /* doc?: Doc;
+    provider?: WebsocketProvider;
+    binding?: MonacoBinding;
+    editor?: editor.IStandaloneCodeEditor; */
+  };
+  dir: { children: FNode[] };
+};
+export type FNode = {
+  [K in keyof FNodeMap]: {
+    name: string;
+    path: string;
+    type: K;
+    id: number;
+    isOpen: boolean;
+    parent?: FNodeOf<"dir">;
+  } & FNodeMap[K];
+}[keyof FNodeMap];
+export type FNodeOf<T extends keyof FNodeMap> = Extract<FNode, { type: T }>;

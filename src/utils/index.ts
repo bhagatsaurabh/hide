@@ -1,7 +1,7 @@
-import { FNode } from "@/reducers/explorer";
 import { ReactNode } from "react";
 import { Location } from "react-router";
 import iconMapping from "@/assets/icon-map.json";
+import { FNode } from "@/models/filesystem";
 
 type IconMap = {
   fileNames: Record<string, string>;

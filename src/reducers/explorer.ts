@@ -1,159 +1,70 @@
-import { WebsocketProvider } from "@/lib/y-websocket";
-import { FSEvent } from "@/models/filesystem";
+import { current, WritableDraft } from "immer";
+import { FNode, FNodeOf, FSCoalescedCreateEvent, FSCoalescedEvent, FSEvent, FTAction } from "@/models/filesystem";
 import { getPath } from "@/utils";
-import { editor } from "monaco-editor";
-import { MonacoBinding } from "y-monaco";
-import { Doc } from "yjs";
-
-interface FTActionMap {
-  LOAD: { path: string; nodes: FNode[]; forceOpen?: boolean };
-  UNLOAD: { path: string };
-  OPEN_FILE: {
-    path: string;
-    doc: Doc;
-    provider: WebsocketProvider;
-    binding: MonacoBinding;
-    editor: editor.IStandaloneCodeEditor;
-  };
-  CLOSE_FILE: { path: string };
-  CLEAR_STALE: unknown;
-  BATCH: { events: FSEvent[] };
-  RESUME: { path: string };
-  BLOCK: { path: string };
-}
-type FTAction = {
-  [K in keyof FTActionMap]: {
-    type: K;
-    payload: FTActionMap[K];
-  };
-}[keyof FTActionMap];
-
-type FNodeMap = {
-  file: {
-    isDirty?: boolean;
-    doc?: Doc;
-    provider?: WebsocketProvider;
-    binding?: MonacoBinding;
-    editor?: editor.IStandaloneCodeEditor;
-  };
-  dir: { children: FNode[] };
-};
-export type FNode = {
-  [K in keyof FNodeMap]: {
-    name: string;
-    path: string;
-    type: K;
-    id: number;
-    isOpen: boolean;
-    parent?: FNodeOf<"dir">;
-  } & FNodeMap[K];
-}[keyof FNodeMap];
-export type FNodeOf<T extends keyof FNodeMap> = Extract<FNode, { type: T }>;
 
 type PathPair<T> = [T, T | undefined];
 export type ExplorerState = {
   root: FNodeOf<"dir">;
-  pathMap: Map<string, FNode>;
   stalePaths: PathPair<string>[];
 };
 
-interface FSCoalescedCreateEvent {
-  watchedPath: string;
-  path: string;
-  ino: number;
-  timestamp: number;
-  type: "file" | "dir";
-}
-interface FSCoalescedModifyEvent {
-  watchedPath: string;
-  path: string;
-  ino: number;
-  timestamp: number;
-  type: "file" | "dir";
-}
-interface FSCoalescedRemoveEvent {
-  watchedPath: string;
-  path: string;
-  timestamp: number;
-  type: "file" | "dir";
-}
-interface FSCoalescedEventMap {
-  create: FSCoalescedCreateEvent;
-  modify: FSCoalescedModifyEvent;
-  move: {
-    from: string;
-    to?: string;
-    oldPath: string;
-    newPath?: string;
-    ino?: number;
-    timestamp: number;
-    type: "file" | "dir";
-  };
-  remove: FSCoalescedRemoveEvent;
-}
-export type FSCoalescedEvent = {
-  [K in keyof FSCoalescedEventMap]: {
-    action: K;
-    data: FSCoalescedEventMap[K];
-  };
-}[keyof FSCoalescedEventMap];
-
-export function fileTreeReducer(state: ExplorerState, action: FTAction): ExplorerState {
+export const fileTreeReducer = (draftState: WritableDraft<ExplorerState>, action: FTAction) => {
   switch (action.type) {
     case "LOAD": {
-      const dirNode = state.pathMap.get(action.payload.path);
-      if (!dirNode || dirNode.type !== "dir") return state;
+      const dirNode = findNode(draftState.root, action.payload.path);
+      console.log(dirNode, current(draftState.root));
+      if (!dirNode || dirNode.type !== "dir") break;
 
-      dirNode.children = action.payload.nodes;
       action.payload.nodes.forEach((node) => {
         if (node.type === "dir") node.children = [];
         node.parent = dirNode;
-        state.pathMap.set(`${getPath(dirNode)}/${node.name}`, node);
       });
+      dirNode.children = action.payload.nodes;
       if (action.payload.forceOpen) {
         dirNode.isOpen = true;
       }
-      return { ...state };
+
+      break;
     }
     case "UNLOAD": {
-      const dirNode = state.pathMap.get(action.payload.path);
-      if (!dirNode || dirNode.type !== "dir") return state;
+      const dirNode = findNode(draftState.root, action.payload.path);
+      if (!dirNode || dirNode.type !== "dir") break;
 
-      const path = getPath(dirNode);
-      dirNode.children?.forEach((child) => {
-        state.pathMap.delete(`${path}/${child.name}`);
-      });
       dirNode.children = [];
-      return { ...state };
+      if (action.payload.forceClose) {
+        dirNode.isOpen = false;
+      }
+      break;
     }
     case "OPEN_FILE": {
-      const node = state.pathMap.get(action.payload.path);
-      if (!node || node.type !== "file") return state;
+      const node = findNode(draftState.root, action.payload.path);
+      if (!node || node.type !== "file") break;
 
       node.isOpen = true;
-      node.doc = action.payload.doc;
-      node.provider = action.payload.provider;
-      node.binding = action.payload.binding;
-      node.editor = action.payload.editor;
-      return { ...state };
+      /* node.doc = action.payload.doc;
+        node.provider = action.payload.provider;
+        node.binding = action.payload.binding;
+        node.editor = action.payload.editor; */
+      break;
     }
     case "CLOSE_FILE": {
-      const node = state.pathMap.get(action.payload.path);
-      if (!node || node.type !== "file") return state;
+      const node = findNode(draftState.root, action.payload.path);
+      if (!node || node.type !== "file") break;
 
-      node.binding?.destroy();
-      node.provider?.destroy();
-      node.editor?.dispose();
+      /*  node.binding?.destroy();
+        node.provider?.destroy();
+        node.editor?.dispose(); */
 
       node.isOpen = false;
-      node.binding = undefined;
-      node.provider = undefined;
-      node.editor = undefined;
-      return { ...state };
+      /* node.binding = undefined;
+        node.provider = undefined;
+        node.editor = undefined; */
+      break;
     }
     case "CLEAR_STALE": {
-      if (state.stalePaths.length === 0) return state;
-      return { ...state, stalePaths: [] };
+      if (draftState.stalePaths.length === 0) break;
+      draftState.stalePaths = [];
+      break;
     }
     case "BATCH": {
       const events = coalescer(action.payload.events);
@@ -163,11 +74,11 @@ export function fileTreeReducer(state: ExplorerState, action: FTAction): Explore
           ev.watchedPath = ev.watchedPath.replace("/workspace", "");
         }
       });
-      console.log(events);
+
       const stalePaths: PathPair<string>[] = [];
       for (const event of events) {
         if (event.action === "create") {
-          const dirNode = state.pathMap.get(event.data.watchedPath);
+          const dirNode = findNode(draftState.root, event.data.watchedPath);
           if (!dirNode || dirNode.type !== "dir") continue;
           const common = {
             id: event.data.ino!,
@@ -182,19 +93,17 @@ export function fileTreeReducer(state: ExplorerState, action: FTAction): Explore
             node = { ...common, type: "file", isOpen: false };
           }
           dirNode.children = [...dirNode.children, node];
-          state.pathMap.set(`${getPath(dirNode)}/${node.name}`, node);
         } else if (event.action === "move") {
-          const oldDirNode = state.pathMap.get(event.data.from);
+          const oldDirNode = findNode(draftState.root, event.data.from);
           let newDirNode: FNode | undefined;
-          if (event.data.to) newDirNode = state.pathMap.get(event.data.to);
-          const node = state.pathMap.get(event.data.oldPath);
+          if (event.data.to) newDirNode = findNode(draftState.root, event.data.to);
+          const node = findNode(draftState.root, event.data.oldPath);
           if (!node) {
             continue;
           }
           let oldPath, newPath;
           if (oldDirNode && oldDirNode.type === "dir") {
             oldPath = getPath(node);
-            state.pathMap.delete(oldPath);
             oldDirNode.children.splice(
               oldDirNode.children.findIndex((n) => n === node),
               1
@@ -205,7 +114,6 @@ export function fileTreeReducer(state: ExplorerState, action: FTAction): Explore
             node.parent = newDirNode;
             newDirNode.children.push(node);
             newPath = getPath(node);
-            state.pathMap.set(newPath, node);
           }
           if (node.type === "dir" && node.isOpen) {
             node.children?.forEach((child) => child.type === "dir" && (child.isOpen = false));
@@ -218,8 +126,8 @@ export function fileTreeReducer(state: ExplorerState, action: FTAction): Explore
         } else if (event.action === "remove") {
           // TODO: Notify users
           console.log("DELETED !");
-          const dirNode = state.pathMap.get(event.data.watchedPath);
-          const node = state.pathMap.get(event.data.path);
+          const dirNode = findNode(draftState.root, event.data.watchedPath);
+          const node = findNode(draftState.root, event.data.path);
           if (!node) {
             continue;
           }
@@ -228,16 +136,25 @@ export function fileTreeReducer(state: ExplorerState, action: FTAction): Explore
               dirNode.children!.findIndex((n) => n === node),
               1
             );
-            state.pathMap.delete(`${getPath(dirNode)}/${node.name}`);
           }
         }
       }
-      return { ...state, stalePaths: [...state.stalePaths, ...stalePaths] };
+
+      draftState.stalePaths.push(...stalePaths);
+      break;
+    }
+    case "BLOCK": {
+      // TODO
+      break;
+    }
+    case "RESUME": {
+      // TODO
+      break;
     }
     default:
-      return state;
+      break;
   }
-}
+};
 
 const coalescer = (events: FSEvent[]) => {
   events.sort((a, b) => a.timestamp - b.timestamp);
@@ -353,4 +270,35 @@ const coalescer = (events: FSEvent[]) => {
     }
   }
   return coalesced;
+};
+
+export const buildIndex = (root: FNode) => {
+  const index: Record<string, FNode> = {};
+
+  const walk = (node: FNode, currentPath: string) => {
+    index[currentPath] = node;
+    if ((node as FNodeOf<"dir">).children) {
+      for (const child of (node as FNodeOf<"dir">).children) {
+        const childPath = currentPath === "/" ? `/${child.name}` : `${currentPath}/${child.name}`;
+        walk(child, childPath);
+      }
+    }
+  };
+
+  walk(root, "/");
+
+  return index;
+};
+
+const findNode = (root: FNode, path: string) => {
+  let curr: FNode | undefined = { children: [root], id: -1, isOpen: false, name: "dummy", path: ".", type: "dir" };
+
+  const parts = path === "/" ? [""] : path.split("/");
+  for (const part of parts) {
+    if (curr.type === "file") return curr;
+    curr = curr.children.find((c) => c.name === part);
+    if (!curr) return undefined;
+  }
+
+  return curr;
 };
