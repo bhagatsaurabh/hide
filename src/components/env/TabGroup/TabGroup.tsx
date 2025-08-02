@@ -2,10 +2,10 @@ import { useContext, useEffect, useRef, useState } from "react";
 import classes from "./TabGroup.module.css";
 import { rand, uuidv4 as uuid } from "lib0/random.js";
 import Icon from "@/components/common/Icon/Icon";
-import { FNode } from "@/reducers/explorer";
 import classNames from "classnames";
 import { TooltipContext } from "@/context/tooltip/tooltip.context";
 import { getFileIcon } from "@/utils";
+import { FNode } from "@/models/filesystem";
 
 const TabGroup = () => {
   const [tabs, setTabs] = useState<FNode[]>([]);
@@ -30,6 +30,7 @@ const TabGroup = () => {
     setTabs((prev) => {
       const updated = [...prev];
       updated.push(fnode);
+      setActive(fnode);
       return updated;
     });
   };
@@ -73,15 +74,7 @@ const TabGroup = () => {
         ))}
       </div>
       <div className={classes.content}>
-        <button
-          onClick={() =>
-            handleTabAdd({ id: rand(), isOpen: false, name: uuid() + ".js", path: uuid() + ".js", type: "file" })
-          }
-        >
-          Add
-        </button>
-        <br />
-        {active?.name ?? "Nothing"}
+        {/* TODO: Editor */}
       </div>
     </div>
   );

@@ -1,11 +1,11 @@
 import { MouseEvent, useContext, useMemo, useState } from "react";
 import classes from "./FileList.module.css";
-import { FNode } from "@/reducers/explorer";
 import Spinner from "../common/Spinner/Spinner";
 import Icon from "../common/Icon/Icon";
 import { getFileIcon } from "@/utils";
 import classNames from "classnames";
 import { TooltipContext } from "@/context/tooltip/tooltip.context";
+import { FNode } from "@/models/filesystem";
 
 type FlatNode = {
   fnode: FNode;
@@ -61,7 +61,6 @@ const FileList = ({ root, open, close }: FileListProps) => {
       success = await open(fnode);
     }
     if (success) {
-      fnode.isOpen = !fnode.isOpen;
       if (fnode.type === "dir") {
         setExpandedDirs((prev) => {
           const next = new Set(prev);

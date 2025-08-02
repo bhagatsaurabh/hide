@@ -1,6 +1,7 @@
-import { MouseEvent, useCallback, useContext, useEffect, useMemo, useReducer, useState } from "react";
-import { FNode, FNodeOf, fileTreeReducer } from "@/reducers/explorer";
+import { MouseEvent, useCallback, useContext, useEffect, useReducer, useRef, useState } from "react";
+import { buildIndex, ExplorerState, fileTreeReducer } from "@/reducers/explorer";
 import { Doc } from "yjs";
+import { produce } from "immer";
 import { editor } from "monaco-editor";
 import { MonacoBinding } from "y-monaco";
 import { socket } from "@/config/socket";
@@ -9,35 +10,38 @@ import { WebsocketProvider } from "@/lib/y-websocket";
 import { InSocketMessage } from "@/models/common";
 import classes from "./Explorer.module.css";
 import { closePath, openPath } from "@/services/env";
-import { FSDirEntries, FSFile } from "@/models/filesystem";
+import { FNode, FNodeOf, FSDirEntries, FSFile } from "@/models/filesystem";
 import { noop } from "@/utils";
 import { ViewContext } from "@/context/view/view.context";
 import Spinner from "@/components/common/Spinner/Spinner";
 import { TooltipContext } from "@/context/tooltip/tooltip.context";
 import Icon from "@/components/common/Icon/Icon";
 import FileList from "@/components/FileList/FileList";
+import classNames from "classnames";
+
+const root: FNodeOf<"dir"> = {
+  id: 0,
+  name: "",
+  path: "/",
+  type: "dir",
+  children: [],
+  isOpen: true,
+};
+const initialState: ExplorerState = {
+  root,
+  stalePaths: [],
+};
 
 const Explorer = () => {
   const { workspace } = useContext(ViewContext)!;
   const { showTooltip, hideTooltip } = useContext(TooltipContext)!;
   const [busy, setBusy] = useState(false);
-  const root: FNodeOf<"dir"> = useMemo(
-    () => ({
-      id: 0,
-      name: "",
-      path: "/",
-      type: "dir",
-      children: [],
-      isOpen: true,
-    }),
-    []
-  );
-  const [fs, fsDispatch] = useReducer(fileTreeReducer, {
-    root,
-    pathMap: new Map<string, FNode>([["/", root]]),
-    stalePaths: [],
-  });
+  const [fs, fsDispatch] = useReducer(produce(fileTreeReducer), initialState);
+  const fsIndex = useRef<Record<string, FNode>>({});
 
+  useEffect(() => {
+    fsIndex.current = buildIndex(fs.root);
+  }, [fs]);
   const init = useCallback(async () => {
     try {
       const { entries } = await openPath<FSDirEntries>(workspace.uuid, "/");
@@ -112,9 +116,11 @@ const Explorer = () => {
   useEffect(() => void handleStalePaths(), [fs.stalePaths, handleStalePaths]);
 
   const open = async (fnode: FNode) => {
+    console.log(fnode.isOpen);
     if (fnode.type === "dir") {
       try {
         const { entries } = await openPath<FSDirEntries>(workspace.uuid, fnode.path.substring(10));
+        console.log("Entries:", entries);
         const nodes = entries.map(
           (entry) =>
             ({
@@ -125,14 +131,14 @@ const Explorer = () => {
               isOpen: false,
             } as FNode)
         );
-        fsDispatch({ type: "LOAD", payload: { path: fnode.path, nodes } });
+        fsDispatch({ type: "LOAD", payload: { path: fnode.path.substring(10), nodes, forceOpen: true } });
         return true;
       } catch (error) {
         console.log(error);
       }
       return false;
     } else {
-      const node = fs.pathMap.get(fnode.path);
+      const node = fsIndex.current[fnode.path];
       if (!node || node.isOpen) return true;
 
       try {
@@ -155,16 +161,17 @@ const Explorer = () => {
     }
   };
   const close = async (fnode: FNode) => {
+    console.log(fnode.isOpen);
     if (fnode.type === "dir") {
       try {
-        closePath(workspace.uuid, fnode.path);
-        fsDispatch({ type: "UNLOAD", payload: { path: fnode.path } });
+        closePath(workspace.uuid, fnode.path.substring(10));
+        fsDispatch({ type: "UNLOAD", payload: { path: fnode.path.substring(10), forceClose: true } });
       } catch (error) {
         console.log(error);
       }
     } else {
       try {
-        closePath(workspace.uuid, fnode.path);
+        closePath(workspace.uuid, fnode.path.substring(10));
         fsDispatch({ type: "CLOSE_FILE", payload: { path: fnode.path } });
       } catch (error) {
         console.log(error);
@@ -213,7 +220,7 @@ const Explorer = () => {
               </button>
             </div>
           </div>
-          <div className={classes.fs}>
+          <div className={classNames({ [classes.fs]: true, scrollable: true })}>
             {fs.root.children.length === 0 ? (
               <div className={classes.empty}>Empty workspace</div>
             ) : (
