@@ -4,7 +4,6 @@ import * as decoding from "lib0/decoding";
 import { Doc } from "yjs";
 import * as syncProtocol from "y-protocols/sync";
 import * as awarenessProtocol from "y-protocols/awareness";
-import { Socket } from "socket.io-client";
 
 import { FSSync } from "@/models/filesystem";
 import { base64ToU8, u8ToBase64 } from "@/utils";
@@ -73,10 +72,11 @@ export class WebsocketProvider {
             action: "fs.sync",
             payload: {
               uuid: this.uuid,
-              path: this.path,
+              path: this.path.substring(10),
               buf: u8ToBase64(encoding.toUint8Array(encoder)),
             },
           });
+          console.log("Sent Sync");
         }
       }, resyncInterval) as unknown as number;
     }
@@ -121,10 +121,11 @@ export class WebsocketProvider {
       action: "fs.sync",
       payload: {
         uuid: this.uuid,
-        path: this.path,
+        path: this.path.substring(10),
         buf: u8ToBase64(encoding.toUint8Array(encoder)),
       },
     });
+    console.log("Sent Sync");
     if (this.awareness.getLocalState() !== null) {
       const encoderAwarenessState = encoding.createEncoder();
       encoding.writeVarUint(encoderAwarenessState, messageAwareness);
@@ -137,13 +138,15 @@ export class WebsocketProvider {
         action: "fs.sync",
         payload: {
           uuid: this.uuid,
-          path: this.path,
+          path: this.path.substring(10),
           buf: u8ToBase64(encoding.toUint8Array(encoderAwarenessState)),
         },
       });
+      console.log("Sent Sync");
     }
     this.socket.on("fs", (msg: InSocketMessage<"fs">) => {
       if (msg.action !== "sync" || msg.payload.path !== this.path) return;
+      console.log("Received Sync", msg.payload.path);
 
       this.wsLastMessageReceived = time.getUnixTime();
       const encoder = this.readMessage(msg.payload, true);
@@ -153,10 +156,11 @@ export class WebsocketProvider {
           action: "fs.sync",
           payload: {
             uuid: this.uuid,
-            path: this.path,
+            path: this.path.substring(10),
             buf: u8ToBase64(encoding.toUint8Array(encoder)),
           },
         });
+        console.log("Sent Sync");
       }
     });
   }
@@ -179,10 +183,11 @@ export class WebsocketProvider {
       action: "fs.sync",
       payload: {
         uuid: this.uuid,
-        path: this.path,
+        path: this.path.substring(10),
         buf: u8ToBase64(buf),
       },
     });
+    console.log("Sent Sync");
   }
   destroy() {
     if (this._resyncInterval !== 0) {

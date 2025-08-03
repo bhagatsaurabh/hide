@@ -1,12 +1,18 @@
-import { MouseEvent, useCallback, useContext, useEffect, useReducer, useRef, useState } from "react";
+import {
+  MouseEvent,
+  Ref,
+  useCallback,
+  useContext,
+  useEffect,
+  useImperativeHandle,
+  useReducer,
+  useRef,
+  useState,
+} from "react";
 import { buildIndex, ExplorerState, fileTreeReducer } from "@/reducers/explorer";
-import { Doc } from "yjs";
 import { produce } from "immer";
-import { editor } from "monaco-editor";
-import { MonacoBinding } from "y-monaco";
 import { socket } from "@/config/socket";
 import { EnvContext } from "@/context/env/env.context";
-import { WebsocketProvider } from "@/lib/y-websocket";
 import { InSocketMessage } from "@/models/common";
 import classes from "./Explorer.module.css";
 import { closePath, openPath } from "@/services/env";
@@ -31,14 +37,23 @@ const initialState: ExplorerState = {
   root,
   stalePaths: [],
 };
+export interface ExplorerRef {
+  closeFile: (fnode: FNodeOf<"file">) => void;
+}
+interface ExplorerProps {
+  ref: Ref<ExplorerRef | null>;
+}
 
-const Explorer = () => {
-  const { workspace } = useContext(ViewContext)!;
+const Explorer = ({ ref }: ExplorerProps) => {
+  const { workspace, loadFile } = useContext(ViewContext)!;
   const { showTooltip, hideTooltip } = useContext(TooltipContext)!;
   const [busy, setBusy] = useState(false);
   const [fs, fsDispatch] = useReducer(produce(fileTreeReducer), initialState);
   const fsIndex = useRef<Record<string, FNode>>({});
 
+  useImperativeHandle(ref, () => {
+    return { closeFile: close };
+  });
   useEffect(() => {
     fsIndex.current = buildIndex(fs.root);
   }, [fs]);
@@ -61,7 +76,6 @@ const Explorer = () => {
     }
   }, [workspace.uuid]);
   const handleFSMessage = (msg: InSocketMessage<"fs">) => {
-    console.log(msg);
     switch (msg.action) {
       case "batch": {
         fsDispatch({ type: "BATCH", payload: { events: msg.payload.events } });
@@ -116,11 +130,9 @@ const Explorer = () => {
   useEffect(() => void handleStalePaths(), [fs.stalePaths, handleStalePaths]);
 
   const open = async (fnode: FNode) => {
-    console.log(fnode.isOpen);
     if (fnode.type === "dir") {
       try {
         const { entries } = await openPath<FSDirEntries>(workspace.uuid, fnode.path.substring(10));
-        console.log("Entries:", entries);
         const nodes = entries.map(
           (entry) =>
             ({
@@ -138,21 +150,13 @@ const Explorer = () => {
       }
       return false;
     } else {
-      const node = fsIndex.current[fnode.path];
+      const node = fsIndex.current[fnode.path.substring(10)];
       if (!node || node.isOpen) return true;
 
       try {
         const { content } = await openPath<FSFile>(workspace.uuid, fnode.path.substring(10));
-        const codeEditor = editor.create(document.getElementById("editor")!, {
-          value: "",
-          language: "javascript",
-        });
-        const model = codeEditor.getModel()!;
-        const doc = new Doc();
-        const yText = doc.getText("monaco");
-        const provider = new WebsocketProvider(workspace.uuid, socket, doc, fnode.path);
-        const binding = new MonacoBinding(yText, model, new Set([codeEditor]), provider.awareness);
-        fsDispatch({ type: "OPEN_FILE", payload: { path: fnode.path, provider, binding, editor: codeEditor, doc } });
+        loadFile(fnode);
+        fsDispatch({ type: "OPEN_FILE", payload: { path: fnode.path } });
         return true;
       } catch (error) {
         console.log(error);
@@ -161,7 +165,6 @@ const Explorer = () => {
     }
   };
   const close = async (fnode: FNode) => {
-    console.log(fnode.isOpen);
     if (fnode.type === "dir") {
       try {
         closePath(workspace.uuid, fnode.path.substring(10));

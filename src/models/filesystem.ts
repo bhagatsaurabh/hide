@@ -1,9 +1,5 @@
-import { WebsocketProvider } from "@/lib/y-websocket";
 import { InSocketMessagePayload } from "./common";
 import { OutSocketMessageEnv } from "./env";
-import { MonacoBinding } from "y-monaco";
-import { editor } from "monaco-editor";
-import { Doc } from "yjs";
 
 export interface FSOpenDTO {
   name: string;
@@ -126,13 +122,7 @@ interface FTActionMap {
   _INDEX: { root: FNode };
   LOAD: { path: string; nodes: FNode[]; forceOpen?: boolean };
   UNLOAD: { path: string; forceClose?: boolean };
-  OPEN_FILE: {
-    path: string;
-    doc: Doc;
-    provider: WebsocketProvider;
-    binding: MonacoBinding;
-    editor: editor.IStandaloneCodeEditor;
-  };
+  OPEN_FILE: { path: string };
   CLOSE_FILE: { path: string };
   CLEAR_STALE: unknown;
   BATCH: { events: FSEvent[] };
@@ -149,10 +139,6 @@ export type FTAction = {
 type FNodeMap = {
   file: {
     isDirty?: boolean;
-    /* doc?: Doc;
-    provider?: WebsocketProvider;
-    binding?: MonacoBinding;
-    editor?: editor.IStandaloneCodeEditor; */
   };
   dir: { children: FNode[] };
 };
