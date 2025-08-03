@@ -1,4 +1,4 @@
-import { current, WritableDraft } from "immer";
+import { WritableDraft } from "immer";
 import { FNode, FNodeOf, FSCoalescedCreateEvent, FSCoalescedEvent, FSEvent, FTAction } from "@/models/filesystem";
 import { getPath } from "@/utils";
 
@@ -12,7 +12,6 @@ export const fileTreeReducer = (draftState: WritableDraft<ExplorerState>, action
   switch (action.type) {
     case "LOAD": {
       const dirNode = findNode(draftState.root, action.payload.path);
-      console.log(dirNode, current(draftState.root));
       if (!dirNode || dirNode.type !== "dir") break;
 
       action.payload.nodes.forEach((node) => {
@@ -39,26 +38,13 @@ export const fileTreeReducer = (draftState: WritableDraft<ExplorerState>, action
     case "OPEN_FILE": {
       const node = findNode(draftState.root, action.payload.path);
       if (!node || node.type !== "file") break;
-
       node.isOpen = true;
-      /* node.doc = action.payload.doc;
-        node.provider = action.payload.provider;
-        node.binding = action.payload.binding;
-        node.editor = action.payload.editor; */
       break;
     }
     case "CLOSE_FILE": {
       const node = findNode(draftState.root, action.payload.path);
       if (!node || node.type !== "file") break;
-
-      /*  node.binding?.destroy();
-        node.provider?.destroy();
-        node.editor?.dispose(); */
-
       node.isOpen = false;
-      /* node.binding = undefined;
-        node.provider = undefined;
-        node.editor = undefined; */
       break;
     }
     case "CLEAR_STALE": {

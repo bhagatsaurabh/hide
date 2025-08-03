@@ -1,4 +1,4 @@
-import { FNode } from "@/reducers/explorer";
+import { FNode } from "@/models/filesystem";
 import { createContext } from "react";
 
 type Env = {

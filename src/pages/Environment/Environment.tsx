@@ -7,10 +7,10 @@ import { selectWorkspaceById } from "@/store/workspace";
 import { useMediaQuery } from "@/hooks/media-query";
 import TitleBar from "@/components/env/TitleBar/TitleBar";
 import ActivityBar from "@/components/env/ActivityBar/ActivityBar";
-import TabGroup from "@/components/env/TabGroup/TabGroup";
+import TabGroup, { TabGroupRef } from "@/components/env/TabGroup/TabGroup";
 import TerminalGroup from "@/components/env/TerminalGroup/TerminalGroup";
 import StatusBar from "@/components/env/StatusBar/StatusBar";
-import Explorer from "@/components/env/Explorer/Explorer";
+import Explorer, { ExplorerRef } from "@/components/env/Explorer/Explorer";
 
 import { useEffect, useRef, useState } from "react";
 
@@ -24,16 +24,17 @@ import Spinner from "@/components/common/Spinner/Spinner";
 import { notify } from "@/store/notifications";
 import { ProvisionPayload } from "@/models/workspace";
 import { socket } from "@/config/socket";
+import { FNodeOf } from "@/models/filesystem";
 // const schemaMobile = layoutMobile as PanelSchema;
 const schemaDesktop = layoutDesktop as PanelSchema;
 
 const views = {
-  title: <TitleBar />,
-  activity: <ActivityBar />,
-  explorer: <Explorer />,
-  tabgroup: <TabGroup />,
-  terminal: <TerminalGroup />,
-  status: <StatusBar />,
+  title: TitleBar,
+  activity: ActivityBar,
+  explorer: Explorer,
+  tabgroup: TabGroup,
+  terminal: TerminalGroup,
+  status: StatusBar,
 };
 
 export const Environment = () => {
@@ -111,6 +112,8 @@ export const Environment = () => {
   }, []);
 
   const nodes = useRef(new Map<string, ReturnType<typeof createHtmlPortalNode>>());
+  const tabGroupRef = useRef<TabGroupRef>(null);
+  const explorerRef = useRef<ExplorerRef>(null);
 
   const getNode = (viewId: string) => {
     if (!nodes.current.has(viewId)) {
@@ -118,13 +121,19 @@ export const Environment = () => {
     }
     return nodes.current.get(viewId)!;
   };
+  const loadFile = (fnode: FNodeOf<"file">) => {
+    tabGroupRef.current?.add(fnode);
+  };
+  const closeFile = (fnode: FNodeOf<"file">) => {
+    explorerRef.current?.closeFile(fnode);
+  };
 
   return busy ? (
     <div className={classes.wait}>
       <Spinner size={2}>{waitMsg}</Spinner>
     </div>
   ) : (
-    <ViewContext.Provider value={{ getNode, workspace }}>
+    <ViewContext.Provider value={{ getNode, workspace, loadFile, closeFile }}>
       <div ref={containerRef} className={[classes.environment, "scrollbar"].join(" ")}>
         <Panel
           style={{ width: "100%", height: "100%" }}
@@ -133,9 +142,17 @@ export const Environment = () => {
           schema={schema}
         />
 
-        {Object.entries(views).map(([viewId, view]) => (
+        {Object.entries(views).map(([viewId, View]) => (
           <InPortal key={viewId} node={getNode(viewId)}>
-            {view}
+            <View
+              ref={(el: unknown) => {
+                if (viewId === "tabgroup") {
+                  tabGroupRef.current = el as TabGroupRef;
+                } else if (viewId === "explorer") {
+                  explorerRef.current = el as ExplorerRef;
+                }
+              }}
+            />
           </InPortal>
         ))}
       </div>
