@@ -67,6 +67,9 @@ export type FSAction = "fs.open" | "fs.sync" | "fs.close";
 export interface FSOpen extends OutSocketMessageEnv {
   path: string;
 }
+export interface FSOpenAck extends OutSocketMessageEnv {
+  path: string;
+}
 export interface FSSyncOut extends OutSocketMessageEnv {
   path: string;
   buf: string;

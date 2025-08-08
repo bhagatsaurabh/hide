@@ -5,9 +5,6 @@ import { Doc } from "yjs";
 import * as syncProtocol from "y-protocols/sync";
 import * as awarenessProtocol from "y-protocols/awareness";
 
-import { FSSync } from "@/models/filesystem";
-import { base64ToU8, u8ToBase64 } from "@/utils";
-import { InSocketMessage } from "@/models/common";
 import { TypedSocket } from "@/config/socket";
 
 export const messageSync = 0;
@@ -40,6 +37,19 @@ messageHandlers[messageAwareness] = (_encoder, decoder, provider, _emitSynced, _
   awarenessProtocol.applyAwarenessUpdate(provider.awareness, decoding.readVarUint8Array(decoder), provider);
 };
 
+const readMessage = (provider: WebsocketProvider, buf: Uint8Array, emitSynced: boolean) => {
+  const decoder = decoding.createDecoder(buf);
+  const encoder = encoding.createEncoder();
+  const messageType = decoding.readVarUint(decoder);
+  const messageHandler = provider.messageHandlers[messageType];
+  if (messageHandler) {
+    messageHandler(encoder, decoder, provider, emitSynced, messageType);
+  } else {
+    console.error("Unable to compute message");
+  }
+  return encoder;
+};
+
 export class WebsocketProvider {
   awareness: awarenessProtocol.Awareness;
   messageHandlers: MessageHandler[];
@@ -54,6 +64,7 @@ export class WebsocketProvider {
     public socket: TypedSocket,
     public doc: Doc,
     public path: string,
+    public emit: (path: string, buf: Uint8Array) => void,
     { awareness = new awarenessProtocol.Awareness(doc), resyncInterval = -1 } = {}
   ) {
     this.doc = doc;
@@ -66,30 +77,21 @@ export class WebsocketProvider {
         if (this.socket.connected) {
           const encoder = encoding.createEncoder();
           encoding.writeVarUint(encoder, messageSync);
-          syncProtocol.writeSyncStep1(encoder, doc);
-          this.socket.emit("msg", {
-            service: "env",
-            action: "fs.sync",
-            payload: {
-              uuid: this.uuid,
-              path: this.path.substring(10),
-              buf: u8ToBase64(encoding.toUint8Array(encoder)),
-            },
-          });
-          console.log("Sent Sync");
+          syncProtocol.writeSyncStep1(encoder, this.doc);
+          this.emit(this.path.substring(10), encoding.toUint8Array(encoder));
         }
-      }, resyncInterval) as unknown as number;
+      }, resyncInterval);
     }
 
     this.updateHandler = this._updateHandler.bind(this);
-    this.awarenessUpdateHandler = this._awarenessUpdateHandler.bind(this);
     this.doc.on("update", this.updateHandler);
+    this.awarenessUpdateHandler = this._awarenessUpdateHandler.bind(this);
     this.awareness.on("update", this.awarenessUpdateHandler);
     this._checkInterval = setInterval(() => {
-      if (messageReconnectTimeout < time.getUnixTime() - this.wsLastMessageReceived) {
+      if (this.socket.connected && messageReconnectTimeout < time.getUnixTime() - this.wsLastMessageReceived) {
         this.close();
       }
-    }, messageReconnectTimeout / 10) as unknown as number;
+    }, messageReconnectTimeout / 10);
     this.setupWS();
   }
 
@@ -98,34 +100,27 @@ export class WebsocketProvider {
       const encoder = encoding.createEncoder();
       encoding.writeVarUint(encoder, messageSync);
       syncProtocol.writeUpdate(encoder, update);
-      this.sendMessage(this.socket, encoding.toUint8Array(encoder));
+      this.emit(this.path.substring(10), encoding.toUint8Array(encoder));
     }
   }
-  _awarenessUpdateHandler({ added, updated, removed }: AwarenessUpdate, _origin: unknown) {
+  _awarenessUpdateHandler({ added, updated, removed }: AwarenessUpdate, _origin: typeof this) {
     const changedClients = added.concat(updated).concat(removed);
     const encoder = encoding.createEncoder();
     encoding.writeVarUint(encoder, messageAwareness);
     encoding.writeVarUint8Array(encoder, awarenessProtocol.encodeAwarenessUpdate(this.awareness, changedClients));
-    this.sendMessage(this.socket, encoding.toUint8Array(encoder));
+    this.emit(this.path.substring(10), encoding.toUint8Array(encoder));
   }
 
   setupWS() {
     this.socket.on("disconnect", () => this.close());
 
     this.wsLastMessageReceived = time.getUnixTime();
+
     const encoder = encoding.createEncoder();
     encoding.writeVarUint(encoder, messageSync);
     syncProtocol.writeSyncStep1(encoder, this.doc);
-    this.socket.emit("msg", {
-      service: "env",
-      action: "fs.sync",
-      payload: {
-        uuid: this.uuid,
-        path: this.path.substring(10),
-        buf: u8ToBase64(encoding.toUint8Array(encoder)),
-      },
-    });
-    console.log("Sent Sync");
+    this.emit(this.path.substring(10), encoding.toUint8Array(encoder));
+
     if (this.awareness.getLocalState() !== null) {
       const encoderAwarenessState = encoding.createEncoder();
       encoding.writeVarUint(encoderAwarenessState, messageAwareness);
@@ -133,61 +128,16 @@ export class WebsocketProvider {
         encoderAwarenessState,
         awarenessProtocol.encodeAwarenessUpdate(this.awareness, [this.doc.clientID])
       );
-      this.socket.emit("msg", {
-        service: "env",
-        action: "fs.sync",
-        payload: {
-          uuid: this.uuid,
-          path: this.path.substring(10),
-          buf: u8ToBase64(encoding.toUint8Array(encoderAwarenessState)),
-        },
-      });
-      console.log("Sent Sync");
+      this.emit(this.path.substring(10), encoding.toUint8Array(encoderAwarenessState));
     }
-    this.socket.on("fs", (msg: InSocketMessage<"fs">) => {
-      if (msg.action !== "sync" || msg.payload.path !== this.path) return;
-      console.log("Received Sync", msg.payload.path);
-
-      this.wsLastMessageReceived = time.getUnixTime();
-      const encoder = this.readMessage(msg.payload, true);
-      if (encoding.length(encoder) > 1) {
-        this.socket.emit("msg", {
-          service: "env",
-          action: "fs.sync",
-          payload: {
-            uuid: this.uuid,
-            path: this.path.substring(10),
-            buf: u8ToBase64(encoding.toUint8Array(encoder)),
-          },
-        });
-        console.log("Sent Sync");
-      }
-    });
   }
-  readMessage(data: FSSync, emitSynced: boolean) {
-    const buf = base64ToU8(data.buf);
-    const decoder = decoding.createDecoder(buf);
-    const encoder = encoding.createEncoder();
-    const messageType = decoding.readVarUint(decoder);
-    const messageHandler = this.messageHandlers[messageType];
-    if (messageHandler) {
-      messageHandler(encoder, decoder, this, emitSynced, messageType);
-    } else {
-      console.error("Unable to compute message");
+  receive(buf: ArrayBufferLike) {
+    console.log("Get", performance.now(), new Uint8Array(buf));
+    this.wsLastMessageReceived = time.getUnixTime();
+    const encoder = readMessage(this, new Uint8Array(buf), true);
+    if (encoding.length(encoder) > 1) {
+      this.emit(this.path.substring(10), encoding.toUint8Array(encoder));
     }
-    return encoder;
-  }
-  sendMessage(socket: TypedSocket, buf: Uint8Array) {
-    socket.emit("msg", {
-      service: "env",
-      action: "fs.sync",
-      payload: {
-        uuid: this.uuid,
-        path: this.path.substring(10),
-        buf: u8ToBase64(buf),
-      },
-    });
-    console.log("Sent Sync");
   }
   destroy() {
     if (this._resyncInterval !== 0) {

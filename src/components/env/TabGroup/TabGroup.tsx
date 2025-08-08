@@ -1,9 +1,9 @@
-import { Ref, useContext, useEffect, useImperativeHandle, useRef, useState } from "react";
+import { Ref, useCallback, useContext, useEffect, useImperativeHandle, useRef, useState } from "react";
 import classes from "./TabGroup.module.css";
 import Icon from "@/components/common/Icon/Icon";
 import classNames from "classnames";
 import { TooltipContext } from "@/context/tooltip/tooltip.context";
-import { getFileIcon } from "@/utils";
+import { base64ToU8, getFileIcon, u8ToBase64 } from "@/utils";
 import { FNode, FNodeOf } from "@/models/filesystem";
 import Spinner from "@/components/common/Spinner/Spinner";
 import { editor, editor as mEditor, Uri } from "monaco-editor";
@@ -12,6 +12,7 @@ import { WebsocketProvider } from "@/lib/y-websocket";
 import { MonacoBinding } from "y-monaco";
 import { ViewContext } from "@/context/view/view.context";
 import { socket } from "@/config/socket";
+import { InSocketMessage } from "@/models/common";
 
 type TabData = {
   uri: Uri;
@@ -40,6 +41,17 @@ const TabGroup = ({ ref }: TabGroupProps) => {
   const [busy, setBusy] = useState(false);
   const { workspace, closeFile } = useContext(ViewContext)!;
 
+  const handleSyncMessage = useCallback(
+    (msg: InSocketMessage<"fs">) => {
+      if (msg.action !== "sync") return;
+      console.log("Sync", msg.payload, tabs);
+      const tab = tabs.find((tab) => tab.node.path === msg.payload.path);
+      if (!tab) return;
+      tab.provider.receive(base64ToU8(msg.payload.buf));
+    },
+    [tabs]
+  );
+
   useEffect(() => {
     editor.current = mEditor.create(editorEl.current!);
 
@@ -49,7 +61,10 @@ const TabGroup = ({ ref }: TabGroupProps) => {
     };
     el?.addEventListener("wheel", scrollHandler);
 
+    socket?.on("fs", handleSyncMessage);
+
     return () => {
+      socket?.off("fs", handleSyncMessage);
       el?.removeEventListener("wheel", scrollHandler);
       editor.current?.dispose();
     };
@@ -66,7 +81,14 @@ const TabGroup = ({ ref }: TabGroupProps) => {
 
     const uri = Uri.parse(`inmemory://model/${fnode.path}`);
     const doc = new Doc();
-    const provider = new WebsocketProvider(workspace.uuid, socket, doc, fnode.path);
+    const provider = new WebsocketProvider(workspace.uuid, socket, doc, fnode.path, (path, buf) => {
+      console.log("Send", performance.now(), buf);
+      socket.emit("msg", {
+        service: "env",
+        action: "fs.sync",
+        payload: { uuid: workspace.uuid, path, buf: u8ToBase64(buf) },
+      });
+    });
     const yText = doc.getText("monaco");
     const model = mEditor.createModel("", undefined, uri);
     const binding = new MonacoBinding(yText, model, new Set([editor.current!]), provider.awareness);
@@ -76,6 +98,13 @@ const TabGroup = ({ ref }: TabGroupProps) => {
     updatedTabs.push(newTab);
     setTabs(updatedTabs);
     setActive(newTab);
+
+    // Client ready
+    socket.emit("msg", {
+      service: "env",
+      action: "fs.open.ack",
+      payload: { uuid: workspace.uuid, path: fnode.path.substring(10) },
+    });
 
     setBusy(false);
   };

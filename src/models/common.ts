@@ -1,5 +1,5 @@
 import { EnvPayload, OutSocketMessageEnv } from "./env";
-import { FSClose, FSDirEntries, FSFile, FSNoop, FSOpen, FSPayload, FSSyncOut } from "./filesystem";
+import { FSClose, FSDirEntries, FSFile, FSNoop, FSOpen, FSOpenAck, FSPayload, FSSyncOut } from "./filesystem";
 import { NotificationPayload } from "./notification";
 import { OutSocketMessagePresence, PresencePing } from "./presence";
 import { SSHClose, SSHData, SSHPayload, SSHRequest } from "./ssh";
@@ -44,6 +44,7 @@ export type OutSocketMessagePayloadMap = EnforcedOutSocketMessagePayloadActionMa
     "ssh.data": SSHData;
     "ssh.close": SSHClose;
     "fs.open": FSOpen;
+    "fs.open.ack": FSOpenAck;
     "fs.sync": FSSyncOut;
     "fs.close": FSClose;
     // ping: EnvPing;

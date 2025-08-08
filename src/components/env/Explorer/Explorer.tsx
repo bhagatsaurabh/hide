@@ -90,7 +90,7 @@ const Explorer = ({ ref }: ExplorerProps) => {
         break;
       }
       case "sync": {
-        // TODO
+        // Ignored
         break;
       }
       case "lost": {
@@ -154,7 +154,7 @@ const Explorer = ({ ref }: ExplorerProps) => {
       if (!node || node.isOpen) return true;
 
       try {
-        const { content } = await openPath<FSFile>(workspace.uuid, fnode.path.substring(10));
+        await openPath<FSFile>(workspace.uuid, fnode.path.substring(10));
         loadFile(fnode);
         fsDispatch({ type: "OPEN_FILE", payload: { path: fnode.path } });
         return true;
