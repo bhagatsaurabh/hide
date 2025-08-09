@@ -125,3 +125,13 @@ export const getFileIcon = (name: string) => {
   const ext = getExt(name);
   return iconMap.fileNames[name] ?? iconMap.fileExtensions[ext] ?? iconMap.languageIds[ext] ?? "document";
 };
+
+export const getRandomAccentColor = (opacity = 1) => {
+  const hue = Math.floor(Math.random() * 360);
+  const saturation = 85;
+  const lightness = 40;
+  return {
+    default: `hsl(${hue} ${saturation}% ${lightness}% / 1)`,
+    transparent: `hsl(${hue} ${saturation}% ${lightness}% / ${opacity})`,
+  };
+};

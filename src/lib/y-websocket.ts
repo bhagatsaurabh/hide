@@ -6,11 +6,15 @@ import * as syncProtocol from "y-protocols/sync";
 import * as awarenessProtocol from "y-protocols/awareness";
 
 import { TypedSocket } from "@/config/socket";
+import { MembershipDTO } from "@/models/workspace";
 
 export const messageSync = 0;
 export const messageQueryAwareness = 3;
 export const messageAwareness = 1;
 
+type UserAwareness = {
+  user: { uid: string; username: string };
+};
 type MessageHandler = (
   encoder: encoding.Encoder,
   decoder: decoding.Decoder,
@@ -60,11 +64,16 @@ export class WebsocketProvider {
   private awarenessUpdateHandler: typeof this._awarenessUpdateHandler;
 
   constructor(
+    public profile: MembershipDTO,
     public uuid: string,
     public socket: TypedSocket,
     public doc: Doc,
     public path: string,
     public emit: (path: string, buf: Uint8Array) => void,
+    public awarenessUpdate: (
+      delta: { added: number[]; removed: number[] },
+      state: Map<number, UserAwareness>
+    ) => void,
     { awareness = new awarenessProtocol.Awareness(doc), resyncInterval = -1 } = {}
   ) {
     this.doc = doc;
@@ -93,6 +102,7 @@ export class WebsocketProvider {
       }
     }, messageReconnectTimeout / 10);
     this.setupWS();
+    this.awareness.setLocalStateField("user", { uid: this.profile.userId, username: this.profile.username });
   }
 
   _updateHandler(update: Uint8Array, origin: typeof this) {
@@ -109,6 +119,7 @@ export class WebsocketProvider {
     encoding.writeVarUint(encoder, messageAwareness);
     encoding.writeVarUint8Array(encoder, awarenessProtocol.encodeAwarenessUpdate(this.awareness, changedClients));
     this.emit(this.path.substring(10), encoding.toUint8Array(encoder));
+    this.awarenessUpdate({ added, removed }, this.awareness.getStates() as Map<number, UserAwareness>);
   }
 
   setupWS() {
@@ -132,7 +143,6 @@ export class WebsocketProvider {
     }
   }
   receive(buf: ArrayBufferLike) {
-    console.log("Get", performance.now(), new Uint8Array(buf));
     this.wsLastMessageReceived = time.getUnixTime();
     const encoder = readMessage(this, new Uint8Array(buf), true);
     if (encoding.length(encoder) > 1) {

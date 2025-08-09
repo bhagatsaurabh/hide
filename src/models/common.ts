@@ -47,7 +47,6 @@ export type OutSocketMessagePayloadMap = EnforcedOutSocketMessagePayloadActionMa
     "fs.open.ack": FSOpenAck;
     "fs.sync": FSSyncOut;
     "fs.close": FSClose;
-    // ping: EnvPing;
   };
   presence: {
     "session.ping": PresencePing;
