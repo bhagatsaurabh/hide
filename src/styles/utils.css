@@ -268,8 +268,14 @@
 .w-1p5 {
   width: 1.5rem;
 }
+.w-1p15 {
+  width: 1.15rem;
+}
 .h-1p5 {
   height: 1.5rem;
+}
+.h-1p15 {
+  height: 1.15rem;
 }
 .var-w-5 {
   --item-width: 5rem;
@@ -321,14 +327,14 @@
   }
 }
 @media (min-width: 1024px) {
-  .md\:w-10 {
-    width: 10rem;
+  .md\:w-2 {
+    width: 2rem;
   }
   .md\:var-w-10 {
     --item-width: 10rem;
   }
-  .md\:h-8 {
-    height: 8rem;
+  .md\:h-2 {
+    height: 2rem;
   }
 }
 

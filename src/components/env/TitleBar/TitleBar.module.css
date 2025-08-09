@@ -7,6 +7,7 @@
   padding: 0 0.75rem;
   width: 100%;
   height: 100%;
+  border-bottom: 1px solid rgb(199, 199, 199);
 }
 .titlebar > div {
   flex: 1;
@@ -18,4 +19,27 @@
 }
 .online {
   text-align: right;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+}
+
+.online {
+  font-size: 0;
+}
+.online > div {
+  border: 1px solid var(--accentColor);
+  border-radius: 50%;
+  margin-left: -0.65rem;
+  padding: 0.15rem;
+  background-color: #f5f5dc;
+}
+.online svg,
+.online img {
+  border-radius: 50%;
+}
+.online svg {
+}
+.online img {
+  background-color: #000;
 }

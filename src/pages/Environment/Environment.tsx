@@ -22,9 +22,12 @@ import { ViewContext } from "@/context/view/view.context";
 import { closeEnv, openEnv, setUuid } from "@/store/env";
 import Spinner from "@/components/common/Spinner/Spinner";
 import { notify } from "@/store/notifications";
-import { ProvisionPayload } from "@/models/workspace";
+import { MembershipDTO, ProvisionPayload } from "@/models/workspace";
 import { socket } from "@/config/socket";
 import { FNodeOf } from "@/models/filesystem";
+import { InSocketMessage } from "@/models/common";
+import { auth } from "@/config/firebase";
+import { getRandomAccentColor } from "@/utils";
 // const schemaMobile = layoutMobile as PanelSchema;
 const schemaDesktop = layoutDesktop as PanelSchema;
 
@@ -49,6 +52,17 @@ export const Environment = () => {
   const [waitMsg, setWaitMsg] = useState("Connecting to workspace...");
   const [provStatus, setProvStatus] = useState<ProvisionPayload | null>(null);
   const navigate = useNavigate();
+  const userColors = useRef(
+    new Map<string, { default: string; transparent: string }>([[auth.currentUser!.uid, getRandomAccentColor()]])
+  );
+  const [awareness, setAwareness] = useState<
+    { profile: MembershipDTO; color: { default: string; transparent: string } }[]
+  >([
+    {
+      profile: workspace.memberships.find((m) => m.userId === auth.currentUser!.uid)!,
+      color: userColors.current.get(auth.currentUser!.uid) ?? getRandomAccentColor(0.5),
+    },
+  ]);
 
   useEffect(() => {
     if (provStatus?.action === "error") {
@@ -110,6 +124,29 @@ export const Environment = () => {
       dispatch(closeEnv({ uuid: workspace.uuid, sessionId }));
     };
   }, []);
+  useEffect(() => {
+    const handleAwarenessMessage = (msg: InSocketMessage<"env">) => {
+      if (msg.action !== "awareness") return;
+
+      const updatedAwareness = msg.payload.uids
+        .filter((uid) => !!workspace.memberships.find((mem) => mem.userId === uid))
+        .map((uid) => {
+          const awareness = {
+            profile: workspace.memberships.find((mem) => mem.userId === uid)!,
+            color: userColors.current.get(uid) ?? { default: "", transparent: "" },
+          };
+          if (!awareness.color.default) {
+            awareness.color = getRandomAccentColor(0.5);
+            userColors.current.set(uid, awareness.color);
+          }
+          return awareness;
+        });
+      setAwareness(updatedAwareness);
+    };
+
+    socket.on("env", handleAwarenessMessage);
+    return () => void socket?.off("env", handleAwarenessMessage);
+  }, []);
 
   const nodes = useRef(new Map<string, ReturnType<typeof createHtmlPortalNode>>());
   const tabGroupRef = useRef<TabGroupRef>(null);
@@ -133,7 +170,7 @@ export const Environment = () => {
       <Spinner size={2}>{waitMsg}</Spinner>
     </div>
   ) : (
-    <ViewContext.Provider value={{ getNode, workspace, loadFile, closeFile }}>
+    <ViewContext.Provider value={{ getNode, workspace, loadFile, closeFile, awareness }}>
       <div ref={containerRef} className={[classes.environment, "scrollbar"].join(" ")}>
         <Panel
           style={{ width: "100%", height: "100%" }}
