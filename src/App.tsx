@@ -6,6 +6,7 @@ import AuthListener from "./components/AuthListener/AuthListener";
 import { openDB } from "./config/database";
 import { Heartbeat } from "./components/Heartbeat/Heartbeat";
 import Toast from "./components/common/Toast/Toast";
+import ContextMenu from "./components/common/ContextMenu/ContextMenu";
 
 function App() {
   const [ready, setReady] = useState(false);
@@ -29,6 +30,7 @@ function App() {
           <Heartbeat />
           <Toast />
           <RouterProvider router={router} />
+          <ContextMenu />
           <div style={{ display: "none" }} id="default-title"></div>
           <div style={{ display: "none" }} id="default-activity"></div>
           <div style={{ display: "none" }} id="default-explorer"></div>

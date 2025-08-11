@@ -1,11 +1,14 @@
-import { MouseEvent, useContext, useMemo, useState } from "react";
+import { MouseEvent, useContext, useEffect, useMemo, useRef, useState } from "react";
 import classes from "./FileList.module.css";
 import Spinner from "../common/Spinner/Spinner";
 import Icon from "../common/Icon/Icon";
 import { getFileIcon } from "@/utils";
 import classNames from "classnames";
 import { TooltipContext } from "@/context/tooltip/tooltip.context";
-import { FNode } from "@/models/filesystem";
+import { FNode, FNodeOf } from "@/models/filesystem";
+import bus from "@/config/bus";
+import { Unsubscribe } from "nanoevents";
+import { uint32 } from "lib0/random.js";
 
 type FlatNode = {
   fnode: FNode;
@@ -13,16 +16,74 @@ type FlatNode = {
 };
 
 interface FileListProps {
-  root: FNode;
+  root: FNodeOf<"dir">;
   open: (fnode: FNode) => Promise<boolean>;
   close: (fnode: FNode) => void;
+  draft: (fnode: FNode) => void;
+  save: (fnode: FNode, commit: boolean) => Promise<void>;
+  isDraft: boolean;
 }
 
-const FileList = ({ root, open, close }: FileListProps) => {
+const FileList = ({ root, open, close, draft, save, isDraft }: FileListProps) => {
   const [expandedDirs, setExpandedDirs] = useState(new Set());
   const [busy, setBusy] = useState<Set<number>>(new Set());
   const [selected, setSelected] = useState<FNode | null>(null);
   const { hideTooltip, showTooltip } = useContext(TooltipContext)!;
+  const draftInputEl = useRef<HTMLInputElement>(null);
+  const [draftInput, setDraftInput] = useState("");
+
+  useEffect(() => {
+    if (isDraft) return;
+
+    const handleNew = (type: "file" | "dir") => {
+      let parent: FNodeOf<"dir">;
+      if (!selected) parent = root;
+      else if (selected.type === "file") {
+        parent = selected.parent;
+      } else {
+        parent = selected;
+      }
+      let draftNode: FNodeOf<"file"> | FNodeOf<"dir">;
+      if (type === "file") {
+        draftNode = {
+          id: -uint32(),
+          isOpen: false,
+          name: "",
+          path: parent.path === "/" ? `/workspace/` : parent.path + "/",
+          type,
+          parent,
+          isDraft: true,
+        };
+      } else {
+        draftNode = {
+          id: -uint32(),
+          isOpen: false,
+          name: "",
+          path: parent.path === "/" ? `/workspace/` : parent.path + "/",
+          type,
+          parent,
+          isDraft: true,
+          children: [],
+        };
+      }
+      draft(draftNode);
+    };
+
+    const unsubs: Unsubscribe[] = [];
+    unsubs.push(bus.on("file.new", () => handleNew("file")));
+    unsubs.push(bus.on("folder.new", () => handleNew("dir")));
+    return () => unsubs.forEach((unsub) => unsub());
+  }, []);
+
+  useEffect(() => {
+    if (isDraft) {
+      if (!draftInputEl.current) {
+        // TODO
+      } else {
+        draftInputEl.current.focus();
+      }
+    }
+  }, [isDraft, draftInputEl.current]);
 
   const flatNodes = useMemo(() => {
     const result: FlatNode[] = [];
@@ -49,8 +110,21 @@ const FileList = ({ root, open, close }: FileListProps) => {
     return result;
   }, [root, expandedDirs]);
 
+  const handleDraftBlur = async (draftNode: FNode) => {
+    setBusy((prev) => new Set([...prev, draftNode.id]));
+
+    draftNode.name = draftInput;
+    draftNode.path = draftNode.path + draftInput;
+    await save(draftNode, !!draftInput);
+
+    setBusy((prev) => {
+      const updated = new Set([...prev]);
+      updated.delete(draftNode.id);
+      return updated;
+    });
+  };
   const handleClick = async (fnode: FNode) => {
-    if (busy.has(fnode.id)) return;
+    if (busy.has(fnode.id) || fnode.isDraft) return;
     setBusy((prev) => new Set([...prev, fnode.id]));
     setSelected(fnode);
     let success = false;
@@ -95,7 +169,12 @@ const FileList = ({ root, open, close }: FileListProps) => {
           {busy.has(fnode.id) ? (
             <Spinner size={0.8} className="ml-0p5 flex-shrink-0" />
           ) : fnode.type === "file" ? (
-            <Icon className="ml-0p5 flex-shrink-0" name={getFileIcon(fnode.name)} size={0.8} fs />
+            <Icon
+              className="ml-0p5 flex-shrink-0"
+              name={getFileIcon(fnode.isDraft ? draftInput : fnode.name)}
+              size={0.8}
+              fs
+            />
           ) : (
             <Icon
               className="ml-0p5 flex-shrink-0"
@@ -106,7 +185,22 @@ const FileList = ({ root, open, close }: FileListProps) => {
               name="chevron-right"
             />
           )}
-          <span className={classes.name}>{fnode.name}</span>
+          {fnode.isDraft && (
+            <input
+              className={classes.draftinput}
+              type="text"
+              spellCheck={false}
+              placeholder={`${fnode.type === "file" ? "File" : "Directory"} name`}
+              value={draftInput}
+              onInput={(e) => setDraftInput((e.target as HTMLInputElement).value)}
+              onBlur={() => handleDraftBlur(fnode)}
+            />
+          )}
+          {fnode.isDraft ? (
+            <span className={[classes.name, classes.draft].join(" ")}>&nbsp;</span>
+          ) : (
+            <span className={classes.name}>{fnode.name}</span>
+          )}
         </div>
       ))}
     </div>

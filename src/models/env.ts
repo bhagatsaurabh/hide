@@ -1,4 +1,5 @@
 import { InSocketMessagePayload, OutSocketMessagePayload } from "./common";
+import { CommandMap } from "./context-menu";
 
 export type EnvAction = "ping";
 
@@ -8,6 +9,11 @@ export interface OutSocketMessageEnv extends OutSocketMessagePayload {
 
 export interface EnvPing extends OutSocketMessageEnv {
   uuid: string;
+}
+
+export interface WSRun extends OutSocketMessageEnv {
+  command: keyof CommandMap;
+  ctx: unknown;
 }
 
 ////////////

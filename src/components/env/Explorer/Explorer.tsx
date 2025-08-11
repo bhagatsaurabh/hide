@@ -15,7 +15,7 @@ import { socket } from "@/config/socket";
 import { EnvContext } from "@/context/env/env.context";
 import { InSocketMessage } from "@/models/common";
 import classes from "./Explorer.module.css";
-import { closePath, openPath } from "@/services/env";
+import { closePath, openPath, runCommand } from "@/services/env";
 import { FNode, FNodeOf, FSDirEntries, FSFile } from "@/models/filesystem";
 import { noop } from "@/utils";
 import { ViewContext } from "@/context/view/view.context";
@@ -36,6 +36,7 @@ const root: FNodeOf<"dir"> = {
 const initialState: ExplorerState = {
   root,
   stalePaths: [],
+  draft: false,
 };
 export interface ExplorerRef {
   closeFile: (fnode: FNodeOf<"file">) => void;
@@ -181,6 +182,16 @@ const Explorer = ({ ref }: ExplorerProps) => {
       }
     }
   };
+  const draft = async (fnode: FNode) => {
+    fsDispatch({ type: "DRAFT", payload: { node: fnode } });
+  };
+  const save = async (fnode: FNode, commit: boolean) => {
+    if (!commit) {
+      fsDispatch({ type: "DRAFT_CANCEL", payload: { node: fnode } });
+      return;
+    }
+    await runCommand(workspace.uuid, fnode.type === "dir" ? "folder.new" : "file.new", { name: fnode.name });
+  };
 
   return (
     <EnvContext.Provider value={{ open, close, save: noop }}>
@@ -227,7 +238,7 @@ const Explorer = ({ ref }: ExplorerProps) => {
             {fs.root.children.length === 0 ? (
               <div className={classes.empty}>Empty workspace</div>
             ) : (
-              <FileList root={fs.root} open={open} close={close} />
+              <FileList root={fs.root} open={open} close={close} draft={draft} isDraft={fs.draft} save={save} />
             )}
           </div>
         </div>

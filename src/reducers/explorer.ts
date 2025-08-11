@@ -6,6 +6,7 @@ type PathPair<T> = [T, T | undefined];
 export type ExplorerState = {
   root: FNodeOf<"dir">;
   stalePaths: PathPair<string>[];
+  draft: boolean;
 };
 
 export const fileTreeReducer = (draftState: WritableDraft<ExplorerState>, action: FTAction) => {
@@ -78,6 +79,15 @@ export const fileTreeReducer = (draftState: WritableDraft<ExplorerState>, action
           } else {
             node = { ...common, type: "file", isOpen: false };
           }
+
+          const possibleDraft = findNode(draftState.root, node.path);
+          if (possibleDraft && possibleDraft.isDraft) {
+            dirNode.children.splice(
+              dirNode.children.findIndex((child) => child.id === possibleDraft.id),
+              1
+            );
+          }
+
           dirNode.children = [...dirNode.children, node];
         } else if (event.action === "move") {
           const oldDirNode = findNode(draftState.root, event.data.from);
@@ -137,6 +147,36 @@ export const fileTreeReducer = (draftState: WritableDraft<ExplorerState>, action
       // TODO
       break;
     }
+    case "DRAFT": {
+      const draftNode = action.payload.node;
+      const parent = findNode(draftState.root, draftNode.parent!.path) as FNodeOf<"dir">;
+      if (!parent) break;
+      parent.children.push(draftNode);
+      draftState.draft = true;
+      break;
+    }
+    case "DRAFT_CANCEL": {
+      const draftNode = action.payload.node;
+      const parent = findNode(draftState.root, draftNode.parent!.path) as FNodeOf<"dir">;
+      if (!parent) break;
+      parent.children.splice(
+        parent.children.findIndex((child) => child.id === draftNode.id),
+        1
+      );
+      draftState.draft = false;
+      break;
+    }
+    /* case "CREATE": {
+      const newNode = action.payload.node;
+      const parent = findNode(draftState.root, newNode.parent!.path) as FNodeOf<"dir">;
+      if (!parent) break;
+      parent.children.splice(
+        parent.children.findIndex((child) => child.id === draftNode.id),
+        1
+      );
+      draftState.draft = false;
+      break;
+    } */
     default:
       break;
   }

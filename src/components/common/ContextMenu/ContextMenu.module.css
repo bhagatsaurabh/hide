@@ -1,0 +1,11 @@
+.contextmenu {
+  font-size: 0.75rem;
+  display: none;
+}
+.contextmenu.show {
+  display: block;
+}
+.wrapper {
+  position: fixed;
+  pointer-events: auto;
+}
