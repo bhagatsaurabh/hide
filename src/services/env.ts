@@ -1,6 +1,7 @@
 import api from "@/config/axios";
 import { socket } from "@/config/socket";
 import { InSocketMessage, InSocketMessagePayload } from "@/models/common";
+import { CommandMap } from "@/models/context-menu";
 import { EnvCloseDTO, EnvOpenDTO } from "@/models/env";
 import { WorkspaceWaitDTO } from "@/models/workspace";
 import { uuidv4 as uuid } from "lib0/random.js";
@@ -31,3 +32,24 @@ export const openPath = async <T extends InSocketMessagePayload>(wsUuid: string,
 export const closePath = (wsUuid: string, path: string) => {
   socket.emit("msg", { service: "env", action: "fs.close", payload: { uuid: wsUuid, path } });
 };
+export const runCommand = async <T extends InSocketMessagePayload>(
+  wsUuid: string,
+  command: keyof CommandMap,
+  ctx: unknown
+) =>
+  new Promise<T>((res, rej) => {
+    const correlationId = uuid();
+    const handler = (msg: InSocketMessage<string>) => {
+      clearTimeout(handle);
+      if (msg.action === "error") rej(msg.payload.error);
+      else res(msg.payload as T);
+    };
+    const handle = setTimeout(() => rej({ code: "TIMEOUT" }), 5000);
+    socket.once(correlationId, handler);
+    socket.emit("msg", {
+      service: "env",
+      action: "ws.run",
+      payload: { uuid: wsUuid, command, ctx },
+      correlationId,
+    });
+  });

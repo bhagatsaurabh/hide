@@ -131,6 +131,8 @@ interface FTActionMap {
   BATCH: { events: FSEvent[] };
   RESUME: { path: string };
   BLOCK: { path: string };
+  DRAFT: { node: FNode };
+  DRAFT_CANCEL: { node: FNode };
 }
 export type FTAction = {
   [K in keyof FTActionMap]: {
@@ -142,8 +144,12 @@ export type FTAction = {
 type FNodeMap = {
   file: {
     isDirty?: boolean;
+    parent: FNodeOf<"dir">;
   };
-  dir: { children: FNode[] };
+  dir: {
+    children: FNode[];
+    parent?: FNodeOf<"dir">;
+  };
 };
 export type FNode = {
   [K in keyof FNodeMap]: {
@@ -152,7 +158,7 @@ export type FNode = {
     type: K;
     id: number;
     isOpen: boolean;
-    parent?: FNodeOf<"dir">;
+    isDraft?: boolean;
   } & FNodeMap[K];
 }[keyof FNodeMap];
 export type FNodeOf<T extends keyof FNodeMap> = Extract<FNode, { type: T }>;

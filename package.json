@@ -24,6 +24,7 @@
     "lib0": "^0.2.107",
     "monaco-editor": "^0.52.2",
     "motion": "^12.18.1",
+    "nanoevents": "^9.1.0",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
     "react-redux": "^9.2.0",

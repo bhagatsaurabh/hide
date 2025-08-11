@@ -25,6 +25,20 @@
   white-space: nowrap;
   overflow: hidden;
 }
+.name.draft {
+}
+.draftinput {
+  font-size: 0.8rem;
+  margin: 0;
+  margin-left: 0.4rem;
+  padding: 0;
+  font-weight: 400;
+  color: #383838;
+  border: 1px solid grey;
+  background-color: transparent;
+  flex: 1;
+  padding: 0.6px 0.25rem;
+}
 
 @media (hover: hover) {
   .fsitem:hover {

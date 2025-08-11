@@ -1,4 +1,4 @@
-import { EnvPayload, OutSocketMessageEnv } from "./env";
+import { EnvPayload, OutSocketMessageEnv, WSRun } from "./env";
 import { FSClose, FSDirEntries, FSFile, FSNoop, FSOpen, FSOpenAck, FSPayload, FSSyncOut } from "./filesystem";
 import { NotificationPayload } from "./notification";
 import { OutSocketMessagePresence, PresencePing } from "./presence";
@@ -47,6 +47,7 @@ export type OutSocketMessagePayloadMap = EnforcedOutSocketMessagePayloadActionMa
     "fs.open.ack": FSOpenAck;
     "fs.sync": FSSyncOut;
     "fs.close": FSClose;
+    "ws.run": WSRun;
   };
   presence: {
     "session.ping": PresencePing;
