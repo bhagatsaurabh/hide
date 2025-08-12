@@ -32,17 +32,17 @@ export const openPath = async <T extends InSocketMessagePayload>(wsUuid: string,
 export const closePath = (wsUuid: string, path: string) => {
   socket.emit("msg", { service: "env", action: "fs.close", payload: { uuid: wsUuid, path } });
 };
-export const runCommand = async <T extends InSocketMessagePayload>(
+export const runCommand = async <K extends keyof CommandMap>(
   wsUuid: string,
-  command: keyof CommandMap,
-  ctx: unknown
+  command: K,
+  ctx: Parameters<CommandMap[K]>[0]
 ) =>
-  new Promise<T>((res, rej) => {
+  new Promise<void>((res, rej) => {
     const correlationId = uuid();
     const handler = (msg: InSocketMessage<string>) => {
       clearTimeout(handle);
       if (msg.action === "error") rej(msg.payload.error);
-      else res(msg.payload as T);
+      else res();
     };
     const handle = setTimeout(() => rej({ code: "TIMEOUT" }), 5000);
     socket.once(correlationId, handler);

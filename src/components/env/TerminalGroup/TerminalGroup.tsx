@@ -7,6 +7,7 @@ import Terminal, { TerminalRef } from "@/components/Terminal/Terminal";
 import { socket } from "@/config/socket";
 import { ViewContext } from "@/context/view/view.context";
 import { uuidv4 as uuid } from "lib0/random.js";
+import bus from "@/config/bus";
 
 const TerminalGroup = () => {
   const { hideTooltip, showTooltip } = useContext(TooltipContext)!;
@@ -59,6 +60,10 @@ const TerminalGroup = () => {
         },
       });
     };
+  }, []);
+  useEffect(() => {
+    const unsub = bus.on("terminal.new", () => handleNewTerminal());
+    return () => unsub();
   }, []);
 
   return (

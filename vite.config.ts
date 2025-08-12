@@ -4,6 +4,9 @@ import { VitePWA } from "vite-plugin-pwa";
 import svgr from "vite-plugin-svgr";
 import SRI from "./plugins/subresource-integrity";
 import path from "path";
+import { readFileSync } from "fs";
+
+const pkg = JSON.parse(readFileSync("./package.json", "utf-8"));
 
 export default defineConfig({
   build: {
@@ -44,5 +47,9 @@ export default defineConfig({
     alias: {
       "@": path.resolve(__dirname, "./src"),
     },
+  },
+  define: {
+    __APP_VERSION__: JSON.stringify(pkg.version),
+    __APP_BUILDDATE__: JSON.stringify(new Date().toUTCString()),
   },
 });

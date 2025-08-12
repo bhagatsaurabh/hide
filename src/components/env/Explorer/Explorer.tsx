@@ -190,7 +190,7 @@ const Explorer = ({ ref }: ExplorerProps) => {
       fsDispatch({ type: "DRAFT_CANCEL", payload: { node: fnode } });
       return;
     }
-    await runCommand(workspace.uuid, fnode.type === "dir" ? "folder.new" : "file.new", { name: fnode.name });
+    await runCommand(workspace.uuid, fnode.type === "dir" ? "folder.new" : "file.new", { path: fnode.path });
   };
 
   return (
