@@ -1,17 +1,18 @@
 export interface CommandMap {
   "internal.context.open": (ctx: { anchor: HTMLElement; items: MenuItem[] }) => void;
   "internal.context.close": () => void;
-  "file.new": (ctx: {}) => void;
-  "folder.new": (ctx: {}) => void;
-  "edit.undo": (ctx: {}) => void;
-  "edit.redo": (ctx: {}) => void;
-  "edit.find": (ctx: {}) => void;
-  "edit.replace": (ctx: {}) => void;
-  "terminal.new": (ctx: {}) => void;
-  "help.report": (ctx: {}) => void;
-  "help.about": (ctx: {}) => void;
+  "file.new": (ctx: { path: string }) => void;
+  "folder.new": (ctx: { path: string }) => void;
+  "edit.undo": (ctx: undefined) => void;
+  "edit.redo": (ctx: undefined) => void;
+  "edit.find": (ctx: undefined) => void;
+  "edit.replace": (ctx: undefined) => void;
+  "terminal.new": (ctx: undefined) => void;
+  "help.report": (ctx: undefined) => void;
+  "help.about": (ctx: undefined) => void;
 }
 
+// eslint-disable-next-line @typescript-eslint/no-empty-object-type
 export type Separator = {};
 export type SubMenu = {
   label: string;

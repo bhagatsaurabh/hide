@@ -14,6 +14,8 @@ import { ViewContext } from "@/context/view/view.context";
 import { socket } from "@/config/socket";
 import { InSocketMessage } from "@/models/common";
 import { auth } from "@/config/firebase";
+import bus from "@/config/bus";
+import { Unsubscribe } from "nanoevents";
 
 type TabMetaData = {
   node: FNodeOf<"file">;
@@ -68,6 +70,26 @@ const TabGroup = ({ ref }: TabGroupProps) => {
     socket?.on("fs", handleSyncMessage);
     return () => void socket?.off("fs", handleSyncMessage);
   }, []);
+  useEffect(() => {
+    const handleExtAction = (action: "undo" | "redo" | "find" | "replace") => {
+      if (!active) return;
+      if (action === "undo" || action === "redo") {
+        editor.current?.trigger("keyboard", "undo", null);
+      } else if (action === "find") {
+        editor.current?.getAction("actions.find")?.run();
+      } else {
+        editor.current?.getAction("editor.action.startFindReplaceAction")?.run();
+      }
+    };
+
+    const unsubs: Unsubscribe[] = [];
+    unsubs.push(bus.on("edit.undo", () => handleExtAction("undo")));
+    unsubs.push(bus.on("edit.redo", () => handleExtAction("redo")));
+    unsubs.push(bus.on("edit.find", () => handleExtAction("find")));
+    unsubs.push(bus.on("edit.replace", () => handleExtAction("replace")));
+
+    return () => unsubs.forEach((unsub) => unsub());
+  }, [active]);
 
   useEffect(() => {
     mEditor.defineTheme("hide-default", {

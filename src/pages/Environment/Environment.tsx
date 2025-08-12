@@ -28,6 +28,10 @@ import { FNodeOf } from "@/models/filesystem";
 import { InSocketMessage } from "@/models/common";
 import { auth } from "@/config/firebase";
 import { getRandomAccentColor } from "@/utils";
+import { Unsubscribe } from "nanoevents";
+import bus from "@/config/bus";
+import Modal, { ModalRef } from "@/components/common/Modal/Modal";
+import Button from "@/components/common/Button/Button";
 // const schemaMobile = layoutMobile as PanelSchema;
 const schemaDesktop = layoutDesktop as PanelSchema;
 
@@ -63,6 +67,9 @@ export const Environment = () => {
       color: userColors.current.get(auth.currentUser!.uid) ?? getRandomAccentColor(0.5),
     },
   ]);
+  const [showAbout, setShowAbout] = useState(false);
+  const [showReport, setShowReport] = useState(false);
+  const aboutRef = useRef<ModalRef>(null);
 
   useEffect(() => {
     if (provStatus?.action === "error") {
@@ -147,6 +154,13 @@ export const Environment = () => {
     socket.on("env", handleAwarenessMessage);
     return () => void socket?.off("env", handleAwarenessMessage);
   }, []);
+  useEffect(() => {
+    const unsubs: Unsubscribe[] = [];
+    unsubs.push(bus.on("help.about", () => setShowAbout(true)));
+    unsubs.push(bus.on("help.report", () => setShowReport(true)));
+
+    return () => unsubs.forEach((unsub) => unsub());
+  }, []);
 
   const nodes = useRef(new Map<string, ReturnType<typeof createHtmlPortalNode>>());
   const tabGroupRef = useRef<TabGroupRef>(null);
@@ -170,29 +184,57 @@ export const Environment = () => {
       <Spinner size={2}>{waitMsg}</Spinner>
     </div>
   ) : (
-    <ViewContext.Provider value={{ getNode, workspace, loadFile, closeFile, awareness }}>
-      <div ref={containerRef} className={[classes.environment, "scrollbar"].join(" ")}>
-        <Panel
-          style={{ width: "100%", height: "100%" }}
-          dimension={dimension}
-          position={{ top: 0, left: 0 }}
-          schema={schema}
-        />
+    <>
+      {showAbout && (
+        <Modal type="pop" title="about" onDismiss={() => setShowAbout(false)} ref={aboutRef} className="p-1p5">
+          <div className={classes.about}>
+            <div className={classes.abheader}></div>
+            <div className={classes.abcontent}>
+              <div className={classes.ablogo}></div>
+              <div className={classes.abinfo}>
+                <div className={classes.abtitle}></div>
+                <div className={classes.abvalues}>
+                  <span>Version:&nbsp;</span>
+                  <span>{document.querySelector('head meta[name="version"]')?.innerHTML}</span>
+                  <span>Date:&nbsp;</span>
+                  <span>{document.querySelector('head meta[name="builddate"]')?.innerHTML}</span>
+                  <span>Version:&nbsp;</span>
+                  <span>{navigator.userAgent}</span>
+                </div>
+              </div>
+            </div>
+            <div className={classes.abactions}>
+              <Button type="secondary" size={1}>
+                OK
+              </Button>
+            </div>
+          </div>
+        </Modal>
+      )}
+      <ViewContext.Provider value={{ getNode, workspace, loadFile, closeFile, awareness }}>
+        <div ref={containerRef} className={[classes.environment, "scrollbar"].join(" ")}>
+          <Panel
+            style={{ width: "100%", height: "100%" }}
+            dimension={dimension}
+            position={{ top: 0, left: 0 }}
+            schema={schema}
+          />
 
-        {Object.entries(views).map(([viewId, View]) => (
-          <InPortal key={viewId} node={getNode(viewId)}>
-            <View
-              ref={(el: unknown) => {
-                if (viewId === "tabgroup") {
-                  tabGroupRef.current = el as TabGroupRef;
-                } else if (viewId === "explorer") {
-                  explorerRef.current = el as ExplorerRef;
-                }
-              }}
-            />
-          </InPortal>
-        ))}
-      </div>
-    </ViewContext.Provider>
+          {Object.entries(views).map(([viewId, View]) => (
+            <InPortal key={viewId} node={getNode(viewId)}>
+              <View
+                ref={(el: unknown) => {
+                  if (viewId === "tabgroup") {
+                    tabGroupRef.current = el as TabGroupRef;
+                  } else if (viewId === "explorer") {
+                    explorerRef.current = el as ExplorerRef;
+                  }
+                }}
+              />
+            </InPortal>
+          ))}
+        </div>
+      </ViewContext.Provider>
+    </>
   );
 };
