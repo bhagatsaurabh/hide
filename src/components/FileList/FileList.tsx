@@ -33,8 +33,6 @@ const FileList = ({ root, open, close, draft, save, isDraft }: FileListProps) =>
   const [draftInput, setDraftInput] = useState("");
 
   useEffect(() => {
-    if (isDraft) return;
-
     const handleNew = (type: "file" | "dir") => {
       let parent: FNodeOf<"dir">;
       if (!selected) parent = root;
@@ -87,6 +85,7 @@ const FileList = ({ root, open, close, draft, save, isDraft }: FileListProps) =>
 
   const flatNodes = useMemo(() => {
     const result: FlatNode[] = [];
+    if (!root || !root.children) return result;
 
     const walk = (node: FNode, depth: number, skip = false) => {
       if (!skip) {
@@ -113,9 +112,11 @@ const FileList = ({ root, open, close, draft, save, isDraft }: FileListProps) =>
   const handleDraftBlur = async (draftNode: FNode) => {
     setBusy((prev) => new Set([...prev, draftNode.id]));
 
-    draftNode.name = draftInput;
-    draftNode.path = draftNode.path + draftInput;
-    await save(draftNode, !!draftInput);
+    const node = { ...draftNode };
+    node.name = draftInput;
+    node.path = draftNode.path + draftInput;
+    console.log({ ...node });
+    await save(node, !!draftInput);
 
     setBusy((prev) => {
       const updated = new Set([...prev]);
@@ -187,6 +188,7 @@ const FileList = ({ root, open, close, draft, save, isDraft }: FileListProps) =>
           )}
           {fnode.isDraft && (
             <input
+              ref={draftInputEl}
               className={classes.draftinput}
               type="text"
               spellCheck={false}

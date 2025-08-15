@@ -133,6 +133,7 @@ interface FTActionMap {
   BLOCK: { path: string };
   DRAFT: { node: FNode };
   DRAFT_CANCEL: { node: FNode };
+  DRAFT_SAVE: { node: FNode };
 }
 export type FTAction = {
   [K in keyof FTActionMap]: {
