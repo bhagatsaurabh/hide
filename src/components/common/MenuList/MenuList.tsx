@@ -1,5 +1,5 @@
 import bus from "@/config/bus";
-import { MenuItem } from "@/models/context-menu";
+import { CommandMap, MenuItem } from "@/models/context-menu";
 import { Fragment, useEffect, useLayoutEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import classes from "./MenuList.module.css";
@@ -16,7 +16,7 @@ interface MenuListProps {
   setOpenPath: (p: number[]) => void;
   activeIndexPath: number[];
   setActiveIndexPath: (p: number[]) => void;
-  context?: any;
+  context?: unknown;
   onMouseEnterMenu: () => void;
   onMouseLeaveMenu: (depth: number) => void;
 }
@@ -94,6 +94,12 @@ const MenuList = ({
       setOpenPath(path);
     }
   };
+  const handleCommandEmit = (command: keyof CommandMap) => {
+    if (command === "file.new" || command === "folder.new") {
+      bus.emit(command, { path: "" });
+      console.log("Emitted:", command);
+    }
+  };
 
   return (
     <div
@@ -122,11 +128,10 @@ const MenuList = ({
               onMouseDown={(e) => e.stopPropagation()}
               onClick={() => {
                 if (!item.disabled && item.type !== "submenu") {
+                  handleCommandEmit(item.command);
+                  bus.emit("internal.context.close");
                   setOpenPath([]);
                   setActiveIndexPath([]);
-
-                  bus.emit(item.command, {});
-                  bus.emit("internal.context.close");
                 }
               }}
             >

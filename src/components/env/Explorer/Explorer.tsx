@@ -24,6 +24,8 @@ import { TooltipContext } from "@/context/tooltip/tooltip.context";
 import Icon from "@/components/common/Icon/Icon";
 import FileList from "@/components/FileList/FileList";
 import classNames from "classnames";
+import { useAppDispatch } from "@/hooks/store";
+import { notify } from "@/store/notifications";
 
 const root: FNodeOf<"dir"> = {
   id: 0,
@@ -51,6 +53,7 @@ const Explorer = ({ ref }: ExplorerProps) => {
   const [busy, setBusy] = useState(false);
   const [fs, fsDispatch] = useReducer(produce(fileTreeReducer), initialState);
   const fsIndex = useRef<Record<string, FNode>>({});
+  const dispatch = useAppDispatch();
 
   useImperativeHandle(ref, () => {
     return { closeFile: close };
@@ -190,7 +193,21 @@ const Explorer = ({ ref }: ExplorerProps) => {
       fsDispatch({ type: "DRAFT_CANCEL", payload: { node: fnode } });
       return;
     }
-    await runCommand(workspace.uuid, fnode.type === "dir" ? "folder.new" : "file.new", { path: fnode.path });
+    try {
+      fsDispatch({ type: "DRAFT", payload: { node: fnode } });
+      await runCommand(workspace.uuid, fnode.type === "dir" ? "folder.new" : "file.new", {
+        path: fnode.path.substring(10),
+      });
+    } catch (error) {
+      console.log(error);
+      dispatch(
+        notify({
+          title: `Failed to create new ${fnode.type === "file" ? "file" : "directory"}`,
+          status: "error",
+          message: "Please try again",
+        })
+      );
+    }
   };
 
   return (
@@ -235,11 +252,8 @@ const Explorer = ({ ref }: ExplorerProps) => {
             </div>
           </div>
           <div className={classNames({ [classes.fs]: true, scrollable: true })}>
-            {fs.root.children.length === 0 ? (
-              <div className={classes.empty}>Empty workspace</div>
-            ) : (
-              <FileList root={fs.root} open={open} close={close} draft={draft} isDraft={fs.draft} save={save} />
-            )}
+            {fs.root.children.length === 0 && <div className={classes.empty}>Empty workspace</div>}
+            <FileList root={fs.root} open={open} close={close} draft={draft} isDraft={fs.draft} save={save} />
           </div>
         </div>
       </div>
