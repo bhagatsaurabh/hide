@@ -74,7 +74,13 @@ export const fetchNotifications = createAsyncThunk("notifications/fetch-all", as
     dispatch(setPending(res.data));
   } catch (error) {
     console.log(error);
-    // TODO: Notify
+    dispatch(
+      notify({
+        status: "warning",
+        title: "Could not fetch latest notifications",
+        message: "Something went wrong while getting recent notifications",
+      })
+    );
   }
 });
 export const notify = createAsyncThunk<

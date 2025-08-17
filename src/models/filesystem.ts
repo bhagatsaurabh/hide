@@ -160,6 +160,7 @@ export type FNode = {
     id: number;
     isOpen: boolean;
     isDraft?: boolean;
+    isBlocked?: boolean;
   } & FNodeMap[K];
 }[keyof FNodeMap];
 export type FNodeOf<T extends keyof FNodeMap> = Extract<FNode, { type: T }>;
