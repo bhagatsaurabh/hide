@@ -97,7 +97,6 @@ const MenuList = ({
   const handleCommandEmit = (command: keyof CommandMap) => {
     if (command === "file.new" || command === "folder.new") {
       bus.emit(command, { path: "" });
-      console.log("Emitted:", command);
     }
   };
 

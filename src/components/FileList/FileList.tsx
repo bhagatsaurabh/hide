@@ -13,6 +13,7 @@ import { uint32 } from "lib0/random.js";
 type FlatNode = {
   fnode: FNode;
   depth: number;
+  blocked?: boolean;
 };
 
 interface FileListProps {
@@ -25,9 +26,9 @@ interface FileListProps {
 }
 
 const FileList = ({ root, open, close, draft, save, isDraft }: FileListProps) => {
-  const [expandedDirs, setExpandedDirs] = useState(new Set());
+  const expandedDirs = useRef<Set<string>>(new Set());
   const [busy, setBusy] = useState<Set<number>>(new Set());
-  const [selected, setSelected] = useState<FNode | null>(null);
+  const selected = useRef<FNode | null>(null);
   const { hideTooltip, showTooltip } = useContext(TooltipContext)!;
   const draftInputEl = useRef<HTMLInputElement>(null);
   const [draftInput, setDraftInput] = useState("");
@@ -35,11 +36,12 @@ const FileList = ({ root, open, close, draft, save, isDraft }: FileListProps) =>
   useEffect(() => {
     const handleNew = (type: "file" | "dir") => {
       let parent: FNodeOf<"dir">;
-      if (!selected) parent = root;
-      else if (selected.type === "file") {
-        parent = selected.parent;
+      if (!selected.current) {
+        parent = root;
+      } else if (selected.current.type === "file") {
+        parent = selected.current.parent;
       } else {
-        parent = selected;
+        parent = selected.current;
       }
       let draftNode: FNodeOf<"file"> | FNodeOf<"dir">;
       if (type === "file") {
@@ -74,25 +76,24 @@ const FileList = ({ root, open, close, draft, save, isDraft }: FileListProps) =>
   }, []);
 
   useEffect(() => {
-    if (isDraft) {
-      if (!draftInputEl.current) {
-        // TODO
-      } else {
-        draftInputEl.current.focus();
-      }
+    if (isDraft && draftInputEl.current) {
+      draftInputEl.current.focus();
     }
-  }, [isDraft, draftInputEl.current]);
+    if (!isDraft) {
+      setDraftInput("");
+    }
+  }, [isDraft, draftInputEl]);
 
   const flatNodes = useMemo(() => {
     const result: FlatNode[] = [];
     if (!root || !root.children) return result;
 
-    const walk = (node: FNode, depth: number, skip = false) => {
+    const walk = (node: FNode, depth: number, blocked = false, skip = false) => {
       if (!skip) {
-        result.push({ fnode: node, depth });
+        result.push({ fnode: node, depth, blocked });
       }
 
-      if (node.type === "dir" && (expandedDirs.has(node.path) || skip) && node.children) {
+      if (node.type === "dir" && (expandedDirs.current.has(node.path) || skip) && node.children) {
         const sortedChildren = [...node.children].sort((a, b) => {
           if (a.type === b.type) {
             return a.name.localeCompare(b.name);
@@ -100,14 +101,36 @@ const FileList = ({ root, open, close, draft, save, isDraft }: FileListProps) =>
           return a.type === "dir" ? -1 : 1;
         });
         for (const child of sortedChildren) {
-          walk(child, depth + 1);
+          walk(child, depth + 1, blocked || child.isBlocked);
         }
       }
     };
 
-    walk(root, 0, true);
+    walk(root, 0, !!root.isBlocked, true);
     return result;
-  }, [root, expandedDirs]);
+  }, [root]);
+
+  useEffect(() => {
+    const handleCollapseAll = () => {
+      flatNodes
+        .filter((node) => node.fnode.type === "dir" && node.fnode.isOpen)
+        .forEach((node) => {
+          console.log(node.fnode.path);
+          handleClick(node.fnode);
+        });
+    };
+    const handleCollapse = (path: string) => {
+      const nodeToCollapse = flatNodes.find((node) => node.fnode.path === path);
+      if (nodeToCollapse && nodeToCollapse.fnode.isOpen) {
+        handleClick(nodeToCollapse.fnode);
+      }
+    };
+
+    const unsubs: Unsubscribe[] = [];
+    unsubs.push(bus.on("internal.explorer.collapseall", () => handleCollapseAll()));
+    unsubs.push(bus.on("internal.explorer.collapse", ({ path }) => handleCollapse(path)));
+    return () => unsubs.forEach((unsub) => unsub());
+  }, [flatNodes]);
 
   const handleDraftBlur = async (draftNode: FNode) => {
     setBusy((prev) => new Set([...prev, draftNode.id]));
@@ -115,7 +138,6 @@ const FileList = ({ root, open, close, draft, save, isDraft }: FileListProps) =>
     const node = { ...draftNode };
     node.name = draftInput;
     node.path = draftNode.path + draftInput;
-    console.log({ ...node });
     await save(node, !!draftInput);
 
     setBusy((prev) => {
@@ -127,7 +149,7 @@ const FileList = ({ root, open, close, draft, save, isDraft }: FileListProps) =>
   const handleClick = async (fnode: FNode) => {
     if (busy.has(fnode.id) || fnode.isDraft) return;
     setBusy((prev) => new Set([...prev, fnode.id]));
-    setSelected(fnode);
+    selected.current = fnode;
     let success = false;
     if (fnode.isOpen) {
       close(fnode);
@@ -137,12 +159,10 @@ const FileList = ({ root, open, close, draft, save, isDraft }: FileListProps) =>
     }
     if (success) {
       if (fnode.type === "dir") {
-        setExpandedDirs((prev) => {
-          const next = new Set(prev);
-          if (next.has(fnode.path)) next.delete(fnode.path);
-          else next.add(fnode.path);
-          return next;
-        });
+        const newSet = new Set([...expandedDirs.current]);
+        if (newSet.has(fnode.path)) newSet.delete(fnode.path);
+        else newSet.add(fnode.path);
+        expandedDirs.current = newSet;
       }
     }
     setBusy((prev) => {
@@ -154,20 +174,20 @@ const FileList = ({ root, open, close, draft, save, isDraft }: FileListProps) =>
 
   return (
     <div className={classes.fslist}>
-      {flatNodes.map(({ fnode, depth }) => (
+      {flatNodes.map(({ fnode, depth, blocked }) => (
         <div
           key={fnode.id}
           className={classNames({
             [classes.fsitem]: true,
-            [classes.selected]: fnode.id === selected?.id,
-            [classes.disabled]: busy.has(fnode.id),
+            [classes.selected]: fnode.id === selected.current?.id,
+            [classes.disabled]: busy.has(fnode.id) || blocked || fnode.isBlocked,
           })}
           style={{ paddingLeft: `${depth * 0.5}rem` }}
           onClick={() => handleClick(fnode)}
           onMouseEnter={(e: MouseEvent) => showTooltip(fnode.path.substring(10), e.clientX, e.clientY)}
           onMouseLeave={hideTooltip}
         >
-          {busy.has(fnode.id) ? (
+          {busy.has(fnode.id) || fnode.isBlocked ? (
             <Spinner size={0.8} className="ml-0p5 flex-shrink-0" />
           ) : fnode.type === "file" ? (
             <Icon
@@ -182,7 +202,7 @@ const FileList = ({ root, open, close, draft, save, isDraft }: FileListProps) =>
               color="#505050"
               strokeWidth={1.5}
               size={0.8}
-              style={{ transform: `rotateZ(${expandedDirs.has(fnode.path) ? 90 : 0}deg)` }}
+              style={{ transform: `rotateZ(${expandedDirs.current.has(fnode.path) ? 90 : 0}deg)` }}
               name="chevron-right"
             />
           )}

@@ -19,21 +19,20 @@ export const fileTreeReducer = (draftState: WritableDraft<ExplorerState>, action
         if (node.type === "dir") node.children = [];
         node.parent = dirNode;
       });
-      dirNode.children = action.payload.nodes;
       if (action.payload.forceOpen) {
         dirNode.isOpen = true;
       }
-
+      dirNode.children = action.payload.nodes;
       break;
     }
     case "UNLOAD": {
       const dirNode = findNode(draftState.root, action.payload.path);
       if (!dirNode || dirNode.type !== "dir") break;
 
-      dirNode.children = [];
       if (action.payload.forceClose) {
         dirNode.isOpen = false;
       }
+      dirNode.children = [];
       break;
     }
     case "OPEN_FILE": {
@@ -44,7 +43,6 @@ export const fileTreeReducer = (draftState: WritableDraft<ExplorerState>, action
     }
     case "CLOSE_FILE": {
       const node = findNode(draftState.root, action.payload.path.substring(10));
-      console.log(!!node);
       if (!node || node.type !== "file") break;
       node.isOpen = false;
       break;
@@ -56,6 +54,7 @@ export const fileTreeReducer = (draftState: WritableDraft<ExplorerState>, action
     }
     case "BATCH": {
       const events = coalescer(action.payload.events);
+      console.log("Batch coalesced:", JSON.parse(JSON.stringify(events)));
       events.forEach((event) => {
         if ((event.data as FSCoalescedCreateEvent).watchedPath) {
           const ev = event.data as FSCoalescedCreateEvent;
@@ -63,11 +62,9 @@ export const fileTreeReducer = (draftState: WritableDraft<ExplorerState>, action
         }
       });
 
-      console.log(events);
       const stalePaths: PathPair<string>[] = [];
       for (const event of events) {
         if (event.action === "create") {
-          console.log(event);
           const dirNode = findNode(draftState.root, event.data.watchedPath);
           if (!dirNode || dirNode.type !== "dir") continue;
           const common = {
@@ -83,22 +80,12 @@ export const fileTreeReducer = (draftState: WritableDraft<ExplorerState>, action
             node = { ...common, type: "file", isOpen: false };
           }
 
-          console.log(
-            draftState.root.children.map((child) => child.path),
-            node.path
-          );
-          const possibleDraft = findNode(draftState.root, node.path);
-          console.log("Possible", possibleDraft);
+          const possibleDraft = findNode(draftState.root, node.path.substring(10));
           if (possibleDraft && possibleDraft.isDraft) {
-            console.log(
-              possibleDraft.id,
-              dirNode.children.findIndex((child) => child.id === possibleDraft.id)
-            );
-            const removed = dirNode.children.splice(
+            dirNode.children.splice(
               dirNode.children.findIndex((child) => child.id === possibleDraft.id),
               1
             );
-            console.log(removed);
             draftState.draft = false;
           }
 
@@ -154,16 +141,27 @@ export const fileTreeReducer = (draftState: WritableDraft<ExplorerState>, action
       break;
     }
     case "BLOCK": {
-      // TODO
+      if (action.payload.path === "/") action.payload.path += "workspace/";
+      const blockedNode = findNode(draftState.root, action.payload.path.substring(10)) as FNodeOf<"dir">;
+      if (blockedNode) {
+        blockedNode.isBlocked = true;
+      }
       break;
     }
     case "RESUME": {
-      // TODO
+      if (action.payload.path === "/") action.payload.path += "workspace/";
+      const blockedNode = findNode(draftState.root, action.payload.path.substring(10)) as FNodeOf<"dir">;
+      if (blockedNode) {
+        blockedNode.isBlocked = false;
+      }
       break;
     }
     case "DRAFT": {
       const draftNode = action.payload.node;
-      const parent = findNode(draftState.root, draftNode.parent!.path) as FNodeOf<"dir">;
+      const parent = findNode(
+        draftState.root,
+        draftNode.parent!.path === "/" ? draftNode.parent!.path : draftNode.parent!.path.substring(10)
+      ) as FNodeOf<"dir">;
       if (!parent) break;
       const existingIdx = parent.children.findIndex((child) => child.id === draftNode.id);
       if (existingIdx >= 0) {
@@ -176,7 +174,10 @@ export const fileTreeReducer = (draftState: WritableDraft<ExplorerState>, action
     }
     case "DRAFT_CANCEL": {
       const draftNode = action.payload.node;
-      const parent = findNode(draftState.root, draftNode.parent!.path) as FNodeOf<"dir">;
+      const parent = findNode(
+        draftState.root,
+        draftNode.parent!.path === "/" ? draftNode.parent!.path : draftNode.parent!.path.substring(10)
+      ) as FNodeOf<"dir">;
       if (!parent) break;
       parent.children.splice(
         parent.children.findIndex((child) => child.id === draftNode.id),
@@ -185,17 +186,6 @@ export const fileTreeReducer = (draftState: WritableDraft<ExplorerState>, action
       draftState.draft = false;
       break;
     }
-    /* case "CREATE": {
-      const newNode = action.payload.node;
-      const parent = findNode(draftState.root, newNode.parent!.path) as FNodeOf<"dir">;
-      if (!parent) break;
-      parent.children.splice(
-        parent.children.findIndex((child) => child.id === draftNode.id),
-        1
-      );
-      draftState.draft = false;
-      break;
-    } */
     default:
       break;
   }
@@ -335,11 +325,10 @@ export const buildIndex = (root: FNode) => {
   return index;
 };
 
-const findNode = (root: FNode, path: string) => {
-  let curr: FNode | undefined = { children: [root], id: -1, isOpen: false, name: "dummy", path: ".", type: "dir" };
+export const findNode = (root: FNode, path: string) => {
+  let curr: FNode | undefined = { children: [root], id: -1, isOpen: true, name: "dummy", path: ".", type: "dir" };
 
   const parts = path === "/" ? [""] : path.split("/");
-  console.log(parts);
   for (const part of parts) {
     if (curr.type === "file") return curr;
     curr = curr.children.find((c) => c.name === part);

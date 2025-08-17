@@ -1,6 +1,9 @@
 export interface CommandMap {
   "internal.context.open": (ctx: { anchor: HTMLElement; items: MenuItem[] }) => void;
   "internal.context.close": () => void;
+  "internal.explorer.refresh": () => void;
+  "internal.explorer.collapseall": () => void;
+  "internal.explorer.collapse": (ctx: { path: string }) => void;
   "file.new": (ctx: { path: string }) => void;
   "folder.new": (ctx: { path: string }) => void;
   "edit.undo": (ctx: undefined) => void;

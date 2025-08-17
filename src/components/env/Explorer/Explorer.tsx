@@ -9,7 +9,7 @@ import {
   useRef,
   useState,
 } from "react";
-import { buildIndex, ExplorerState, fileTreeReducer } from "@/reducers/explorer";
+import { buildIndex, ExplorerState, fileTreeReducer, findNode } from "@/reducers/explorer";
 import { produce } from "immer";
 import { socket } from "@/config/socket";
 import { EnvContext } from "@/context/env/env.context";
@@ -26,6 +26,7 @@ import FileList from "@/components/FileList/FileList";
 import classNames from "classnames";
 import { useAppDispatch } from "@/hooks/store";
 import { notify } from "@/store/notifications";
+import bus from "@/config/bus";
 
 const root: FNodeOf<"dir"> = {
   id: 0,
@@ -60,6 +61,7 @@ const Explorer = ({ ref }: ExplorerProps) => {
   });
   useEffect(() => {
     fsIndex.current = buildIndex(fs.root);
+    setBusy(!!fs.root.isBlocked);
   }, [fs]);
   const init = useCallback(async () => {
     try {
@@ -79,7 +81,7 @@ const Explorer = ({ ref }: ExplorerProps) => {
       console.log(error);
     }
   }, [workspace.uuid]);
-  const handleFSMessage = (msg: InSocketMessage<"fs">) => {
+  const handleFSMessage = async (msg: InSocketMessage<"fs">) => {
     switch (msg.action) {
       case "batch": {
         fsDispatch({ type: "BATCH", payload: { events: msg.payload.events } });
@@ -90,6 +92,13 @@ const Explorer = ({ ref }: ExplorerProps) => {
         break;
       }
       case "resume": {
+        let path = msg.payload.path;
+        if (path === "/") path += "workspace/";
+        const resumedNode = findNode(fs.root, path.substring(10));
+        if (resumedNode) {
+          await close(resumedNode);
+          await open(resumedNode);
+        }
         fsDispatch({ type: "RESUME", payload: { path: msg.payload.path } });
         break;
       }
@@ -98,7 +107,7 @@ const Explorer = ({ ref }: ExplorerProps) => {
         break;
       }
       case "lost": {
-        // TODO
+        bus.emit("internal.explorer.collapse", { path: msg.payload.path });
         break;
       }
       default:
@@ -210,6 +219,11 @@ const Explorer = ({ ref }: ExplorerProps) => {
     }
   };
 
+  const handleRefresh = async () => {
+    await close(fs.root);
+    await open(fs.root);
+  };
+
   return (
     <EnvContext.Provider value={{ open, close, save: noop }}>
       <div className={classes.explorer}>
@@ -222,6 +236,7 @@ const Explorer = ({ ref }: ExplorerProps) => {
             </div>
             <div className={classes.titleright}>
               <button
+                onClick={() => bus.emit("file.new", { path: "" })}
                 onMouseEnter={(e: MouseEvent) => showTooltip("New File", e.clientX, e.clientY)}
                 onMouseLeave={hideTooltip}
                 className="p-0p1"
@@ -229,6 +244,7 @@ const Explorer = ({ ref }: ExplorerProps) => {
                 <Icon name="new-file" />
               </button>
               <button
+                onClick={() => bus.emit("folder.new", { path: "" })}
                 onMouseEnter={(e: MouseEvent) => showTooltip("New Folder", e.clientX, e.clientY)}
                 onMouseLeave={hideTooltip}
                 className="p-0p1"
@@ -236,6 +252,7 @@ const Explorer = ({ ref }: ExplorerProps) => {
                 <Icon name="new-folder" />
               </button>
               <button
+                onClick={handleRefresh}
                 onMouseEnter={(e: MouseEvent) => showTooltip("Refresh", e.clientX, e.clientY)}
                 onMouseLeave={hideTooltip}
                 className="p-0p1"
@@ -243,6 +260,7 @@ const Explorer = ({ ref }: ExplorerProps) => {
                 <Icon name="refresh" />
               </button>
               <button
+                onClick={() => bus.emit("internal.explorer.collapseall")}
                 onMouseEnter={(e: MouseEvent) => showTooltip("Collapse All", e.clientX, e.clientY)}
                 onMouseLeave={hideTooltip}
                 className="p-0p1"
