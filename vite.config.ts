@@ -42,14 +42,21 @@ export default defineConfig({
       },
     }),
     SRI(),
+    {
+      name: "html-transform",
+      transformIndexHtml(html) {
+        return html.replace(
+          "</head>",
+          ` <meta name="version" content="${pkg.version}">
+            <meta name="builddate" content="${new Date().toUTCString()}">
+          </head>`
+        );
+      },
+    },
   ],
   resolve: {
     alias: {
       "@": path.resolve(__dirname, "./src"),
     },
-  },
-  define: {
-    __APP_VERSION__: JSON.stringify(pkg.version),
-    __APP_BUILDDATE__: JSON.stringify(new Date().toUTCString()),
   },
 });

@@ -22,7 +22,7 @@ import { ViewContext } from "@/context/view/view.context";
 import Spinner from "@/components/common/Spinner/Spinner";
 import { TooltipContext } from "@/context/tooltip/tooltip.context";
 import Icon from "@/components/common/Icon/Icon";
-import FileList from "@/components/FileList/FileList";
+import FileList, { FileListRef } from "@/components/FileList/FileList";
 import classNames from "classnames";
 import { useAppDispatch } from "@/hooks/store";
 import { notify } from "@/store/notifications";
@@ -55,6 +55,7 @@ const Explorer = ({ ref }: ExplorerProps) => {
   const [fs, fsDispatch] = useReducer(produce(fileTreeReducer), initialState);
   const fsIndex = useRef<Record<string, FNode>>({});
   const dispatch = useAppDispatch();
+  const fileListRef = useRef<FileListRef>(null);
 
   useImperativeHandle(ref, () => {
     return { closeFile: close };
@@ -96,7 +97,6 @@ const Explorer = ({ ref }: ExplorerProps) => {
         if (path === "/") path += "workspace/";
         const resumedNode = findNode(fs.root, path.substring(10));
         if (resumedNode) {
-          await close(resumedNode);
           await open(resumedNode);
         }
         fsDispatch({ type: "RESUME", payload: { path: msg.payload.path } });
@@ -220,8 +220,8 @@ const Explorer = ({ ref }: ExplorerProps) => {
   };
 
   const handleRefresh = async () => {
-    await close(fs.root);
     await open(fs.root);
+    fileListRef.current?.refresh();
   };
 
   return (
@@ -271,7 +271,15 @@ const Explorer = ({ ref }: ExplorerProps) => {
           </div>
           <div className={classNames({ [classes.fs]: true, scrollable: true })}>
             {fs.root.children.length === 0 && <div className={classes.empty}>Empty workspace</div>}
-            <FileList root={fs.root} open={open} close={close} draft={draft} isDraft={fs.draft} save={save} />
+            <FileList
+              ref={fileListRef}
+              root={fs.root}
+              open={open}
+              close={close}
+              draft={draft}
+              isDraft={fs.draft}
+              save={save}
+            />
           </div>
         </div>
       </div>

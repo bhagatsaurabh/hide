@@ -1,4 +1,4 @@
-import { MouseEvent, useContext, useEffect, useMemo, useRef, useState } from "react";
+import { MouseEvent, Ref, useContext, useEffect, useImperativeHandle, useMemo, useRef, useState } from "react";
 import classes from "./FileList.module.css";
 import Spinner from "../common/Spinner/Spinner";
 import Icon from "../common/Icon/Icon";
@@ -15,6 +15,9 @@ type FlatNode = {
   depth: number;
   blocked?: boolean;
 };
+export type FileListRef = {
+  refresh: () => void;
+};
 
 interface FileListProps {
   root: FNodeOf<"dir">;
@@ -23,9 +26,10 @@ interface FileListProps {
   draft: (fnode: FNode) => void;
   save: (fnode: FNode, commit: boolean) => Promise<void>;
   isDraft: boolean;
+  ref: Ref<FileListRef>;
 }
 
-const FileList = ({ root, open, close, draft, save, isDraft }: FileListProps) => {
+const FileList = ({ root, open, close, draft, save, isDraft, ref }: FileListProps) => {
   const expandedDirs = useRef<Set<string>>(new Set());
   const [busy, setBusy] = useState<Set<number>>(new Set());
   const selected = useRef<FNode | null>(null);
@@ -74,7 +78,6 @@ const FileList = ({ root, open, close, draft, save, isDraft }: FileListProps) =>
     unsubs.push(bus.on("folder.new", () => handleNew("dir")));
     return () => unsubs.forEach((unsub) => unsub());
   }, []);
-
   useEffect(() => {
     if (isDraft && draftInputEl.current) {
       draftInputEl.current.focus();
@@ -83,7 +86,6 @@ const FileList = ({ root, open, close, draft, save, isDraft }: FileListProps) =>
       setDraftInput("");
     }
   }, [isDraft, draftInputEl]);
-
   const flatNodes = useMemo(() => {
     const result: FlatNode[] = [];
     if (!root || !root.children) return result;
@@ -109,13 +111,11 @@ const FileList = ({ root, open, close, draft, save, isDraft }: FileListProps) =>
     walk(root, 0, !!root.isBlocked, true);
     return result;
   }, [root]);
-
   useEffect(() => {
     const handleCollapseAll = () => {
       flatNodes
         .filter((node) => node.fnode.type === "dir" && node.fnode.isOpen)
         .forEach((node) => {
-          console.log(node.fnode.path);
           handleClick(node.fnode);
         });
     };
@@ -131,6 +131,13 @@ const FileList = ({ root, open, close, draft, save, isDraft }: FileListProps) =>
     unsubs.push(bus.on("internal.explorer.collapse", ({ path }) => handleCollapse(path)));
     return () => unsubs.forEach((unsub) => unsub());
   }, [flatNodes]);
+  useImperativeHandle(ref, () => ({
+    refresh,
+  }));
+
+  const refresh = () => {
+    expandedDirs.current = new Set();
+  };
 
   const handleDraftBlur = async (draftNode: FNode) => {
     setBusy((prev) => new Set([...prev, draftNode.id]));
@@ -160,8 +167,15 @@ const FileList = ({ root, open, close, draft, save, isDraft }: FileListProps) =>
     if (success) {
       if (fnode.type === "dir") {
         const newSet = new Set([...expandedDirs.current]);
-        if (newSet.has(fnode.path)) newSet.delete(fnode.path);
-        else newSet.add(fnode.path);
+        if (newSet.has(fnode.path)) {
+          expandedDirs.current.forEach((path) => {
+            if (path.startsWith(fnode.path)) {
+              newSet.delete(path);
+            }
+          });
+        } else {
+          newSet.add(fnode.path);
+        }
         expandedDirs.current = newSet;
       }
     }

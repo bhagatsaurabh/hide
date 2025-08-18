@@ -97,6 +97,8 @@ const MenuList = ({
   const handleCommandEmit = (command: keyof CommandMap) => {
     if (command === "file.new" || command === "folder.new") {
       bus.emit(command, { path: "" });
+    } else if (command.startsWith("edit") || command.startsWith("terminal") || command.startsWith("help")) {
+      bus.emit(command);
     }
   };
 

@@ -74,11 +74,14 @@ const TabGroup = ({ ref }: TabGroupProps) => {
     const handleExtAction = (action: "undo" | "redo" | "find" | "replace") => {
       if (!active) return;
       if (action === "undo" || action === "redo") {
-        editor.current?.trigger("keyboard", "undo", null);
+        editor.current?.trigger("keyboard", action, null);
+        console.log(action);
       } else if (action === "find") {
         editor.current?.getAction("actions.find")?.run();
+        console.log("find");
       } else {
         editor.current?.getAction("editor.action.startFindReplaceAction")?.run();
+        console.log("replace");
       }
     };
 
