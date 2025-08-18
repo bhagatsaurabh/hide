@@ -22,7 +22,7 @@ export const fileTreeReducer = (draftState: WritableDraft<ExplorerState>, action
       if (action.payload.forceOpen) {
         dirNode.isOpen = true;
       }
-      dirNode.children = action.payload.nodes;
+      dirNode.children = [...action.payload.nodes];
       break;
     }
     case "UNLOAD": {
@@ -54,7 +54,6 @@ export const fileTreeReducer = (draftState: WritableDraft<ExplorerState>, action
     }
     case "BATCH": {
       const events = coalescer(action.payload.events);
-      console.log("Batch coalesced:", JSON.parse(JSON.stringify(events)));
       events.forEach((event) => {
         if ((event.data as FSCoalescedCreateEvent).watchedPath) {
           const ev = event.data as FSCoalescedCreateEvent;

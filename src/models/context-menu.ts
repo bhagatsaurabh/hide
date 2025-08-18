@@ -6,13 +6,13 @@ export interface CommandMap {
   "internal.explorer.collapse": (ctx: { path: string }) => void;
   "file.new": (ctx: { path: string }) => void;
   "folder.new": (ctx: { path: string }) => void;
-  "edit.undo": (ctx: undefined) => void;
-  "edit.redo": (ctx: undefined) => void;
-  "edit.find": (ctx: undefined) => void;
-  "edit.replace": (ctx: undefined) => void;
-  "terminal.new": (ctx: undefined) => void;
-  "help.report": (ctx: undefined) => void;
-  "help.about": (ctx: undefined) => void;
+  "edit.undo": () => void;
+  "edit.redo": () => void;
+  "edit.find": () => void;
+  "edit.replace": () => void;
+  "terminal.new": () => void;
+  "help.report": () => void;
+  "help.about": () => void;
 }
 
 // eslint-disable-next-line @typescript-eslint/no-empty-object-type
