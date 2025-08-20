@@ -4,6 +4,7 @@ export interface CommandMap {
   "internal.explorer.refresh": () => void;
   "internal.explorer.collapseall": () => void;
   "internal.explorer.collapse": (ctx: { path: string }) => void;
+  "internal.file.displaced": (ctx: { ino: number }) => void;
   "file.new": (ctx: { path: string }) => void;
   "folder.new": (ctx: { path: string }) => void;
   "edit.undo": () => void;

@@ -110,6 +110,10 @@ const Explorer = ({ ref }: ExplorerProps) => {
         bus.emit("internal.explorer.collapse", { path: msg.payload.path });
         break;
       }
+      case "displaced": {
+        bus.emit("internal.file.displaced", { ino: msg.payload.ino });
+        break;
+      }
       default:
         break;
     }
@@ -187,7 +191,7 @@ const Explorer = ({ ref }: ExplorerProps) => {
       }
     } else {
       try {
-        closePath(workspace.uuid, fnode.path.substring(10));
+        closePath(workspace.uuid, fnode.path.substring(10), fnode.id);
         fsDispatch({ type: "CLOSE_FILE", payload: { path: fnode.path } });
       } catch (error) {
         console.log(error);

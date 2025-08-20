@@ -72,6 +72,10 @@
 .tabhead.active {
   background-color: #fffff0;
 }
+.name.displaced {
+  text-decoration: line-through;
+  color: rgb(255, 111, 111);
+}
 
 @media (hover: hover) {
   .tabhead button:hover {

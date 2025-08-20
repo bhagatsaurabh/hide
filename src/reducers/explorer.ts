@@ -1,6 +1,8 @@
 import { WritableDraft } from "immer";
 import { FNode, FNodeOf, FSCoalescedCreateEvent, FSCoalescedEvent, FSEvent, FTAction } from "@/models/filesystem";
 import { getPath } from "@/utils";
+import store from "@/store";
+import { notify } from "@/store/notifications";
 
 type PathPair<T> = [T, T | undefined];
 export type ExplorerState = {
@@ -118,12 +120,9 @@ export const fileTreeReducer = (draftState: WritableDraft<ExplorerState>, action
           }
         } else if (event.action === "modify") {
           // TODO: Notify users with possible integration with yjs & arbitration in-case of conflicts
-          console.log("CONFLICT !");
         } else if (event.action === "remove") {
-          // TODO: Notify users
-          console.log("DELETED !");
           const dirNode = findNode(draftState.root, event.data.watchedPath);
-          const node = findNode(draftState.root, event.data.path);
+          const node = findNode(draftState.root, event.data.path.substring(10));
           if (!node) {
             continue;
           }
@@ -132,6 +131,7 @@ export const fileTreeReducer = (draftState: WritableDraft<ExplorerState>, action
               dirNode.children!.findIndex((n) => n === node),
               1
             );
+            dirNode.children = [...dirNode.children];
           }
         }
       }
