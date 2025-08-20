@@ -68,8 +68,8 @@ export class WebsocketProvider {
     public uuid: string,
     public socket: TypedSocket,
     public doc: Doc,
-    public path: string,
-    public emit: (path: string, buf: Uint8Array) => void,
+    public ino: number,
+    public emit: (ino: number, buf: Uint8Array) => void,
     public awarenessUpdate: (
       delta: { added: number[]; removed: number[] },
       state: Map<number, UserAwareness>
@@ -87,7 +87,7 @@ export class WebsocketProvider {
           const encoder = encoding.createEncoder();
           encoding.writeVarUint(encoder, messageSync);
           syncProtocol.writeSyncStep1(encoder, this.doc);
-          this.emit(this.path.substring(10), encoding.toUint8Array(encoder));
+          this.emit(this.ino, encoding.toUint8Array(encoder));
         }
       }, resyncInterval);
     }
@@ -110,7 +110,7 @@ export class WebsocketProvider {
       const encoder = encoding.createEncoder();
       encoding.writeVarUint(encoder, messageSync);
       syncProtocol.writeUpdate(encoder, update);
-      this.emit(this.path.substring(10), encoding.toUint8Array(encoder));
+      this.emit(this.ino, encoding.toUint8Array(encoder));
     }
   }
   _awarenessUpdateHandler({ added, updated, removed }: AwarenessUpdate, _origin: typeof this) {
@@ -118,7 +118,7 @@ export class WebsocketProvider {
     const encoder = encoding.createEncoder();
     encoding.writeVarUint(encoder, messageAwareness);
     encoding.writeVarUint8Array(encoder, awarenessProtocol.encodeAwarenessUpdate(this.awareness, changedClients));
-    this.emit(this.path.substring(10), encoding.toUint8Array(encoder));
+    this.emit(this.ino, encoding.toUint8Array(encoder));
     this.awarenessUpdate({ added, removed }, this.awareness.getStates() as Map<number, UserAwareness>);
   }
 
@@ -130,7 +130,7 @@ export class WebsocketProvider {
     const encoder = encoding.createEncoder();
     encoding.writeVarUint(encoder, messageSync);
     syncProtocol.writeSyncStep1(encoder, this.doc);
-    this.emit(this.path.substring(10), encoding.toUint8Array(encoder));
+    this.emit(this.ino, encoding.toUint8Array(encoder));
 
     if (this.awareness.getLocalState() !== null) {
       const encoderAwarenessState = encoding.createEncoder();
@@ -139,14 +139,14 @@ export class WebsocketProvider {
         encoderAwarenessState,
         awarenessProtocol.encodeAwarenessUpdate(this.awareness, [this.doc.clientID])
       );
-      this.emit(this.path.substring(10), encoding.toUint8Array(encoderAwarenessState));
+      this.emit(this.ino, encoding.toUint8Array(encoderAwarenessState));
     }
   }
   receive(buf: ArrayBufferLike) {
     this.wsLastMessageReceived = time.getUnixTime();
     const encoder = readMessage(this, new Uint8Array(buf), true);
     if (encoding.length(encoder) > 1) {
-      this.emit(this.path.substring(10), encoding.toUint8Array(encoder));
+      this.emit(this.ino, encoding.toUint8Array(encoder));
     }
   }
   destroy() {

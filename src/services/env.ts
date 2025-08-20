@@ -29,8 +29,8 @@ export const openPath = async <T extends InSocketMessagePayload>(wsUuid: string,
       correlationId,
     });
   });
-export const closePath = (wsUuid: string, path: string) => {
-  socket.emit("msg", { service: "env", action: "fs.close", payload: { uuid: wsUuid, path } });
+export const closePath = (wsUuid: string, path: string, ino?: number) => {
+  socket.emit("msg", { service: "env", action: "fs.close", payload: { uuid: wsUuid, path, ino } });
 };
 export const runCommand = async <K extends keyof CommandMap>(
   wsUuid: string,

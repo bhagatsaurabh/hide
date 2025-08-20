@@ -19,6 +19,7 @@ import { Unsubscribe } from "nanoevents";
 
 type TabMetaData = {
   node: FNodeOf<"file">;
+  isDisplaced: boolean;
 };
 type TabData = {
   uri: Uri;
@@ -39,7 +40,7 @@ interface TabGroupProps {
 
 const TabGroup = ({ ref }: TabGroupProps) => {
   const [tabsMeta, setTabsMeta] = useState<TabMetaData[]>([]);
-  const tabs = useRef<Record<string, TabData>>({});
+  const tabs = useRef<Record<number, TabData>>({});
   const [active, setActive] = useState<TabMetaData | null>(null);
   const { showTooltip, hideTooltip } = useContext(TooltipContext)!;
   const headingEl = useRef<HTMLDivElement>(null);
@@ -62,7 +63,7 @@ const TabGroup = ({ ref }: TabGroupProps) => {
   useEffect(() => {
     const handleSyncMessage = (msg: InSocketMessage<"fs">) => {
       if (msg.action !== "sync") return;
-      const tab = tabs.current[msg.payload.path];
+      const tab = tabs.current[msg.payload.ino];
       if (!tab) return;
       tab.provider.receive(base64ToU8(msg.payload.buf));
     };
@@ -75,13 +76,10 @@ const TabGroup = ({ ref }: TabGroupProps) => {
       if (!active) return;
       if (action === "undo" || action === "redo") {
         editor.current?.trigger("keyboard", action, null);
-        console.log(action);
       } else if (action === "find") {
         editor.current?.getAction("actions.find")?.run();
-        console.log("find");
       } else {
         editor.current?.getAction("editor.action.startFindReplaceAction")?.run();
-        console.log("replace");
       }
     };
 
@@ -93,6 +91,20 @@ const TabGroup = ({ ref }: TabGroupProps) => {
 
     return () => unsubs.forEach((unsub) => unsub());
   }, [active]);
+  useEffect(() => {
+    const handleFileDisplaced = (ino: number) => {
+      const updatedTabsMeta = [...tabsMeta];
+      const tabMeta = updatedTabsMeta.find((tabMeta) => tabMeta.node.id === ino);
+      if (!tabMeta) return;
+
+      tabMeta.isDisplaced = true;
+      setTabsMeta(updatedTabsMeta);
+    };
+
+    const unsub = bus.on("internal.file.displaced", ({ ino }) => handleFileDisplaced(ino));
+
+    return () => unsub();
+  }, [tabsMeta]);
 
   useEffect(() => {
     mEditor.defineTheme("hide-default", {
@@ -125,8 +137,8 @@ const TabGroup = ({ ref }: TabGroupProps) => {
   }, []);
 
   useEffect(() => {
-    if (active && tabs.current[active.node.path]?.model) {
-      editor.current!.setModel(tabs.current[active.node.path]?.model);
+    if (active && tabs.current[active.node.id]?.model) {
+      editor.current!.setModel(tabs.current[active.node.id]?.model);
     }
   }, [active]);
 
@@ -140,12 +152,12 @@ const TabGroup = ({ ref }: TabGroupProps) => {
       workspace.uuid,
       socket,
       doc,
-      fnode.path,
-      (path, buf) => {
+      fnode.id,
+      (ino, buf) => {
         socket.emit("msg", {
           service: "env",
           action: "fs.sync",
-          payload: { uuid: workspace.uuid, path, buf: u8ToBase64(buf) },
+          payload: { uuid: workspace.uuid, ino, buf: u8ToBase64(buf) },
         });
       },
       ({ added, removed }, state) => {
@@ -195,8 +207,8 @@ const TabGroup = ({ ref }: TabGroupProps) => {
     const binding = new MonacoBinding(yText, model, new Set([editor.current!]), provider.awareness);
 
     const newTab: TabData = { binding, doc, node: fnode as FNodeOf<"file">, provider, uri, model };
-    tabs.current[fnode.path] = newTab;
-    const newTabMeta = { node: fnode as FNodeOf<"file"> };
+    tabs.current[fnode.id] = newTab;
+    const newTabMeta: TabMetaData = { node: fnode as FNodeOf<"file">, isDisplaced: false };
     const updatedTabsMeta = [...tabsMeta, newTabMeta];
     setTabsMeta(updatedTabsMeta);
     setActive(newTabMeta);
@@ -205,7 +217,7 @@ const TabGroup = ({ ref }: TabGroupProps) => {
     socket.emit("msg", {
       service: "env",
       action: "fs.open.ack",
-      payload: { uuid: workspace.uuid, path: fnode.path.substring(10) },
+      payload: { uuid: workspace.uuid, ino: fnode.id },
     });
 
     setBusy(false);
@@ -216,7 +228,7 @@ const TabGroup = ({ ref }: TabGroupProps) => {
       updatedTabsMeta.findIndex((tabMeta) => tabMeta === tabMetaToRemove),
       1
     );
-    const tabToRemove = tabs.current[tabMetaToRemove.node.path];
+    const tabToRemove = tabs.current[tabMetaToRemove.node.id];
     tabToRemove.binding.destroy();
     tabToRemove.provider.destroy();
     tabToRemove.model.dispose();
@@ -224,7 +236,7 @@ const TabGroup = ({ ref }: TabGroupProps) => {
 
     if (active === tabMetaToRemove) {
       if (updatedTabsMeta.length > 0) {
-        editor.current!.setModel(tabs.current[updatedTabsMeta[0].node.path].model);
+        editor.current!.setModel(tabs.current[updatedTabsMeta[0].node.id].model);
         setActive(updatedTabsMeta[0]);
       } else {
         editor.current!.setModel(null);
@@ -233,7 +245,7 @@ const TabGroup = ({ ref }: TabGroupProps) => {
     }
 
     setTabsMeta(updatedTabsMeta);
-    delete tabs.current[tabMetaToRemove.node.path];
+    delete tabs.current[tabMetaToRemove.node.id];
     closeFile(tabToRemove.node);
   };
 
@@ -258,7 +270,9 @@ const TabGroup = ({ ref }: TabGroupProps) => {
             onClick={() => setActive(tabMeta)}
           >
             <Icon name={getFileIcon(tabMeta.node.name)} fs />
-            <span className={classes.name}>{tabMeta.node.name}</span>
+            <span className={classNames({ [classes.name]: true, [classes.displaced]: tabMeta.isDisplaced })}>
+              {tabMeta.node.name}
+            </span>
             <button
               onMouseEnter={(e) => showTooltip("Close", e.clientX, e.clientY)}
               onMouseLeave={hideTooltip}

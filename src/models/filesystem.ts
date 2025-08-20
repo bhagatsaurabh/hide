@@ -29,8 +29,12 @@ export type FSResume = FSBlock;
 export type FSLost = FSBlock;
 export interface FSSync extends InSocketMessagePayload {
   uuid: string;
-  path: string;
+  ino: number;
   buf: string;
+}
+export interface FSFileDisplaced extends InSocketMessagePayload {
+  ino: number;
+  uuid: string;
 }
 export interface FSDirEntries extends InSocketMessagePayload {
   entries: FSOpenDTO[];
@@ -52,6 +56,7 @@ export type FSResponseMap = {
   resume: FSResume;
   sync: FSSync;
   lost: FSLost;
+  displaced: FSFileDisplaced;
 };
 export type FSPayload = {
   [K in keyof FSResponseMap]: {
@@ -68,14 +73,15 @@ export interface FSOpen extends OutSocketMessageEnv {
   path: string;
 }
 export interface FSOpenAck extends OutSocketMessageEnv {
-  path: string;
+  ino: number;
 }
 export interface FSSyncOut extends OutSocketMessageEnv {
-  path: string;
+  ino: number;
   buf: string;
 }
 export interface FSClose extends OutSocketMessageEnv {
   path: string;
+  ino?: number;
 }
 
 //////////////////
