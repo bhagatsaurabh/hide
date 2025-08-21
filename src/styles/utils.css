@@ -67,6 +67,10 @@
   padding-left: 0.5rem;
   padding-right: 0.5rem;
 }
+.py-0p2 {
+  padding-top: 0.2rem;
+  padding-bottom: 0.2rem;
+}
 .mb-2 {
   margin-bottom: 2rem;
 }

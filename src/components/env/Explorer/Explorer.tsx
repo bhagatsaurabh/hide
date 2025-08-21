@@ -107,10 +107,11 @@ const Explorer = ({ ref }: ExplorerProps) => {
         break;
       }
       case "lost": {
-        bus.emit("internal.explorer.collapse", { path: msg.payload.path });
+        bus.emit("internal.editor.disconnected", { ino: msg.payload.ino });
         break;
       }
       case "displaced": {
+        console.log("Displaced", msg.payload);
         bus.emit("internal.file.displaced", { ino: msg.payload.ino });
         break;
       }
@@ -119,21 +120,37 @@ const Explorer = ({ ref }: ExplorerProps) => {
     }
   };
   const handleStalePaths = useCallback(async () => {
+    if (fs.stalePaths.length === 0) return;
+
     // Unwatch all stale paths
-    await Promise.all(fs.stalePaths.map((pathPair) => closePath(workspace.uuid, pathPair[0])));
-    // Watch all new "moved" paths
+    fs.stalePaths.map((pathPair) => closePath(workspace.uuid, pathPair[0]));
+
     const newPaths = fs.stalePaths.filter((pathPair) => !!pathPair[1]).map((pathPair) => pathPair[1]!);
-    const resps = await Promise.all(newPaths.map((newPath) => openPath(workspace.uuid, newPath)));
+
+    // Watch all new "moved" paths
+    const resps = await Promise.allSettled(
+      newPaths.map((newPath) => openPath<FSDirEntries>(workspace.uuid, newPath))
+    );
     newPaths.forEach((newPath, idx) => {
-      if (resps?.[idx]?.data) {
+      if (resps[idx].status === "fulfilled") {
+        const nodes = resps[idx].value.entries.map(
+          (entry) =>
+            ({
+              id: entry.id,
+              name: entry.name,
+              path: entry.path,
+              type: entry.isDir ? "dir" : "file",
+              isOpen: false,
+            } as FNode)
+        );
         fsDispatch({
           type: "LOAD",
-          payload: { path: newPath, nodes: resps[idx].data as unknown as FNode[], forceOpen: true },
+          payload: { path: newPath, nodes, forceOpen: true },
         });
       }
     });
     fsDispatch({ type: "CLEAR_STALE", payload: null });
-  }, [fs.stalePaths, workspace.uuid]);
+  }, [fs.stalePaths, workspace.uuid, fsDispatch]);
 
   useEffect(() => {
     init();

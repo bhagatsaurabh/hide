@@ -18,7 +18,9 @@ export const openPath = async <T extends InSocketMessagePayload>(wsUuid: string,
     const handler = (msg: InSocketMessage<string>) => {
       clearTimeout(handle);
       if (msg.action === "error") rej(msg.payload.error);
-      else res(msg.payload as T);
+      else {
+        res(msg.payload as T);
+      }
     };
     const handle = setTimeout(() => rej({ code: "TIMEOUT" }), 5000);
     socket.once(correlationId, handler);

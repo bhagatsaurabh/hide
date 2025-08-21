@@ -30,7 +30,7 @@ interface FileListProps {
 }
 
 const FileList = ({ root, open, close, draft, save, isDraft, ref }: FileListProps) => {
-  const expandedDirs = useRef<Set<string>>(new Set());
+  // const expandedDirs = useRef<Set<string>>(new Set());
   const [busy, setBusy] = useState<Set<number>>(new Set());
   const selected = useRef<FNode | null>(null);
   const { hideTooltip, showTooltip } = useContext(TooltipContext)!;
@@ -95,7 +95,7 @@ const FileList = ({ root, open, close, draft, save, isDraft, ref }: FileListProp
         result.push({ fnode: node, depth, blocked });
       }
 
-      if (node.type === "dir" && (expandedDirs.current.has(node.path) || skip) && node.children) {
+      if (node.type === "dir" && /* expandedDirs.current.has(node.path) */ (node.isOpen || skip) && node.children) {
         const sortedChildren = [...node.children].sort((a, b) => {
           if (a.type === b.type) {
             return a.name.localeCompare(b.name);
@@ -136,7 +136,7 @@ const FileList = ({ root, open, close, draft, save, isDraft, ref }: FileListProp
   }));
 
   const refresh = () => {
-    expandedDirs.current = new Set();
+    // expandedDirs.current = new Set();
   };
 
   const handleDraftBlur = async (draftNode: FNode) => {
@@ -166,7 +166,7 @@ const FileList = ({ root, open, close, draft, save, isDraft, ref }: FileListProp
     }
     if (success) {
       if (fnode.type === "dir") {
-        const newSet = new Set([...expandedDirs.current]);
+        /* const newSet = new Set([...expandedDirs.current]);
         if (newSet.has(fnode.path)) {
           expandedDirs.current.forEach((path) => {
             if (path.startsWith(fnode.path)) {
@@ -176,7 +176,7 @@ const FileList = ({ root, open, close, draft, save, isDraft, ref }: FileListProp
         } else {
           newSet.add(fnode.path);
         }
-        expandedDirs.current = newSet;
+        expandedDirs.current = newSet; */
       }
     }
     setBusy((prev) => {
@@ -216,7 +216,7 @@ const FileList = ({ root, open, close, draft, save, isDraft, ref }: FileListProp
               color="#505050"
               strokeWidth={1.5}
               size={0.8}
-              style={{ transform: `rotateZ(${expandedDirs.current.has(fnode.path) ? 90 : 0}deg)` }}
+              style={{ transform: `rotateZ(${/* expandedDirs.current.has(fnode.path) */ fnode.isOpen ? 90 : 0}deg)` }}
               name="chevron-right"
             />
           )}

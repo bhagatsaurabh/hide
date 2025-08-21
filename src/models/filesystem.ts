@@ -26,7 +26,9 @@ export interface FSBlock extends InSocketMessagePayload {
   path: string;
 }
 export type FSResume = FSBlock;
-export type FSLost = FSBlock;
+export interface FSLost extends InSocketMessagePayload {
+  ino: number;
+}
 export interface FSSync extends InSocketMessagePayload {
   uuid: string;
   ino: number;

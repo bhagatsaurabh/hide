@@ -1,8 +1,6 @@
 import { WritableDraft } from "immer";
 import { FNode, FNodeOf, FSCoalescedCreateEvent, FSCoalescedEvent, FSEvent, FTAction } from "@/models/filesystem";
 import { getPath } from "@/utils";
-import store from "@/store";
-import { notify } from "@/store/notifications";
 
 type PathPair<T> = [T, T | undefined];
 export type ExplorerState = {
@@ -92,10 +90,10 @@ export const fileTreeReducer = (draftState: WritableDraft<ExplorerState>, action
 
           dirNode.children = [...dirNode.children, node];
         } else if (event.action === "move") {
-          const oldDirNode = findNode(draftState.root, event.data.from);
+          const oldDirNode = findNode(draftState.root, event.data.from.substring(10));
           let newDirNode: FNode | undefined;
-          if (event.data.to) newDirNode = findNode(draftState.root, event.data.to);
-          const node = findNode(draftState.root, event.data.oldPath);
+          if (event.data.to) newDirNode = findNode(draftState.root, event.data.to.substring(10));
+          const node = findNode(draftState.root, event.data.oldPath.substring(10));
           if (!node) {
             continue;
           }
@@ -103,23 +101,33 @@ export const fileTreeReducer = (draftState: WritableDraft<ExplorerState>, action
           if (oldDirNode && oldDirNode.type === "dir") {
             oldPath = getPath(node);
             oldDirNode.children.splice(
-              oldDirNode.children.findIndex((n) => n === node),
+              oldDirNode.children.findIndex((n) => n.id === node.id),
               1
             );
+            oldDirNode.children = [...oldDirNode.children];
           }
           if (newDirNode && newDirNode.type === "dir") {
             node.name = event.data.newPath!.substring(event.data.newPath!.lastIndexOf("/") + 1);
             node.parent = newDirNode;
+            node.path = event.data.newPath!;
             newDirNode.children.push(node);
             newPath = getPath(node);
           }
           if (node.type === "dir" && node.isOpen) {
-            node.children?.forEach((child) => child.type === "dir" && (child.isOpen = false));
+            node.children?.forEach((child) => {
+              if (child.type === "dir" && child.isOpen) {
+                child.isOpen = false;
+                child.children = [];
+              }
+            });
             node.isOpen = false;
+            node.children = [];
             stalePaths.push([oldPath!, newPath]);
           }
         } else if (event.action === "modify") {
-          // TODO: Notify users with possible integration with yjs & arbitration in-case of conflicts
+          console.log("Modify event:", event.data);
+          // Feature: Notify users with possible arbitration in-case of conflicts
+          // TODO
         } else if (event.action === "remove") {
           const dirNode = findNode(draftState.root, event.data.watchedPath);
           const node = findNode(draftState.root, event.data.path.substring(10));
@@ -128,7 +136,7 @@ export const fileTreeReducer = (draftState: WritableDraft<ExplorerState>, action
           }
           if (dirNode && dirNode.type === "dir") {
             dirNode.children!.splice(
-              dirNode.children!.findIndex((n) => n === node),
+              dirNode.children!.findIndex((n) => n.id === node.id),
               1
             );
             dirNode.children = [...dirNode.children];

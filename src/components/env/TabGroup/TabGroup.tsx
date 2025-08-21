@@ -16,10 +16,12 @@ import { InSocketMessage } from "@/models/common";
 import { auth } from "@/config/firebase";
 import bus from "@/config/bus";
 import { Unsubscribe } from "nanoevents";
+import Button from "@/components/common/Button/Button";
 
 type TabMetaData = {
   node: FNodeOf<"file">;
-  isDisplaced: boolean;
+  isDisplaced?: boolean;
+  isDisconnected?: boolean;
 };
 type TabData = {
   uri: Uri;
@@ -93,17 +95,29 @@ const TabGroup = ({ ref }: TabGroupProps) => {
   }, [active]);
   useEffect(() => {
     const handleFileDisplaced = (ino: number) => {
+      console.log("Handling");
       const updatedTabsMeta = [...tabsMeta];
       const tabMeta = updatedTabsMeta.find((tabMeta) => tabMeta.node.id === ino);
+      console.log("Tab", tabMeta);
       if (!tabMeta) return;
 
       tabMeta.isDisplaced = true;
       setTabsMeta(updatedTabsMeta);
     };
+    const handleFileDisconnected = (ino: number) => {
+      const updatedTabsMeta = [...tabsMeta];
+      const tabMeta = updatedTabsMeta.find((tabMeta) => tabMeta.node.id === ino);
+      if (!tabMeta) return;
 
-    const unsub = bus.on("internal.file.displaced", ({ ino }) => handleFileDisplaced(ino));
+      tabMeta.isDisconnected = true;
+      setTabsMeta(updatedTabsMeta);
+    };
 
-    return () => unsub();
+    const unsubs: Unsubscribe[] = [];
+    unsubs.push(bus.on("internal.editor.disconnected", ({ ino }) => handleFileDisconnected(ino)));
+    unsubs.push(bus.on("internal.file.displaced", ({ ino }) => handleFileDisplaced(ino)));
+
+    return () => unsubs.forEach((unsub) => unsub());
   }, [tabsMeta]);
 
   useEffect(() => {
@@ -208,7 +222,7 @@ const TabGroup = ({ ref }: TabGroupProps) => {
 
     const newTab: TabData = { binding, doc, node: fnode as FNodeOf<"file">, provider, uri, model };
     tabs.current[fnode.id] = newTab;
-    const newTabMeta: TabMetaData = { node: fnode as FNodeOf<"file">, isDisplaced: false };
+    const newTabMeta: TabMetaData = { node: fnode as FNodeOf<"file"> };
     const updatedTabsMeta = [...tabsMeta, newTabMeta];
     setTabsMeta(updatedTabsMeta);
     setActive(newTabMeta);
@@ -287,6 +301,15 @@ const TabGroup = ({ ref }: TabGroupProps) => {
         {busy && (
           <div className={classes.wait}>
             <Spinner size={1.2}>Loading</Spinner>
+          </div>
+        )}
+        {!busy && active && active.isDisconnected && (
+          <div className={classes.disconnected}>
+            <h3>Something went wrong</h3>
+            <h4>File disconnected, please reopen</h4>
+            <Button className="py-0p2 px-0p75" type="secondary" onClick={() => handleTabRemove(active)}>
+              Close
+            </Button>
           </div>
         )}
         <div ref={editorEl} className={classNames({ [classes.wrapper]: true, [classes.active]: !!active })}></div>
