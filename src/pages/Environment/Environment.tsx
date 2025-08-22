@@ -172,8 +172,8 @@ export const Environment = () => {
     }
     return nodes.current.get(viewId)!;
   };
-  const loadFile = (fnode: FNodeOf<"file">) => {
-    tabGroupRef.current?.add(fnode);
+  const loadFile = (fnode: FNodeOf<"file">, conflict?: { isConflicting?: boolean; conflictResolver?: string }) => {
+    tabGroupRef.current?.add(fnode, conflict);
   };
   const closeFile = (fnode: FNodeOf<"file">) => {
     explorerRef.current?.closeFile(fnode);
