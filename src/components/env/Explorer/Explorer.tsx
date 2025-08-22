@@ -107,12 +107,19 @@ const Explorer = ({ ref }: ExplorerProps) => {
         break;
       }
       case "lost": {
-        bus.emit("internal.editor.disconnected", { ino: msg.payload.ino });
+        bus.emit("internal.file.disconnected", { ino: msg.payload.ino });
         break;
       }
       case "displaced": {
-        console.log("Displaced", msg.payload);
         bus.emit("internal.file.displaced", { ino: msg.payload.ino });
+        break;
+      }
+      case "conflict": {
+        bus.emit("internal.file.conflict", { ino: msg.payload.ino, resolverUid: msg.payload.resolverUid });
+        break;
+      }
+      case "resolved": {
+        bus.emit("internal.file.conflict.resolved", { ino: msg.payload.ino });
         break;
       }
       default:
@@ -188,8 +195,8 @@ const Explorer = ({ ref }: ExplorerProps) => {
       if (!node || node.isOpen) return true;
 
       try {
-        await openPath<FSFile>(workspace.uuid, fnode.path.substring(10));
-        loadFile(fnode);
+        const { isConflicting, conflictResolver } = await openPath<FSFile>(workspace.uuid, fnode.path.substring(10));
+        loadFile(fnode, { isConflicting, conflictResolver });
         fsDispatch({ type: "OPEN_FILE", payload: { path: fnode.path } });
         return true;
       } catch (error) {

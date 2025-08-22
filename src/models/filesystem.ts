@@ -38,17 +38,24 @@ export interface FSFileDisplaced extends InSocketMessagePayload {
   ino: number;
   uuid: string;
 }
+export interface FSFileConflict extends InSocketMessagePayload {
+  ino: number;
+  uuid: string;
+  resolverUid: string;
+}
+export interface FSFileResolved extends InSocketMessagePayload {
+  ino: number;
+  uuid: string;
+}
 export interface FSDirEntries extends InSocketMessagePayload {
   entries: FSOpenDTO[];
 }
 export interface FSFile extends InSocketMessagePayload {
-  content: string;
+  isConflicting?: boolean;
+  conflictResolver?: string;
 }
 export interface FSDirEntries extends InSocketMessagePayload {
   entries: FSOpenDTO[];
-}
-export interface FSFile extends InSocketMessagePayload {
-  content: string;
 }
 export type FSNoop = InSocketMessagePayload;
 
@@ -59,6 +66,8 @@ export type FSResponseMap = {
   sync: FSSync;
   lost: FSLost;
   displaced: FSFileDisplaced;
+  conflict: FSFileConflict;
+  resolved: FSFileResolved;
 };
 export type FSPayload = {
   [K in keyof FSResponseMap]: {
@@ -76,6 +85,10 @@ export interface FSOpen extends OutSocketMessageEnv {
 }
 export interface FSOpenAck extends OutSocketMessageEnv {
   ino: number;
+}
+export interface FSConflictResolve extends OutSocketMessageEnv {
+  ino: number;
+  decision: "keep" | "reload";
 }
 export interface FSSyncOut extends OutSocketMessageEnv {
   ino: number;

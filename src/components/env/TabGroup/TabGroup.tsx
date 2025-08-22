@@ -1,4 +1,4 @@
-import { Ref, useContext, useEffect, useImperativeHandle, useRef, useState } from "react";
+import { CSSProperties, Ref, useContext, useEffect, useImperativeHandle, useRef, useState } from "react";
 import classes from "./TabGroup.module.css";
 import Icon from "@/components/common/Icon/Icon";
 import classNames from "classnames";
@@ -22,6 +22,8 @@ type TabMetaData = {
   node: FNodeOf<"file">;
   isDisplaced?: boolean;
   isDisconnected?: boolean;
+  isConflicting?: boolean;
+  conflictResolver?: string;
 };
 type TabData = {
   uri: Uri;
@@ -33,7 +35,7 @@ type TabData = {
 };
 
 export interface TabGroupRef {
-  add: (fnode: FNodeOf<"file">) => void;
+  add: (fnode: FNodeOf<"file">, conflict?: { isConflicting?: boolean; conflictResolver?: string }) => void;
 }
 
 interface TabGroupProps {
@@ -57,11 +59,11 @@ const TabGroup = ({ ref }: TabGroupProps) => {
   const userColors = useRef<Map<string, { default: string; transparent: string }>>(
     new Map(awareness.map((entry) => [entry.profile.userId, entry.color]))
   );
+  const [busyConflict, setBusyConflict] = useState("");
 
   useEffect(() => {
     userColors.current = new Map(awareness.map((entry) => [entry.profile.userId, entry.color]));
   }, [awareness]);
-
   useEffect(() => {
     const handleSyncMessage = (msg: InSocketMessage<"fs">) => {
       if (msg.action !== "sync") return;
@@ -112,14 +114,37 @@ const TabGroup = ({ ref }: TabGroupProps) => {
       tabMeta.isDisconnected = true;
       setTabsMeta(updatedTabsMeta);
     };
+    const handleFileConflict = (ino: number, resolverUid: string) => {
+      console.log("Conflict:", ino, resolverUid);
+      const updatedTabsMeta = [...tabsMeta];
+      const tabMeta = updatedTabsMeta.find((tabMeta) => tabMeta.node.id === ino);
+      if (!tabMeta) return;
+
+      tabMeta.isConflicting = true;
+      tabMeta.conflictResolver = resolverUid;
+      setTabsMeta(updatedTabsMeta);
+      setBusyConflict("");
+    };
+    const handleFileResolved = (ino: number) => {
+      console.log("Resolved:", ino);
+      const updatedTabsMeta = [...tabsMeta];
+      const tabMeta = updatedTabsMeta.find((tabMeta) => tabMeta.node.id === ino);
+      if (!tabMeta) return;
+
+      tabMeta.isConflicting = false;
+      delete tabMeta.conflictResolver;
+      setTabsMeta(updatedTabsMeta);
+      setBusyConflict("");
+    };
 
     const unsubs: Unsubscribe[] = [];
-    unsubs.push(bus.on("internal.editor.disconnected", ({ ino }) => handleFileDisconnected(ino)));
+    unsubs.push(bus.on("internal.file.disconnected", ({ ino }) => handleFileDisconnected(ino)));
     unsubs.push(bus.on("internal.file.displaced", ({ ino }) => handleFileDisplaced(ino)));
+    unsubs.push(bus.on("internal.file.conflict", ({ ino, resolverUid }) => handleFileConflict(ino, resolverUid)));
+    unsubs.push(bus.on("internal.file.conflict.resolved", ({ ino }) => handleFileResolved(ino)));
 
     return () => unsubs.forEach((unsub) => unsub());
   }, [tabsMeta]);
-
   useEffect(() => {
     mEditor.defineTheme("hide-default", {
       base: "vs",
@@ -149,14 +174,13 @@ const TabGroup = ({ ref }: TabGroupProps) => {
       }
     };
   }, []);
-
   useEffect(() => {
     if (active && tabs.current[active.node.id]?.model) {
       editor.current!.setModel(tabs.current[active.node.id]?.model);
     }
   }, [active]);
 
-  const handleTabAdd = (fnode: FNode) => {
+  const handleTabAdd = (fnode: FNode, conflict: { isConflicting?: boolean; conflictResolver?: string } = {}) => {
     setBusy(true);
 
     const uri = Uri.parse(`inmemory://model/${fnode.path}`);
@@ -234,6 +258,10 @@ const TabGroup = ({ ref }: TabGroupProps) => {
       payload: { uuid: workspace.uuid, ino: fnode.id },
     });
 
+    if (conflict.isConflicting) {
+      bus.emit("internal.file.conflict", { ino: fnode.id, resolverUid: conflict.conflictResolver! });
+      console.log("Emitted");
+    }
     setBusy(false);
   };
   const handleTabRemove = (tabMetaToRemove: TabMetaData) => {
@@ -250,11 +278,11 @@ const TabGroup = ({ ref }: TabGroupProps) => {
 
     if (active === tabMetaToRemove) {
       if (updatedTabsMeta.length > 0) {
-        editor.current!.setModel(tabs.current[updatedTabsMeta[0].node.id].model);
         setActive(updatedTabsMeta[0]);
+        editor.current!.setModel(tabs.current[updatedTabsMeta[0].node.id].model);
       } else {
-        editor.current!.setModel(null);
         setActive(null);
+        editor.current!.setModel(null);
       }
     }
 
@@ -262,12 +290,22 @@ const TabGroup = ({ ref }: TabGroupProps) => {
     delete tabs.current[tabMetaToRemove.node.id];
     closeFile(tabToRemove.node);
   };
+  const handleConflictAction = (active: TabMetaData, decision: "keep" | "reload") => {
+    socket.emit("msg", {
+      service: "env",
+      action: "fs.conflict.resolve",
+      payload: { ino: active.node.id, uuid: workspace.uuid, decision },
+    });
+    setBusyConflict(decision);
+  };
 
   useImperativeHandle(ref, () => {
     return {
       add: handleTabAdd,
     };
   });
+
+  const resolverProfile = awareness.find((awareness) => awareness.profile.userId === active?.conflictResolver);
 
   return (
     <div className={classes.tabgroup} ref={tabGroupEl}>
@@ -287,6 +325,8 @@ const TabGroup = ({ ref }: TabGroupProps) => {
             <span className={classNames({ [classes.name]: true, [classes.displaced]: tabMeta.isDisplaced })}>
               {tabMeta.node.name}
             </span>
+            &nbsp;
+            {tabMeta.isConflicting && <span className={classes.conflictname}>(conflict)</span>}
             <button
               onMouseEnter={(e) => showTooltip("Close", e.clientX, e.clientY)}
               onMouseLeave={hideTooltip}
@@ -310,6 +350,49 @@ const TabGroup = ({ ref }: TabGroupProps) => {
             <Button className="py-0p2 px-0p75" type="secondary" onClick={() => handleTabRemove(active)}>
               Close
             </Button>
+          </div>
+        )}
+        {!busy && active && !active.isDisconnected && active.isConflicting && (
+          <div className={classes.conflict}>
+            <h3>File contents changed on disk</h3>
+            {active.conflictResolver === auth.currentUser!.uid ? (
+              <>
+                <h4>
+                  Do you want to keep your changes (overwrite file on disk) or reopen the file from disk (overwrite
+                  current changes) ?
+                </h4>
+                <br />
+                <Button
+                  className="py-0p2 px-0p75 mb-0p5"
+                  type="secondary"
+                  onClick={() => handleConflictAction(active, "keep")}
+                  busy={busyConflict === "keep"}
+                >
+                  Keep changes
+                </Button>
+                <Button
+                  className="py-0p2 px-0p75"
+                  type="tertiary"
+                  onClick={() => handleConflictAction(active, "reload")}
+                  busy={busyConflict === "reload"}
+                >
+                  Reload file
+                </Button>
+              </>
+            ) : (
+              <>
+                <h4>
+                  User{" "}
+                  <span
+                    style={{ "--resolver-accent": resolverProfile?.color.default ?? "#afafaf" } as CSSProperties}
+                    className={classes.resolver}
+                  >
+                    @{resolverProfile?.profile.username ?? "Unknown"}
+                  </span>{" "}
+                  is making a decision on whether to keep the current changes or reload from disk
+                </h4>
+              </>
+            )}
           </div>
         )}
         <div ref={editorEl} className={classNames({ [classes.wrapper]: true, [classes.active]: !!active })}></div>
