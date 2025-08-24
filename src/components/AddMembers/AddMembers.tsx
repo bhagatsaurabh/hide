@@ -11,6 +11,8 @@ import { WorkspaceDTO } from "@/models/workspace";
 import Button from "../common/Button/Button";
 import PillGroup, { Pill } from "../common/PillGroup/PillGroup";
 import { updateExistingWorkspace } from "@/store/workspace";
+import { getSSHKey } from "@/utils/driver";
+import { auth } from "@/config/firebase";
 
 interface AddMembersProps {
   workspace: WorkspaceDTO;
@@ -61,12 +63,14 @@ const AddMembers = ({ workspace, onBack }: AddMembersProps) => {
     setInvBusy(true);
     const updatedMembers = new Set(workspace.memberships.map((member) => member.userId));
     added.forEach((member) => updatedMembers.add(member.id as string));
+    const sshKey = await getSSHKey(auth.currentUser!.uid, workspace.uuid);
     const res = await dispatch(
       updateExistingWorkspace({
         id: workspace.id,
         description: workspace.description,
         name: workspace.name,
         members: [...updatedMembers],
+        sshKey,
       })
     );
     if (res.payload) {

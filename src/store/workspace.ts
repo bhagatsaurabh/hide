@@ -141,7 +141,8 @@ export const respondToInvitation = createAsyncThunk<void, { accept: boolean; ntf
   async ({ accept, ntfn }, { dispatch }) => {
     try {
       if (accept) {
-        await acceptInvitation({ id: ntfn.id, token: ntfn.token });
+        const res = await acceptInvitation({ id: ntfn.id, token: ntfn.token });
+        await storeSSHKey(auth.currentUser!.uid, ntfn.workspaceUUID, res.data.sshKey);
         await dispatch(fetchWorkspaces());
       } else {
         await ignoreInvitation({ id: ntfn.id, token: ntfn.token });

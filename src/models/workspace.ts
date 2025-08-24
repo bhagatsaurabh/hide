@@ -45,6 +45,7 @@ export interface WorkspaceUpdateDTO {
   name: string;
   description: string;
   members?: string[];
+  sshKey: string;
 }
 
 export interface ProvisionDTO {

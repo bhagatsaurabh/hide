@@ -125,7 +125,6 @@ export const fileTreeReducer = (draftState: WritableDraft<ExplorerState>, action
             stalePaths.push([oldPath!, newPath]);
           }
         } else if (event.action === "modify") {
-          console.log("Modify event:", event.data);
           // Ignored: Arbitration on conflict resolution for opened documents handled separately.
         } else if (event.action === "remove") {
           const dirNode = findNode(draftState.root, event.data.watchedPath);

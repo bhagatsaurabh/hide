@@ -195,8 +195,8 @@ const Explorer = ({ ref }: ExplorerProps) => {
       if (!node || node.isOpen) return true;
 
       try {
-        const { isConflicting, conflictResolver } = await openPath<FSFile>(workspace.uuid, fnode.path.substring(10));
-        loadFile(fnode, { isConflicting, conflictResolver });
+        const data = await openPath<FSFile>(workspace.uuid, fnode.path.substring(10));
+        loadFile(fnode, { isConflicting: data.isConflicting, conflictResolver: data.conflictResolver });
         fsDispatch({ type: "OPEN_FILE", payload: { path: fnode.path } });
         return true;
       } catch (error) {
