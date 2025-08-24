@@ -21,7 +21,7 @@ export const updateWorkspace = async (data: WorkspaceUpdateDTO) => {
 };
 
 export const acceptInvitation = async (data: InvitationAcceptDTO) => {
-  return await api.post("/workspace/accept", data);
+  return await api.post<{ sshKey: string }>("/workspace/accept", data);
 };
 
 export const ignoreInvitation = async (data: InvitationIgnoreDTO) => {

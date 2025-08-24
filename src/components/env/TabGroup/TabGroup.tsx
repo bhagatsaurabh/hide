@@ -97,10 +97,8 @@ const TabGroup = ({ ref }: TabGroupProps) => {
   }, [active]);
   useEffect(() => {
     const handleFileDisplaced = (ino: number) => {
-      console.log("Handling");
       const updatedTabsMeta = [...tabsMeta];
       const tabMeta = updatedTabsMeta.find((tabMeta) => tabMeta.node.id === ino);
-      console.log("Tab", tabMeta);
       if (!tabMeta) return;
 
       tabMeta.isDisplaced = true;
@@ -115,7 +113,6 @@ const TabGroup = ({ ref }: TabGroupProps) => {
       setTabsMeta(updatedTabsMeta);
     };
     const handleFileConflict = (ino: number, resolverUid: string) => {
-      console.log("Conflict:", ino, resolverUid);
       const updatedTabsMeta = [...tabsMeta];
       const tabMeta = updatedTabsMeta.find((tabMeta) => tabMeta.node.id === ino);
       if (!tabMeta) return;
@@ -126,7 +123,6 @@ const TabGroup = ({ ref }: TabGroupProps) => {
       setBusyConflict("");
     };
     const handleFileResolved = (ino: number) => {
-      console.log("Resolved:", ino);
       const updatedTabsMeta = [...tabsMeta];
       const tabMeta = updatedTabsMeta.find((tabMeta) => tabMeta.node.id === ino);
       if (!tabMeta) return;
@@ -248,6 +244,11 @@ const TabGroup = ({ ref }: TabGroupProps) => {
     tabs.current[fnode.id] = newTab;
     const newTabMeta: TabMetaData = { node: fnode as FNodeOf<"file"> };
     const updatedTabsMeta = [...tabsMeta, newTabMeta];
+    if (conflict.isConflicting) {
+      newTabMeta.isConflicting = conflict.isConflicting;
+      newTabMeta.conflictResolver = conflict.conflictResolver;
+      setBusyConflict("");
+    }
     setTabsMeta(updatedTabsMeta);
     setActive(newTabMeta);
 
@@ -258,10 +259,6 @@ const TabGroup = ({ ref }: TabGroupProps) => {
       payload: { uuid: workspace.uuid, ino: fnode.id },
     });
 
-    if (conflict.isConflicting) {
-      bus.emit("internal.file.conflict", { ino: fnode.id, resolverUid: conflict.conflictResolver! });
-      console.log("Emitted");
-    }
     setBusy(false);
   };
   const handleTabRemove = (tabMetaToRemove: TabMetaData) => {
