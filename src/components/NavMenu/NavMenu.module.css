@@ -30,9 +30,30 @@
   font-size: 1.25rem;
   padding: 0.5rem 1.5rem;
 }
+.actions {
+  display: none;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 0.5rem;
+}
 
 @media (hover: hover) {
   .link:hover {
     color: rgb(169, 169, 169);
+  }
+}
+
+@media (min-width: 768px) {
+}
+
+@media (min-width: 1024px) {
+  .menu {
+    display: none;
+  }
+  .button {
+    display: none;
+  }
+  .actions {
+    display: flex;
   }
 }

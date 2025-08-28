@@ -1,0 +1,39 @@
+@media (min-width: 1024px) {
+  .ntfnslist {
+    display: none;
+  }
+  .menu {
+    position: absolute;
+    right: 0;
+    top: calc(100% + 1.5rem);
+    z-index: 150;
+    min-width: 20rem;
+    max-width: 25rem;
+    background-color: rgba(128, 128, 128, 0.5);
+    box-shadow: 0 0 10px 0px #00000052;
+    border-radius: 0.25rem;
+    padding: 1rem;
+  }
+  .menu .header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0.75rem;
+  }
+  .menu .header .title {
+    font-size: 1rem;
+    color: white;
+    font-weight: 300;
+    margin: 0;
+  }
+  .menu .ntfns {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    color: white;
+  }
+  .menu .ntfns .emptyitem {
+    font-weight: 200;
+    font-size: 0.9rem;
+  }
+}

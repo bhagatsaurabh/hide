@@ -63,7 +63,7 @@
 .mb-1 {
   margin-bottom: 1rem;
 }
-.px-0p5 {
+.px-0p5.px-0p5 {
   padding-left: 0.5rem;
   padding-right: 0.5rem;
 }
@@ -167,15 +167,15 @@
   padding-left: 1rem;
   padding-right: 1rem;
 }
-.px-0p75 {
+.px-0p75.px-0p75 {
   padding-left: 0.75rem;
   padding-right: 0.75rem;
 }
-.py-0p5 {
+.py-0p5.py-0p5 {
   padding-top: 0.5rem;
   padding-bottom: 0.5rem;
 }
-.py-0p25 {
+.py-0p25.py-0p25 {
   padding-top: 0.25rem;
   padding-bottom: 0.25rem;
 }

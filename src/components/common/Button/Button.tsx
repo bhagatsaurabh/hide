@@ -47,7 +47,9 @@ const Button = ({
   const iconClasses = ["va-text-bottom"];
 
   if (children) {
-    content.push(isText(children) ? <span style={{ lineHeight: `${size * 1.5}rem` }}>{children}</span> : children);
+    content.push(
+      isText(children) ? <span style={!fit ? { lineHeight: `${size * 1.5}rem` } : {}}>{children}</span> : children
+    );
   }
   if (icon) {
     content.push(
