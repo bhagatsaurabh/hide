@@ -48,7 +48,7 @@ const views = {
 export const Environment = () => {
   const workspaceId = useLoaderData<typeof workspaceLoader>();
   const workspace = useAppSelector((state) => selectWorkspaceById(state, workspaceId))!;
-  const isMobile = useMediaQuery("(max-width: 767px)");
+  const isMobile = useMediaQuery("(max-width: 768px)");
   const schema = isMobile ? /* schemaMobile */ schemaDesktop : schemaDesktop;
   const [dimension, setDimension] = useState({ width: window.innerWidth, height: window.innerHeight });
   const containerRef = useRef<HTMLDivElement>(null);
