@@ -12,6 +12,7 @@ import Button from "@/components/common/Button/Button";
 import Spinner from "@/components/common/Spinner/Spinner";
 import Icon from "@/components/common/Icon/Icon";
 import { notify } from "@/store/notifications";
+import { InternalNotificationPayload } from "@/models/notification";
 
 export const CreateProfile = () => {
   const dispatch = useAppDispatch();
@@ -77,7 +78,13 @@ export const CreateProfile = () => {
     if (success) {
       dispatch(setStatus(AuthStatus.SIGNED_IN));
     } else {
-      dispatch(notify({ message: "Profile creation failed, try again", status: "error", title: "Create profile" }));
+      dispatch(
+        notify({
+          message: "Profile creation failed, try again",
+          status: "error",
+          title: "Create profile",
+        } as InternalNotificationPayload)
+      );
     }
     setBusy(false);
   };

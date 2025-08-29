@@ -1,3 +1,5 @@
+import { NotificationType } from "@/models/notification";
+
 export const usernameRegex = /^[^!@#$%^&*()+={}[\]`~:;"?/<>\s]{3,}$/;
 export const nameRegex = /^.[^!@#$%^&*()+={}[\]`~:;"?/<>]{3,}$/;
 export const descRegex = /^.[^!@#$%^&*()+={}[\]`~:;"?/<>]{3,}$/;
@@ -25,3 +27,5 @@ export const imageToIcon: Record<string, string> = {
   "hide-env-deno": "deno",
   "hide-env-deno-dev": "deno",
 };
+
+export const persistentNtfnsTypes: NotificationType[] = ["workspace-invite"];

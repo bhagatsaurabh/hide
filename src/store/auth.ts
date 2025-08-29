@@ -7,6 +7,7 @@ import { collection, getDocs, query, where } from "firebase/firestore";
 import { notify } from "./notifications";
 import { checkNetwork } from "@/utils";
 import { register } from "@/services/user";
+import { InternalNotificationPayload } from "@/models/notification";
 
 export enum AuthStatus {
   PENDING,
@@ -97,7 +98,7 @@ export const signIn = createAsyncThunk<void, { type: AuthType }>("auth/sign-in",
         status: "error",
         title: "Could not sign in",
         message: checkNetwork("Something went wrong, please try again"),
-      })
+      } as InternalNotificationPayload)
     );
     dispatch(setStatus(AuthStatus.PENDING));
     console.log(error);
@@ -122,7 +123,11 @@ export const signOut = createAsyncThunk("auth/sign-out", async (_, { dispatch })
   } catch (error) {
     console.log(error);
     dispatch(
-      notify({ title: "Couldn't sign you out", status: "error", message: "Something went wrong, please try again" })
+      notify({
+        title: "Couldn't sign you out",
+        status: "error",
+        message: "Something went wrong, please try again",
+      } as InternalNotificationPayload)
     );
   } finally {
     dispatch(setStatus(AuthStatus.SIGNED_OUT));

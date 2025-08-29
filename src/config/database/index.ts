@@ -6,7 +6,7 @@ const openDB = async (uid?: string, version?: number) => {
 
     request.addEventListener("upgradeneeded", () => {
       const database = request.result;
-      createSchema(database, uid);
+      createSchema(database, uid, ["sshkeys", "notifications"]);
     });
 
     request.addEventListener("success", () => {
@@ -25,12 +25,14 @@ const openDB = async (uid?: string, version?: number) => {
     });
   });
 };
-const createSchema = (database: IDBDatabase, uid?: string) => {
-  if (uid) {
-    const keystoreName = `sshkeys:${uid}`;
-    if (!database.objectStoreNames.contains(keystoreName)) {
-      database.createObjectStore(keystoreName);
-    }
+const createSchema = (database: IDBDatabase, uid?: string, objectStores?: string[]) => {
+  if (uid && objectStores) {
+    objectStores.forEach((objectStore) => {
+      const objectStoreName = `${objectStore}:${uid}`;
+      if (!database.objectStoreNames.contains(objectStoreName)) {
+        database.createObjectStore(objectStoreName);
+      }
+    });
   }
 };
 const schemaChange = async (uid: string) => {

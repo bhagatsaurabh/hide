@@ -18,6 +18,7 @@ export interface UserNotificationPayload extends InSocketMessagePayload {
   id: string;
   createdOn: string;
   actedOn?: string;
+  isPersistent?: boolean;
 }
 
 export interface WorkspaceInvite extends UserNotificationPayload {

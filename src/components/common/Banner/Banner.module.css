@@ -1,0 +1,85 @@
+.banner {
+  position: fixed;
+  right: 2rem;
+  top: 2rem;
+  width: 22rem;
+  z-index: 100;
+}
+.banner ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 1rem;
+}
+.banner ul li {
+  padding: 1rem 1.25rem;
+  background-color: #eaeaea;
+  color: rgb(24 24 24);
+  border-radius: 0.75rem;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 5px 5px 25px 0 #2b2b2b;
+}
+.banner ul li .heading {
+  margin-bottom: 0.5rem;
+  display: flex;
+}
+.heading .title {
+  margin: 0;
+  margin-right: 0.75rem;
+  font-size: 1rem;
+  font-weight: 400;
+  vertical-align: middle;
+}
+.heading.heading button {
+  color: grey;
+}
+.banner ul li .msg {
+  overflow-wrap: break-word;
+  padding-right: 1rem;
+  font-weight: 300;
+  font-size: 0.9rem;
+}
+.icon {
+  flex-shrink: 0;
+  border-radius: 0.75rem;
+  width: 1rem;
+  height: 1rem;
+  margin-right: 0.75rem;
+  display: inline;
+  vertical-align: middle;
+}
+.icon.info {
+  color: #7070c5;
+}
+.icon.info-warning {
+  color: #dc6161;
+}
+.icon.warning {
+  color: #bdaa00;
+}
+.icon.success {
+  color: #649b64;
+}
+.icon.error {
+  color: #dc6161;
+}
+.mark {
+  background-color: #80808047;
+  padding: 0.25rem 0.5rem;
+  border-radius: 1rem;
+}
+.controls {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 1rem;
+  margin-top: 1rem;
+}
+.controls.controls.controls button {
+  margin-left: 0;
+}

@@ -198,6 +198,9 @@
   pointer-events: all;
 }
 
+.position-relative {
+  position: relative;
+}
 .absolute-center {
   position: absolute;
   left: 50%;
@@ -363,6 +366,9 @@
 }
 .ml-0p5 {
   margin-left: 0.5rem;
+}
+.ml-auto {
+  margin-left: auto;
 }
 .ml-0p75 {
   margin-left: 0.75rem;

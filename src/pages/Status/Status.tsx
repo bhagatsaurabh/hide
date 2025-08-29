@@ -10,6 +10,7 @@ import { noop } from "@/utils";
 import { socket } from "@/config/socket";
 import { ProvisionPayload } from "@/models/workspace";
 import { processNewWorkspace } from "@/store/workspace";
+import { InternalNotificationPayload } from "@/models/notification";
 
 export const Status = () => {
   const navigate = useNavigate();
@@ -36,7 +37,7 @@ export const Status = () => {
           title: "Could not provision workspace",
           status: "error",
           message: "Something went wrong while provisioning your workspace, please try again later",
-        })
+        } as InternalNotificationPayload)
       );
       handleDismiss(-1);
     } else if (provStatus?.action === "success") {

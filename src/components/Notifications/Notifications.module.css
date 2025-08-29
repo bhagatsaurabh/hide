@@ -1,24 +1,44 @@
+.ntfnicon svg {
+  margin-left: 0 !important;
+}
+
 @media (min-width: 1024px) {
   .ntfnslist {
     display: none;
   }
+  .count {
+    position: absolute;
+    right: 0;
+    background-color: #ececec;
+    color: #000;
+    padding: 0.08rem 0.2rem;
+    border-radius: 50%;
+    font-size: 0.65rem;
+    min-width: 1rem;
+    top: -9%;
+  }
   .menu {
     position: absolute;
     right: 0;
-    top: calc(100% + 1.5rem);
+    top: 100%;
     z-index: 150;
     min-width: 20rem;
     max-width: 25rem;
-    background-color: rgba(128, 128, 128, 0.5);
+    background-color: rgb(94, 94, 94);
     box-shadow: 0 0 10px 0px #00000052;
     border-radius: 0.25rem;
     padding: 1rem;
+  }
+  .menuopen {
+    z-index: 155;
+    border-bottom-left-radius: 0 !important;
+    border-bottom-right-radius: 0 !important;
   }
   .menu .header {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 0.75rem;
+    margin-bottom: 1.5rem;
   }
   .menu .header .title {
     font-size: 1rem;
@@ -31,9 +51,75 @@
     padding: 0;
     margin: 0;
     color: white;
+    overflow: hidden;
   }
   .menu .ntfns .emptyitem {
     font-weight: 200;
     font-size: 0.9rem;
+  }
+
+  .icon {
+    display: inline;
+    vertical-align: middle;
+    flex-shrink: 0;
+    border-radius: 0.75rem;
+    width: 1rem;
+    height: 1rem;
+    margin-right: 0.75rem;
+  }
+  .icon.info {
+    color: #7070c5;
+  }
+  .icon.info-warning {
+    color: #dc6161;
+  }
+  .icon.warning {
+    color: #bdaa00;
+  }
+  .icon.success {
+    color: #649b64;
+  }
+  .icon.error {
+    color: #dc6161;
+  }
+
+  .item {
+    position: relative;
+    padding-bottom: 0.5rem;
+    margin-bottom: 0.5rem;
+    border-bottom: 1px solid grey;
+  }
+  .item .heading {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0.5rem;
+  }
+  .item .heading .title {
+    margin: 0;
+    font-weight: 400;
+    margin-right: 0.75rem;
+    font-size: 1rem;
+    vertical-align: middle;
+  }
+  .item .msg {
+    overflow-wrap: break-word;
+    font-size: 0.85rem;
+  }
+
+  .controls {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    gap: 1rem;
+    margin-top: 1rem;
+  }
+  .controls.controls.controls button {
+    margin-left: 0;
+  }
+  .mark {
+    background-color: #80808047;
+    padding: 0.25rem 0.5rem;
+    border-radius: 1rem;
   }
 }

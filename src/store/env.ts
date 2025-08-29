@@ -4,6 +4,7 @@ import { RootState } from ".";
 import { close, open } from "@/services/env";
 import { notify } from "./notifications";
 import { EnvCloseDTO, EnvOpenDTO } from "@/models/env";
+import { InternalNotificationPayload } from "@/models/notification";
 
 type EnvState = {
   uuid: string;
@@ -38,7 +39,7 @@ export const openEnv = createAsyncThunk<{ success: boolean; wait?: boolean }, En
           title: "Failed to open workspace",
           message: "Could not open workspace, please try again later",
           status: "error",
-        })
+        } as InternalNotificationPayload)
       );
     }
     return { success: false };
