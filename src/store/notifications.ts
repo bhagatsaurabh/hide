@@ -8,7 +8,11 @@ import {
   UserNotificationPayload,
   WorkspaceInvite,
 } from "@/models/notification";
-import { getAllPersistentNotifications, storePersistentNotification } from "@/utils/driver";
+import {
+  deletePersistentNotification,
+  getAllPersistentNotifications,
+  storePersistentNotification,
+} from "@/utils/driver";
 import { auth } from "@/config/firebase";
 import { persistentNtfnsTypes } from "@/utils/constants";
 import { getDetails } from "@/services/user";
@@ -73,6 +77,7 @@ export const ntfnsSlice = createSlice({
         );
         state.active = updatedActive;
       }
+      deletePersistentNotification(auth.currentUser!.uid, action.payload);
     },
     removeAllNotifications: (state) => {
       state.pending = state.pending.filter((ntfn) => ntfn.isPersistent);

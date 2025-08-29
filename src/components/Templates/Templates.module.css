@@ -1,6 +1,6 @@
 .heading {
   font-size: 2rem;
-  font-weight: 400;
+  font-weight: 200;
   color: beige;
   text-align: center;
 }
@@ -34,5 +34,16 @@
 @media (hover: hover) {
   .template:hover {
     cursor: pointer;
+  }
+}
+
+@media (min-width: 768px) {
+  .template {
+    width: 9rem;
+  }
+}
+@media (min-width: 1024px) {
+  .template {
+    width: 10rem;
   }
 }

@@ -323,25 +323,58 @@
 }
 
 @media (min-width: 768px) {
-  .sm\:w-7p5 {
-    width: 7.5rem;
+  .sm\:w-3 {
+    width: 3rem;
   }
-  .sm\:var-w-7p5 {
-    --item-width: 7.5rem;
+  .sm\:w-4 {
+    width: 4rem;
+  }
+  .sm\:w-6 {
+    width: 6rem;
+  }
+  .sm\:h-3 {
+    height: 3rem;
+  }
+  .sm\:h-4 {
+    height: 4rem;
   }
   .sm\:h-6 {
     height: 6rem;
   }
+  .sm\:h-4p8 {
+    height: 4.8rem;
+  }
+  .sm\:var-w-6 {
+    --item-width: 6rem;
+  }
 }
 @media (min-width: 1024px) {
-  .md\:w-2 {
-    width: 2rem;
+  .md\:w-4 {
+    width: 4rem;
   }
-  .md\:var-w-10 {
-    --item-width: 10rem;
+  .md\:w-5 {
+    width: 5rem;
   }
-  .md\:h-2 {
-    height: 2rem;
+  .md\:w-7 {
+    width: 7rem;
+  }
+  .md\:h-4 {
+    height: 4rem;
+  }
+  .md\:h-5 {
+    height: 5rem;
+  }
+  .md\:h-5p6 {
+    height: 5.6rem;
+  }
+  .md\:w-10 {
+    width: 10rem;
+  }
+  .md\:h-8 {
+    height: 8rem;
+  }
+  .md\:var-w-7 {
+    --item-width: 7rem;
   }
 }
 

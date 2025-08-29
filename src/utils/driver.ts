@@ -1,5 +1,5 @@
 import { schemaChange } from "@/config/database";
-import { getAll, getObject, updateObject } from "@/config/database/ops";
+import { deleteObject, getAll, getObject, updateObject } from "@/config/database/ops";
 import { UserNotificationPayload } from "@/models/notification";
 
 export const storeSSHKey = async (uid: string, workspaceUUID: string, sshKey: string) => {
@@ -20,4 +20,8 @@ export const storePersistentNotification = async (uid: string, ntfn: UserNotific
 
 export const getAllPersistentNotifications = async (uid: string) => {
   return await getAll<UserNotificationPayload>(`notifications:${uid}`);
+};
+
+export const deletePersistentNotification = async (uid: string, ntfnId: string) => {
+  await deleteObject(`notifications:${uid}`, ntfnId);
 };

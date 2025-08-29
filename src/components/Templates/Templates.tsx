@@ -19,7 +19,7 @@ const Templates = () => {
       <div className={classes.list}>
         {tmplts.map((template, idx) => (
           <a key={idx} className={classes.template} href={(template as Record<string, string>)["data-href"]}>
-            <Image {...template} className="w-3 h-3 sm:w-7p5 sm:h-6 md:w-10 md:h-8 of-contain" asset />
+            <Image {...template} className="w-3 h-3 sm:w-4 sm:h-4 md:w-5 md:h-5 of-contain" asset />
             <span>{template.alt}</span>
           </a>
         ))}

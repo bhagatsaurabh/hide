@@ -8,7 +8,6 @@ import {
   removeAllNotifications,
   removeNotification,
   selectNotifications,
-  setPending,
 } from "@/store/notifications";
 import { readNotification } from "@/services/notifications";
 import Modal, { ModalRef } from "../common/Modal/Modal";
@@ -16,13 +15,11 @@ import classes from "./Notifications.module.css";
 import Button from "../common/Button/Button";
 import { socket } from "@/config/socket";
 import {
-  ExclusionData,
   InternalNotificationPayload,
   InternalNotificationType,
   UserNotificationPayload,
   WorkspaceInvite,
 } from "@/models/notification";
-import { getDetails } from "@/services/user";
 import { respondToInvitation, selectConnected } from "@/store/workspace";
 import { useMediaQuery } from "@/hooks/media-query";
 import Backdrop from "../common/Backdrop/Backdrop";
@@ -32,9 +29,6 @@ import warning from "@/assets/icons/warning.svg?react";
 import success from "@/assets/icons/success.svg?react";
 import error from "@/assets/icons/error.svg?react";
 import classNames from "classnames";
-import { persistentNtfnsTypes } from "@/utils/constants";
-import { storePersistentNotification } from "@/utils/driver";
-import { auth } from "@/config/firebase";
 
 const iconMap = {
   info,
@@ -54,6 +48,19 @@ export const NotificationBar = () => {
   const connected = useAppSelector(selectConnected);
   const isHandheld = useMediaQuery("(max-width: 1024px)");
 
+  useEffect(() => {
+    setTimeout(
+      () =>
+        dispatch(
+          notify({
+            status: "error",
+            title: "Test Notification",
+            message: "This is a test notification",
+          } as InternalNotificationPayload)
+        ),
+      3000
+    );
+  }, []);
   useEffect(() => {
     if (authStatus === AuthStatus.SIGNED_IN) {
       dispatch(loadNotifications());
@@ -110,9 +117,6 @@ export const NotificationBar = () => {
   };
   const handleNtfnsClear = () => {
     dispatch(removeAllNotifications());
-  };
-  const handleNotificationRead = async (id: string) => {
-    await readNotification({ id });
   };
 
   const handleInvitation = async (ntfn: WorkspaceInvite, accept: boolean) => {
@@ -172,6 +176,47 @@ export const NotificationBar = () => {
     }
   };
 
+  const getList = () => (
+    <>
+      <div className={classes.header}>
+        <h3 className={classes.title}>Notifications</h3>
+        <Button className="px-0p5 py-0p25" size={0.85} onClick={handleNtfnsClear} fit>
+          Clear All
+        </Button>
+      </div>
+      <ul className={classes.ntfns}>
+        <AnimatePresence mode="sync">
+          {!ntfns.length && (
+            <motion.li
+              key={-1}
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ type: "tween", duration: 0.2 }}
+              layout
+              className={classes.emptyitem}
+            >
+              No new notifications
+            </motion.li>
+          )}
+          {ntfns.map((ntfn) => (
+            <motion.li
+              className={classes.item}
+              key={ntfn.id}
+              initial={{ left: "100%", opacity: 0 }}
+              animate={{ left: "0", opacity: 1 }}
+              exit={{ left: "100%", opacity: 0 }}
+              transition={{ type: "tween", duration: 0.2 }}
+              layout
+            >
+              {getNtfn(ntfn)}
+            </motion.li>
+          ))}
+        </AnimatePresence>
+      </ul>
+    </>
+  );
+
   return (
     authStatus === AuthStatus.SIGNED_IN && (
       <>
@@ -205,42 +250,7 @@ export const NotificationBar = () => {
                   transition={{ ease: "easeIn", duration: 0.15 }}
                   className={classes.menu}
                 >
-                  <div className={classes.header}>
-                    <h3 className={classes.title}>Notifications</h3>
-                    <Button className="px-0p5 py-0p25" size={0.85} onClick={handleNtfnsClear} fit>
-                      Clear All
-                    </Button>
-                  </div>
-                  <ul className={classes.ntfns}>
-                    <AnimatePresence mode="sync">
-                      {!ntfns.length && (
-                        <motion.li
-                          key={-1}
-                          initial={{ opacity: 0 }}
-                          animate={{ opacity: 1 }}
-                          exit={{ opacity: 0 }}
-                          transition={{ type: "tween", duration: 0.2 }}
-                          layout
-                          className={classes.emptyitem}
-                        >
-                          No new notifications
-                        </motion.li>
-                      )}
-                      {ntfns.map((ntfn) => (
-                        <motion.li
-                          className={classes.item}
-                          key={ntfn.id}
-                          initial={{ left: "100%", opacity: 0 }}
-                          animate={{ left: "0", opacity: 1 }}
-                          exit={{ left: "100%", opacity: 0 }}
-                          transition={{ type: "tween", duration: 0.2 }}
-                          layout
-                        >
-                          {getNtfn(ntfn)}
-                        </motion.li>
-                      ))}
-                    </AnimatePresence>
-                  </ul>
+                  {getList()}
                 </motion.div>
               )}
             </AnimatePresence>
@@ -255,17 +265,7 @@ export const NotificationBar = () => {
             full
             ignoreHeader
           >
-            <div className={classes.ntfnslist}>
-              <div className={classes.list}>{ntfns.length}</div>
-              <ul>
-                {ntfns.map((ntfn) => (
-                  <li key={ntfn.id}>
-                    {ntfn.type}
-                    <button onClick={() => handleNotificationRead(ntfn.id)}></button>
-                  </li>
-                ))}
-              </ul>
-            </div>
+            <div className={classes.list}>{getList()}</div>
           </Modal>
         )}
       </>

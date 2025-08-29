@@ -53,7 +53,12 @@ const Banner = ({ className }: BannerProps) => {
                 <Icon className={[classes.icon, classes[ntfn.status as InternalNotificationType]].join(" ")} />
                 <span className={classes.title}>{ntfn.title as string}</span>
               </div>
-              <Button icon="close" onClick={() => handleDismiss(ntfn.id)} fit />
+              <Button
+                className="p-0p5 ml-auto flex-shrink-0"
+                icon="close"
+                onClick={() => handleDismiss(ntfn.id)}
+                fit
+              />
             </div>
             <span className={classes.msg}>{ntfn.message as ReactNode}</span>
           </>
@@ -70,10 +75,11 @@ const Banner = ({ className }: BannerProps) => {
                 <span className={classes.title}>Workspace invitation</span>
               </div>
               <Button
+                type="primary"
                 className="p-0p5 ml-auto flex-shrink-0"
+                onClick={() => handleDismiss(ntfn.id)}
                 iconProps={{ strokeWidth: 2 }}
                 icon="close"
-                onClick={() => handleDismiss(ntfn.id)}
                 fit
               />
             </div>

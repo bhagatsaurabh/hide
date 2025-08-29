@@ -66,11 +66,11 @@ export const Home = () => {
         <section className={classes.display}>
           <Marquee
             Component={Image}
-            className="var-w-5 sm:var-w-7p5 md:var-w-10"
+            className="var-w-5 sm:var-w-6 md:var-w-7"
             spacing={2}
             props={templates.map((template) => ({
               ...template,
-              className: "w-5 h-4 sm:w-7p5 sm:h-6 md:w-10 md:h-8 of-contain",
+              className: "w-5 h-4 sm:w-6 sm:h-4p8 md:w-7 md:h-5p6 of-contain",
               asset: true,
             }))}
             height={9}
