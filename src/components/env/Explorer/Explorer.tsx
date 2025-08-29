@@ -27,6 +27,7 @@ import classNames from "classnames";
 import { useAppDispatch } from "@/hooks/store";
 import { notify } from "@/store/notifications";
 import bus from "@/config/bus";
+import { InternalNotificationPayload } from "@/models/notification";
 
 const root: FNodeOf<"dir"> = {
   id: 0,
@@ -242,7 +243,7 @@ const Explorer = ({ ref }: ExplorerProps) => {
           title: `Failed to create new ${fnode.type === "file" ? "file" : "directory"}`,
           status: "error",
           message: "Please try again",
-        })
+        } as InternalNotificationPayload)
       );
     }
   };

@@ -33,6 +33,7 @@ import bus from "@/config/bus";
 import Modal, { ModalRef } from "@/components/common/Modal/Modal";
 import Button from "@/components/common/Button/Button";
 import Logo from "@/components/common/Logo/Logo";
+import { InternalNotificationPayload } from "@/models/notification";
 // const schemaMobile = layoutMobile as PanelSchema;
 const schemaDesktop = layoutDesktop as PanelSchema;
 
@@ -78,7 +79,7 @@ export const Environment = () => {
           title: "Could not connect to workspace",
           status: "error",
           message: "Something went wrong while connecting to your workspace, please try again later",
-        })
+        } as InternalNotificationPayload)
       );
       navigate(-1);
       socket?.off("provision");
@@ -109,7 +110,9 @@ export const Environment = () => {
   useEffect(() => {
     const sessionId = sessionStorage.getItem("sessionId");
     if (!sessionId) {
-      dispatch(notify({ title: "No session", message: "Session inactive", status: "warning" }));
+      dispatch(
+        notify({ title: "No session", message: "Session inactive", status: "warning" } as InternalNotificationPayload)
+      );
       navigate(-1);
       return;
     }

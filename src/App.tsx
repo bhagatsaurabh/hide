@@ -7,9 +7,12 @@ import { openDB } from "./config/database";
 import { Heartbeat } from "./components/Heartbeat/Heartbeat";
 import Toast from "./components/common/Toast/Toast";
 import ContextMenu from "./components/common/ContextMenu/ContextMenu";
+import { useMediaQuery } from "./hooks/media-query";
+import Banner from "./components/common/Banner/Banner";
 
 function App() {
   const [ready, setReady] = useState(false);
+  const isHandheld = useMediaQuery("(max-width: 1024px)");
 
   useEffect(() => {
     init();
@@ -28,7 +31,7 @@ function App() {
         <>
           <AuthListener />
           <Heartbeat />
-          <Toast />
+          {isHandheld ? <Toast /> : <Banner />}
           <RouterProvider router={router} />
           <ContextMenu />
           <div style={{ display: "none" }} id="default-title"></div>

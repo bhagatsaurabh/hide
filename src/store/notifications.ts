@@ -2,7 +2,20 @@ import { createAsyncThunk, createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { RootState } from ".";
 import { getPendingNotifications } from "@/services/notifications";
 import { uuidv4 as uuid } from "lib0/random.js";
-import { UserNotificationPayload } from "@/models/notification";
+import {
+  ExclusionData,
+  InternalNotificationPayload,
+  UserNotificationPayload,
+  WorkspaceInvite,
+} from "@/models/notification";
+import {
+  deletePersistentNotification,
+  getAllPersistentNotifications,
+  storePersistentNotification,
+} from "@/utils/driver";
+import { auth } from "@/config/firebase";
+import { persistentNtfnsTypes } from "@/utils/constants";
+import { getDetails } from "@/services/user";
 
 type NotificationsState = {
   pending: UserNotificationPayload[];
@@ -64,39 +77,112 @@ export const ntfnsSlice = createSlice({
         );
         state.active = updatedActive;
       }
+      deletePersistentNotification(auth.currentUser!.uid, action.payload);
+    },
+    removeAllNotifications: (state) => {
+      state.pending = state.pending.filter((ntfn) => ntfn.isPersistent);
+      state.active = state.active.filter((ntfn) => ntfn.isPersistent);
     },
   },
 });
 
-export const fetchNotifications = createAsyncThunk("notifications/fetch-all", async (_, { dispatch }) => {
+export const fetchNotifications = createAsyncThunk<void, UserNotificationPayload[] | undefined>(
+  "notifications/fetch-all",
+  async (loadedNtfns, { dispatch }) => {
+    try {
+      let notifications: UserNotificationPayload[];
+      if (!loadedNtfns) {
+        notifications = (await getPendingNotifications()).data;
+      } else {
+        notifications = loadedNtfns;
+      }
+      const ntfns = await Promise.all(notifications.map((ntfn) => dispatch(process(ntfn)).unwrap()));
+      await Promise.allSettled(
+        ntfns
+          .filter((ntfn) => ntfn.isPersistent)
+          .map((ntfn) => storePersistentNotification(auth.currentUser!.uid, ntfn))
+      );
+      dispatch(setPending(ntfns));
+    } catch (error) {
+      console.log(error);
+      dispatch(
+        notify({
+          status: "warning",
+          title: "Could not fetch latest notifications",
+          message: "Something went wrong while getting recent notifications",
+        } as InternalNotificationPayload)
+      );
+    }
+  }
+);
+export const loadNotifications = createAsyncThunk("notifications/load-all", async (_, { dispatch }) => {
   try {
-    const res = await getPendingNotifications();
-    dispatch(setPending(res.data));
+    const ntfns = await getAllPersistentNotifications(auth.currentUser!.uid);
+    dispatch(setPending(ntfns));
   } catch (error) {
     console.log(error);
     dispatch(
       notify({
         status: "warning",
-        title: "Could not fetch latest notifications",
-        message: "Something went wrong while getting recent notifications",
-      })
+        title: "Could not load notifications",
+        message: "Something went wrong while loading notifications",
+      } as InternalNotificationPayload)
     );
   }
 });
-export const notify = createAsyncThunk<
-  void,
-  {
-    status: "info" | "info-warning" | "warning" | "success" | "error";
-    title: string;
-    message: string;
+export const notify = createAsyncThunk<void, InternalNotificationPayload | UserNotificationPayload>(
+  "notifications/notify",
+  async (ntfn, { dispatch }) => {
+    if (typeof ntfn.type === "string") {
+      ntfn = await dispatch(process(ntfn)).unwrap();
+      if (ntfn.isPersistent) {
+        await storePersistentNotification(auth.currentUser!.uid, ntfn);
+      }
+      dispatch(pushNotification(ntfn));
+    } else {
+      dispatch(
+        pushNotification({
+          id: uuid(),
+          type: "user",
+          message: ntfn.message,
+          status: ntfn.status,
+          title: ntfn.title,
+          createdOn: new Date().toISOString(),
+        })
+      );
+    }
   }
->("notifications/notify", async ({ status, message, title }, { dispatch }) => {
-  dispatch(
-    pushNotification({ id: uuid(), type: "user", message, status, title, createdOn: new Date().toISOString() })
-  );
-});
+);
+const process = createAsyncThunk<UserNotificationPayload, UserNotificationPayload>(
+  "notifications/process",
+  async (notification) => {
+    if (persistentNtfnsTypes.includes(notification.type)) {
+      notification.isPersistent = true;
+    }
+    if (notification.type === "workspace-invite") {
+      const ntfn = notification as WorkspaceInvite;
+      try {
+        const res = await getDetails(ntfn.inviterId);
+        ntfn.inviterName = res.data.name;
+        ntfn.inviterUsername = res.data.username;
+      } catch (error) {
+        console.log(error);
+        ntfn.inviterName = "Unknown";
+        ntfn.inviterUsername = "Unknown";
+      }
+    } else if (notification.type === "workspace-membership-removed") {
+      const ntfn = notification as InternalNotificationPayload;
+      ntfn.status = "info";
+      ntfn.title = "Membership removed";
+      ntfn.message = `You've been removed from workspace: ${(notification as ExclusionData).name}`;
+      ntfn.type = "user";
+    }
+    return notification;
+  }
+);
 
-export const { setPending, pushNotification, dismissNotification, removeNotification } = ntfnsSlice.actions;
+export const { setPending, pushNotification, dismissNotification, removeNotification, removeAllNotifications } =
+  ntfnsSlice.actions;
 
 export const selectNotifications = (state: RootState) => state.notifications.pending;
 export const selectActiveNotifications = (state: RootState) => state.notifications.active;

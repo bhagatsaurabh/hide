@@ -42,7 +42,7 @@ const getObject = async <T>(objectStore: string, key: string) => {
     }
   });
 };
-const updateObject = async (objectStore: string, key: string, value: string) => {
+const updateObject = async <T>(objectStore: string, key: string, value: T) => {
   return new Promise<void>((resolve, reject) => {
     try {
       const request = db.transaction(objectStore, "readwrite").objectStore(objectStore).put(value, key);

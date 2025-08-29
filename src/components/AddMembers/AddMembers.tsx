@@ -13,6 +13,7 @@ import PillGroup, { Pill } from "../common/PillGroup/PillGroup";
 import { updateExistingWorkspace } from "@/store/workspace";
 import { getSSHKey } from "@/utils/driver";
 import { auth } from "@/config/firebase";
+import { InternalNotificationPayload } from "@/models/notification";
 
 interface AddMembersProps {
   workspace: WorkspaceDTO;
@@ -39,7 +40,11 @@ const AddMembers = ({ workspace, onBack }: AddMembersProps) => {
     } catch (error) {
       console.log(error);
       dispatch(
-        notify({ title: "Something went wrong, please try again", message: "Cannot search users", status: "error" })
+        notify({
+          title: "Something went wrong, please try again",
+          message: "Cannot search users",
+          status: "error",
+        } as InternalNotificationPayload)
       );
     } finally {
       setBusy(false);
@@ -75,7 +80,11 @@ const AddMembers = ({ workspace, onBack }: AddMembersProps) => {
     );
     if (res.payload) {
       dispatch(
-        notify({ title: "Invitation sent", message: `${added.size} member(s) have been invited`, status: "success" })
+        notify({
+          title: "Invitation sent",
+          message: `${added.size} member(s) have been invited`,
+          status: "success",
+        } as InternalNotificationPayload)
       );
     }
     setInvBusy(false);

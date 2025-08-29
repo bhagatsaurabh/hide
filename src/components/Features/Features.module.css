@@ -32,3 +32,10 @@
   box-shadow: 7px 7px 20px 0 #0000004f;
   margin-bottom: 1rem;
 }
+
+@media (min-width: 1024px) {
+  .feature {
+    width: 20rem;
+    margin-top: 0;
+  }
+}

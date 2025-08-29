@@ -3,16 +3,17 @@
   padding: 2rem;
   background-color: rgb(241, 241, 241);
   overflow: hidden;
+  --duration: 25s;
+  --total-spacing: calc((var(--no-of-items) * var(--spacing)));
 }
 .marquee.marquee > * {
   position: absolute;
   top: 50%;
   transform: translateY(-50%);
-  left: max(calc(var(--item-width) * (var(--no-of-items) * var(--spacing))), 100%);
-  animation: scroll 25s linear infinite;
+  left: max(calc(var(--item-width) * var(--total-spacing)), 100%);
+  animation: scroll var(--duration) linear infinite;
   animation-delay: calc(
-    (25s / (var(--no-of-items) * var(--spacing))) *
-      ((var(--no-of-items) * var(--spacing)) - var(--item-pos) * var(--spacing)) * -1
+    (var(--duration) / var(--total-spacing)) * (var(--total-spacing) - var(--item-pos) * var(--spacing)) * -1
   );
   opacity: 0.8;
 }
@@ -20,5 +21,16 @@
 @keyframes scroll {
   to {
     left: calc(var(--item-width) * -1);
+  }
+}
+
+@media (min-width: 768px) {
+  .marquee {
+    --duration: 27.5s;
+  }
+}
+@media (min-width: 1024px) {
+  .marquee {
+    --duration: 30s;
   }
 }

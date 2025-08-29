@@ -1,5 +1,5 @@
 import { ReactNode } from "react";
-import classes from "./Toast.module.css";
+import classes from "./Banner.module.css";
 import info from "@/assets/icons/info.svg?react";
 import warning from "@/assets/icons/warning.svg?react";
 import success from "@/assets/icons/success.svg?react";
@@ -24,15 +24,15 @@ const iconMap = {
   "info-warning": info,
 };
 
-interface ToastProps {
+interface BannerProps {
   className?: string;
 }
 
-const Toast = ({ className }: ToastProps) => {
+const Banner = ({ className }: BannerProps) => {
   const notifications = useAppSelector(selectActiveNotifications);
   const dispatch = useAppDispatch();
 
-  const classNames = [classes.toast, className ?? ""];
+  const classNames = [classes.banner, className ?? ""];
 
   const handleDismiss = (id: string) => {
     dispatch(dismissNotification(id));
@@ -49,9 +49,16 @@ const Toast = ({ className }: ToastProps) => {
         return (
           <>
             <div className={classes.heading}>
-              <Icon className={[classes.icon, classes[ntfn.status as InternalNotificationType]].join(" ")} />
-              <h3>{ntfn.title as string}</h3>
-              <Button icon="close" onClick={() => handleDismiss(ntfn.id)} fit />
+              <div>
+                <Icon className={[classes.icon, classes[ntfn.status as InternalNotificationType]].join(" ")} />
+                <span className={classes.title}>{ntfn.title as string}</span>
+              </div>
+              <Button
+                className="p-0p5 ml-auto flex-shrink-0"
+                icon="close"
+                onClick={() => handleDismiss(ntfn.id)}
+                fit
+              />
             </div>
             <span className={classes.msg}>{ntfn.message as ReactNode}</span>
           </>
@@ -63,19 +70,28 @@ const Toast = ({ className }: ToastProps) => {
         return (
           <>
             <div className={classes.heading}>
-              <Icon className={[classes.icon, classes.info].join(" ")} />
-              <h3>Workspace invitation</h3>
-              <Button icon="close" onClick={() => handleDismiss(ntfn.id)} fit />
+              <div className={classes.left}>
+                <Icon className={[classes.icon, classes.info].join(" ")} />
+                <span className={classes.title}>Workspace invitation</span>
+              </div>
+              <Button
+                type="primary"
+                className="p-0p5 ml-auto flex-shrink-0"
+                onClick={() => handleDismiss(ntfn.id)}
+                iconProps={{ strokeWidth: 2 }}
+                icon="close"
+                fit
+              />
             </div>
             <span className={classes.msg}>
               You've been invited by <span className={classes.mark}>{ntfn.inviterName as string}</span> to collaborate
               on their workspace
             </span>
             <div className={classes.controls}>
-              <Button type="secondary" className="m-0 m-0" onClick={() => handleInvitation(ntfn, true)}>
+              <Button type="secondary" className="m-0 m-0 p-0p5" onClick={() => handleInvitation(ntfn, true)} fit>
                 Accept
               </Button>
-              <Button type="tertiary" className="m-0" onClick={() => handleInvitation(ntfn, false)}>
+              <Button type="tertiary" className="m-0 p-0p5" onClick={() => handleInvitation(ntfn, false)} fit>
                 Ignore
               </Button>
             </div>
@@ -89,7 +105,7 @@ const Toast = ({ className }: ToastProps) => {
     <aside className={classNames.join(" ")}>
       <ul>
         <AnimatePresence mode="popLayout">
-          {notifications.map((ntfn) => {
+          {notifications.reverse().map((ntfn) => {
             return (
               <motion.li
                 key={ntfn.id}
@@ -109,4 +125,4 @@ const Toast = ({ className }: ToastProps) => {
   );
 };
 
-export default Toast;
+export default Banner;

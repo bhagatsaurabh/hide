@@ -9,7 +9,7 @@ const Features = () => {
           <Image
             path="../../../assets/icons/cloud.svg"
             alt="Cloud icon"
-            className="w-2 h-2 sm:w-7p5 sm:h-6 md:w-10 md:h-8 of-contain"
+            className="w-2 h-2 sm:w-3 sm:h-3 md:w-4 md:h-4 of-contain"
             asset
           />
         </div>
@@ -21,7 +21,7 @@ const Features = () => {
           <Image
             path="../../../assets/icons/lock.svg"
             alt="Lock icon"
-            className="w-2 h-2 sm:w-7p5 sm:h-6 md:w-10 md:h-8 of-contain"
+            className="w-2 h-2 sm:w-3 sm:h-3 md:w-4 md:h-4 of-contain"
             asset
           />
         </div>
@@ -33,7 +33,7 @@ const Features = () => {
           <Image
             path="../../../assets/icons/refresh.svg"
             alt="Wrench icon"
-            className="w-2 h-2 sm:w-7p5 sm:h-6 md:w-10 md:h-8 of-contain"
+            className="w-2 h-2 sm:w-3 sm:h-3 md:w-4 md:h-4 of-contain"
             asset
           />
         </div>
@@ -47,7 +47,7 @@ const Features = () => {
           <Image
             path="../../../assets/icons/wrench.svg"
             alt="Wrench icon"
-            className="w-2 h-2 sm:w-7p5 sm:h-6 md:w-10 md:h-8 of-contain"
+            className="w-2 h-2 sm:w-3 sm:h-3 md:w-4 md:h-4 of-contain"
             asset
           />
         </div>
@@ -59,7 +59,7 @@ const Features = () => {
           <Image
             path="../../../assets/icons/group.svg"
             alt="Wrench icon"
-            className="w-2 h-2 sm:w-7p5 sm:h-6 md:w-10 md:h-8 of-contain"
+            className="w-2 h-2 sm:w-3 sm:h-3 md:w-4 md:h-4 of-contain"
             asset
           />
         </div>

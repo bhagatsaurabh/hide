@@ -13,7 +13,7 @@ import { RootState } from ".";
 import { auth } from "@/config/firebase";
 import { storeSSHKey } from "@/utils/driver";
 import { notify, removeNotification } from "./notifications";
-import { WorkspaceInvite } from "@/models/notification";
+import { InternalNotificationPayload, WorkspaceInvite } from "@/models/notification";
 
 type WorkspaceState = {
   workspaces: WorkspaceDTO[];
@@ -72,7 +72,7 @@ export const createNewWorkspace = createAsyncThunk<{ success: boolean; wait?: bo
           title: "Failed to create new workspace",
           message: "Something went wrong when creating new workspace, please try again later",
           status: "error",
-        })
+        } as InternalNotificationPayload)
       );
       console.log(error);
     }
@@ -91,7 +91,7 @@ export const processNewWorkspace = createAsyncThunk<void, { workspace: Workspace
           title: "Failed to create new workspace",
           message: "Something went wrong when creating new workspace, please try again later.",
           status: "error",
-        })
+        } as InternalNotificationPayload)
       );
       console.log(error);
     }
@@ -110,7 +110,7 @@ export const updateExistingWorkspace = createAsyncThunk<boolean, WorkspaceUpdate
           title: "Failed to update workspace",
           message: "Something went wrong when updating the workspace, please try again later.",
           status: "error",
-        })
+        } as InternalNotificationPayload)
       );
       console.log(error);
     }
@@ -129,7 +129,7 @@ export const deleteExistingWorkspace = createAsyncThunk<boolean, string>(
           title: "Failed to delete workspace",
           message: "Something went wrong when deleting the workspace, please try again later.",
           status: "error",
-        })
+        } as InternalNotificationPayload)
       );
       console.log(error);
     }
@@ -155,7 +155,7 @@ export const respondToInvitation = createAsyncThunk<void, { accept: boolean; ntf
           title: "Failed to accept invitation",
           message: "Something went wrong while accepting the invitation, please try again.",
           status: "error",
-        })
+        } as InternalNotificationPayload)
       );
       console.log(error);
     }
