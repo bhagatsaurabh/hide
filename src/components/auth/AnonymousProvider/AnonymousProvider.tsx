@@ -17,11 +17,12 @@ const AnonymousProvider = () => {
 
   return (
     <div className={classes["sign-guest"]}>
-      <h2 className={classes.heading}>Guest</h2>
-      <InfoBox type="info-warning" className="mb-2">
-        Guest accounts gets auto-deleted in 2 days, including all the provisioned workspaces.
+      <h2 className={classes.heading}>Sign in as a Guest</h2>
+      <InfoBox type="info-warning" className="mb-2 fs-0p9 max-width-34">
+        <span>Guest accounts gets auto-deleted in 2 days, including all the provisioned workspaces.</span>
       </InfoBox>
       <Button
+        className="px-1 py-0p5"
         busy={busy}
         disabled={busy}
         icon="chevron-right"
