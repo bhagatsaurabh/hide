@@ -1,0 +1,25 @@
+.pin {
+  display: flex;
+  gap: 0.5rem;
+}
+.input {
+  width: 2.5rem;
+  height: 3rem;
+  text-align: center;
+  font-size: 1.3rem;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  outline: none;
+}
+.errormsg {
+  width: 100%;
+  text-align: left;
+  text-overflow: ellipsis;
+  overflow: hidden;
+  white-space: nowrap;
+  font-weight: 600;
+  color: #ed7b7b;
+  transform-origin: bottom;
+  transition: transform 0.05s linear;
+  font-size: 1rem;
+}

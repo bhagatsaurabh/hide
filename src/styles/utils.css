@@ -409,6 +409,15 @@
 .flex-shrink-0 {
   flex-shrink: 0;
 }
+.fw-300 {
+  font-weight: 300;
+}
+.fs-0p9 {
+  font-size: 0.9rem;
+}
+.max-width-34 {
+  max-width: 34rem;
+}
 
 @supports selector(::-webkit-scrollbar) {
   .scrollable::-webkit-scrollbar {

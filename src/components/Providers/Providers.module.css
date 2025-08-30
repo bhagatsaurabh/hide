@@ -12,3 +12,28 @@
   flex-wrap: wrap;
   gap: 1rem;
 }
+.wrapper {
+}
+
+@media (min-width: 1024px) {
+  .wrapper {
+    display: flex;
+    align-items: center;
+  }
+  .heading {
+    padding-right: 2rem;
+    border-right: 1px solid grey;
+    height: 10rem;
+    display: flex;
+    align-items: center;
+    margin-bottom: 0;
+    font-size: 2rem;
+  }
+  .providers {
+    margin-left: 2rem;
+  }
+  .list {
+    max-width: 20rem;
+    justify-content: flex-start;
+  }
+}

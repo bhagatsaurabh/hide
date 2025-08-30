@@ -3,6 +3,8 @@ import { NotificationType } from "@/models/notification";
 export const usernameRegex = /^[^!@#$%^&*()+={}[\]`~:;"?/<>\s]{3,}$/;
 export const nameRegex = /^.[^!@#$%^&*()+={}[\]`~:;"?/<>]{3,}$/;
 export const descRegex = /^.[^!@#$%^&*()+={}[\]`~:;"?/<>]{3,}$/;
+export const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+export const emailPinRegex = /^[a-zA-Z0-9]{5}$/;
 
 export const KeyCodes = {
   KEYCODE_TAB: 9,

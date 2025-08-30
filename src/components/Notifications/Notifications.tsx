@@ -9,7 +9,6 @@ import {
   removeNotification,
   selectNotifications,
 } from "@/store/notifications";
-import { readNotification } from "@/services/notifications";
 import Modal, { ModalRef } from "../common/Modal/Modal";
 import classes from "./Notifications.module.css";
 import Button from "../common/Button/Button";
@@ -48,19 +47,6 @@ export const NotificationBar = () => {
   const connected = useAppSelector(selectConnected);
   const isHandheld = useMediaQuery("(max-width: 1024px)");
 
-  useEffect(() => {
-    setTimeout(
-      () =>
-        dispatch(
-          notify({
-            status: "error",
-            title: "Test Notification",
-            message: "This is a test notification",
-          } as InternalNotificationPayload)
-        ),
-      3000
-    );
-  }, []);
   useEffect(() => {
     if (authStatus === AuthStatus.SIGNED_IN) {
       dispatch(loadNotifications());
