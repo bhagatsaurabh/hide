@@ -9,6 +9,7 @@ export interface PINInputRef {
   validate: (val: string) => string;
   invalidate: (msg: string) => void;
   focus: () => void;
+  clear: (focus: boolean) => void;
 }
 interface PINInuptProps {
   length: number;
@@ -20,7 +21,7 @@ interface PINInuptProps {
 }
 
 const PINInput = ({ length, onChange = noop, validator = () => "", validation = "Lazy", ref }: PINInuptProps) => {
-  const [chars, setChars] = useState(Array(length).fill(""));
+  const [chars, setChars] = useState<string[]>(Array(length).fill(""));
   const inputs = useRef<HTMLInputElement[]>([]);
   const [err, setErr] = useState<string>("");
 
@@ -28,7 +29,10 @@ const PINInput = ({ length, onChange = noop, validator = () => "", validation = 
     validate,
     invalidate,
     focus: () => inputs.current[0]?.focus(),
-    err,
+    clear: (focus: boolean) => {
+      setChars(Array(length).fill(""));
+      void (focus && inputs.current[0]?.focus());
+    },
   }));
   const validate = (val: string) => {
     const errMsg = validator(val);
@@ -48,7 +52,7 @@ const PINInput = ({ length, onChange = noop, validator = () => "", validation = 
 
       const newChars = [...chars];
       newChars[index] = value;
-      setChars(newChars);
+      setChars(newChars.map((char) => char.toUpperCase()));
       onChange(newChars.join(""));
 
       if (value && index < length - 1) {
@@ -70,7 +74,7 @@ const PINInput = ({ length, onChange = noop, validator = () => "", validation = 
       pastedChars.forEach((char, idx) => {
         if (idx < length) newChars[idx] = char.toUpperCase();
       });
-      setChars(newChars);
+      setChars(newChars.map((char) => char.toUpperCase()));
       onChange(newChars.join(""));
 
       const nextIdx = Math.min(pastedChars.length, length - 1);
@@ -95,18 +99,15 @@ const PINInput = ({ length, onChange = noop, validator = () => "", validation = 
           />
         ))}
       </div>
-      <AnimatePresence>
-        {validation !== "Off" && !!err ? (
-          <motion.span
-            initial={{ scaleY: 0 }}
-            animate={{ scaleY: 1 }}
-            exit={{ scaleY: 0 }}
-            className={classNames([classes["errormsg"]])}
-          >
-            {err}
-          </motion.span>
-        ) : null}
-      </AnimatePresence>
+
+      <motion.span
+        initial={{ opacity: 0 }}
+        animate={{ opacity: validation !== "Off" ? 1 : 0 }}
+        transition={{ duration: 0.15 }}
+        className={classNames([classes["errormsg"]])}
+      >
+        {err}
+      </motion.span>
     </>
   );
 };

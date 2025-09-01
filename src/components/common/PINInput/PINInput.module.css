@@ -13,13 +13,12 @@
 }
 .errormsg {
   width: 100%;
-  text-align: left;
+  text-align: center;
+  margin-top: 1rem;
   text-overflow: ellipsis;
   overflow: hidden;
   white-space: nowrap;
   font-weight: 600;
   color: #ed7b7b;
-  transform-origin: bottom;
-  transition: transform 0.05s linear;
   font-size: 1rem;
 }

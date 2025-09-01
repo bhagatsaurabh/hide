@@ -418,6 +418,9 @@
 .max-width-34 {
   max-width: 34rem;
 }
+.w-16 {
+  width: 16rem;
+}
 
 @supports selector(::-webkit-scrollbar) {
   .scrollable::-webkit-scrollbar {
