@@ -1,5 +1,15 @@
 import { createAsyncThunk, createSlice, PayloadAction } from "@reduxjs/toolkit";
-import { getAdditionalUserInfo, signInAnonymously, signInWithEmailLink, UserCredential } from "firebase/auth";
+import {
+  AuthErrorCodes,
+  getAdditionalUserInfo,
+  GithubAuthProvider,
+  GoogleAuthProvider,
+  OAuthProvider,
+  signInAnonymously,
+  signInWithCustomToken,
+  signInWithPopup,
+  UserCredential,
+} from "firebase/auth";
 import type { RootState } from "@/store";
 import { auth, db } from "@/config/firebase";
 import { storeUser } from "@/utils/driver";
@@ -8,8 +18,16 @@ import { notify } from "./notifications";
 import { checkNetwork } from "@/utils";
 import { register } from "@/services/user";
 import { InternalNotificationPayload } from "@/models/notification";
-import { registerEmail, verifyEmail } from "@/services/auth";
+import { verifyEmail } from "@/services/auth";
 import { VerifyEmailDTO } from "@/models/auth";
+import { isAxiosError } from "axios";
+import { errorMap, UserError } from "@/utils/constants";
+import { FirebaseError } from "firebase/app";
+
+const githubAuthProvider = new GithubAuthProvider();
+githubAuthProvider.addScope("read:user");
+const googleAuthProvider = new GoogleAuthProvider();
+const microsoftAuthProvider = new OAuthProvider("microsoft.com");
 
 export enum AuthStatus {
   PENDING,
@@ -19,8 +37,11 @@ export enum AuthStatus {
   INCOMPLETE_PROFILE,
 }
 export enum AuthType {
-  GUEST,
-  EMAIL,
+  GUEST = "guest",
+  EMAIL = "email",
+  GITHUB = "github",
+  GOOGLE = "google",
+  MICROSOFT = "microsoft",
 }
 interface AuthState {
   status: AuthStatus;
@@ -85,16 +106,24 @@ export const fetchProfile = createAsyncThunk("auth/fetch-profile", async (_, { d
   dispatch(setUid(auth.currentUser!.uid));
   return profile as UserProfile;
 });
-export const signIn = createAsyncThunk<void, { type: AuthType; req?: unknown }>(
+export const signIn = createAsyncThunk<UserError | void | undefined, { type: AuthType; req?: unknown }>(
   "auth/sign-in",
   async ({ type, req }, { dispatch }) => {
     dispatch(setStatus(AuthStatus.SIGNING_IN));
     try {
+      let res: UserError | void | undefined;
       if (type === AuthType.GUEST) {
-        await dispatch(signInGuest()).unwrap();
+        res = await dispatch(signInGuest()).unwrap();
       } else if (type === AuthType.EMAIL) {
-        await dispatch(signInEmail(req as VerifyEmailDTO)).unwrap();
+        res = await dispatch(signInEmail(req as VerifyEmailDTO)).unwrap();
+      } else if (type === AuthType.GITHUB) {
+        res = await dispatch(signInGitHub()).unwrap();
+      } else if (type === AuthType.GOOGLE) {
+        res = await dispatch(signInGoogle()).unwrap();
+      } else if (type === AuthType.MICROSOFT) {
+        res = await dispatch(signInMicrosoft()).unwrap();
       }
+      return res;
     } catch (error) {
       dispatch(
         notify({
@@ -108,14 +137,118 @@ export const signIn = createAsyncThunk<void, { type: AuthType; req?: unknown }>(
     }
   }
 );
-export const signInGuest = createAsyncThunk<void, void>("auth/sign-in-guest", async (_, { dispatch }) => {
-  let userCred: UserCredential | null = null;
-  userCred = await signInAnonymously(auth);
-  await dispatch(checkSignedInUser(userCred)).unwrap();
-});
-export const signInEmail = createAsyncThunk<void, VerifyEmailDTO>("auth/sign-in-email", async ({ email, pin }) => {
-  await verifyEmail(email, pin);
-});
+export const signInGuest = createAsyncThunk<UserError | void | undefined, void>(
+  "auth/sign-in-guest",
+  async (_, { dispatch }) => {
+    const userCred = await signInAnonymously(auth);
+    await dispatch(checkSignedInUser(userCred)).unwrap();
+  }
+);
+export const signInEmail = createAsyncThunk<UserError | void | undefined, VerifyEmailDTO>(
+  "auth/sign-in-email",
+  async ({ email, code }, { dispatch }) => {
+    try {
+      const res = await verifyEmail(email, code.toUpperCase());
+      const { token } = res.data;
+      const userCred = await signInWithCustomToken(auth, token);
+      await dispatch(checkSignedInUser(userCred)).unwrap();
+    } catch (error) {
+      if (!isAxiosError(error) || !errorMap[error.response?.data.message]) {
+        console.log(error);
+        dispatch(
+          notify({
+            status: "error",
+            title: "Sign in failed",
+            message: "Something went wrong while verifying your email, please try again",
+          } as InternalNotificationPayload)
+        );
+        return;
+      }
+      return errorMap[error.response?.data.message];
+    }
+  }
+);
+export const signInGitHub = createAsyncThunk<UserError | void | undefined>(
+  "auth/sign-in-github",
+  async (_, { dispatch }) => {
+    try {
+      const userCred = await signInWithPopup(auth, githubAuthProvider);
+      await dispatch(checkSignedInUser(userCred)).unwrap();
+    } catch (error) {
+      if ((error as FirebaseError).code === AuthErrorCodes.NEED_CONFIRMATION) {
+        dispatch(
+          notify({
+            status: "error",
+            title: "Account already exists",
+            message: "Account already exists with the same email",
+          } as InternalNotificationPayload)
+        );
+        return;
+      }
+      dispatch(
+        notify({
+          status: "error",
+          title: "Sign-in failed",
+          message: "Something went wrong when signing you in, please try again",
+        } as InternalNotificationPayload)
+      );
+    }
+  }
+);
+export const signInGoogle = createAsyncThunk<UserError | void | undefined>(
+  "auth/sign-in-google",
+  async (_, { dispatch }) => {
+    try {
+      const userCred = await signInWithPopup(auth, googleAuthProvider);
+      await dispatch(checkSignedInUser(userCred)).unwrap();
+    } catch (error) {
+      if ((error as FirebaseError).code === AuthErrorCodes.NEED_CONFIRMATION) {
+        dispatch(
+          notify({
+            status: "error",
+            title: "Account already exists",
+            message: "Account already exists with the same email",
+          } as InternalNotificationPayload)
+        );
+        return;
+      }
+      dispatch(
+        notify({
+          status: "error",
+          title: "Sign-in failed",
+          message: "Something went wrong when signing you in, please try again",
+        } as InternalNotificationPayload)
+      );
+    }
+  }
+);
+export const signInMicrosoft = createAsyncThunk<UserError | void | undefined>(
+  "auth/sign-in-microsoft",
+  async (_, { dispatch }) => {
+    try {
+      const userCred = await signInWithPopup(auth, microsoftAuthProvider);
+      await dispatch(checkSignedInUser(userCred)).unwrap();
+    } catch (error) {
+      if ((error as FirebaseError).code === AuthErrorCodes.NEED_CONFIRMATION) {
+        dispatch(
+          notify({
+            status: "error",
+            title: "Account already exists",
+            message: "Account already exists with the same email",
+          } as InternalNotificationPayload)
+        );
+        return;
+      }
+      dispatch(
+        notify({
+          status: "error",
+          title: "Sign-in failed",
+          message: "Something went wrong when signing you in, please try again",
+        } as InternalNotificationPayload)
+      );
+    }
+  }
+);
 export const checkSignedInUser = createAsyncThunk<void, UserCredential>(
   "auth/check-user",
   async (userCred, { dispatch }) => {
@@ -153,5 +286,6 @@ export const { setStatus, setUsername, setName, setUid } = authSlice.actions;
 
 export const selectStatus = (state: RootState) => state.auth.status;
 export const selectUid = (state: RootState) => state.auth.uid;
+export const selectName = (state: RootState) => state.auth.name;
 
 export default authSlice.reducer;

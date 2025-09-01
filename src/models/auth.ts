@@ -1,4 +1,7 @@
 export interface VerifyEmailDTO {
   email: string;
-  pin: string;
+  code: string;
+}
+export interface RegisterEmailDTO {
+  email: string;
 }

@@ -1,6 +1,7 @@
 import { publicApi } from "@/config/axios";
-import { VerifyEmailDTO } from "@/models/auth";
+import { RegisterEmailDTO, VerifyEmailDTO } from "@/models/auth";
 import { UsernameAvailabilityDTO } from "@/models/user";
+import { AxiosResponse } from "axios";
 
 export const checkUsername = async (username: string) => {
   return await publicApi.get<UsernameAvailabilityDTO>("/check-username", {
@@ -11,9 +12,12 @@ export const checkUsername = async (username: string) => {
 };
 
 export const registerEmail = async (email: string) => {
-  return await publicApi.get("/register-email", { data: { email } });
+  return await publicApi.post<unknown, AxiosResponse<unknown>, RegisterEmailDTO>("/register-email", { email });
 };
 
-export const verifyEmail = async (email: string, pin: string) => {
-  return await publicApi.post<unknown, unknown, VerifyEmailDTO>("/verify-email", { email, pin });
+export const verifyEmail = async (email: string, code: string) => {
+  return await publicApi.post<{ token: string }, AxiosResponse<{ token: string }>, VerifyEmailDTO>("/verify-email", {
+    email,
+    code,
+  });
 };

@@ -13,6 +13,7 @@ import Spinner from "@/components/common/Spinner/Spinner";
 import Icon from "@/components/common/Icon/Icon";
 import { notify } from "@/store/notifications";
 import { InternalNotificationPayload } from "@/models/notification";
+import { auth } from "@/config/firebase";
 
 export const CreateProfile = () => {
   const dispatch = useAppDispatch();
@@ -20,7 +21,7 @@ export const CreateProfile = () => {
   const [username, setUsername] = useState("");
   const status = useAppSelector(selectStatus);
   const input = useRef<InputRef>(null);
-  const [name, setName] = useState("");
+  const [name, setName] = useState(auth.currentUser?.displayName ?? "");
   const nameInput = useRef<InputRef>(null);
   const [busy, setBusy] = useState(false);
   const [usernameCheckState, setUsernameCheckState] = useState<{

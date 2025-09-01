@@ -24,3 +24,7 @@
 .warning svg {
   color: rgb(215, 103, 103);
 }
+.actions {
+  display: flex;
+  gap: 1rem;
+}
