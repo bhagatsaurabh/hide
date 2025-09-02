@@ -1,0 +1,50 @@
+.profile {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+.profile h2 {
+  text-align: center;
+  color: #ececec;
+  font-size: 2.5rem;
+  margin: 2rem 0 2rem 0;
+  font-weight: 200;
+}
+.profile form {
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+}
+.profile form button {
+  margin-top: 2.5rem;
+}
+.usernamestate {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 2rem;
+  color: white;
+  font-weight: 200;
+  font-size: 0.9rem;
+}
+.usernamestate svg {
+  vertical-align: bottom;
+  margin-right: 0.25rem;
+}
+.avatar {
+  font-size: 0;
+  padding: 0.5rem;
+  border-radius: 50%;
+  overflow: hidden;
+  border: 1px solid #eeeeee;
+  cursor: pointer;
+}
+.avatarwrap {
+  position: relative;
+}
+.avatarwrap > button {
+  right: -0.25rem;
+  bottom: -0.25rem;
+  background-color: grey;
+}

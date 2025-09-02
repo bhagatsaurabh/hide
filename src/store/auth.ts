@@ -11,11 +11,11 @@ import {
   UserCredential,
 } from "firebase/auth";
 import type { RootState } from "@/store";
-import { auth, db } from "@/config/firebase";
+import { auth, db, storage } from "@/config/firebase";
 import { storeUser } from "@/utils/driver";
 import { collection, getDocs, query, where } from "firebase/firestore";
 import { notify } from "./notifications";
-import { checkNetwork } from "@/utils";
+import { checkNetwork, convertToPng } from "@/utils";
 import { register } from "@/services/user";
 import { InternalNotificationPayload } from "@/models/notification";
 import { verifyEmail } from "@/services/auth";
@@ -23,6 +23,8 @@ import { VerifyEmailDTO } from "@/models/auth";
 import { isAxiosError } from "axios";
 import { errorMap, UserError } from "@/utils/constants";
 import { FirebaseError } from "firebase/app";
+import { User } from "@/models/user";
+import { getDownloadURL, ref, uploadBytes } from "firebase/storage";
 
 const githubAuthProvider = new GithubAuthProvider();
 githubAuthProvider.addScope("read:user");
@@ -48,6 +50,7 @@ interface AuthState {
   username: string;
   name: string;
   uid: string;
+  picture: string;
 }
 
 const initialState: AuthState = {
@@ -55,6 +58,7 @@ const initialState: AuthState = {
   username: "",
   name: "",
   uid: "",
+  picture: "",
 };
 
 export const authSlice = createSlice({
@@ -73,21 +77,24 @@ export const authSlice = createSlice({
     setUid: (state, action: PayloadAction<string>) => {
       state.uid = action.payload;
     },
+    setPicture: (state, action: PayloadAction<string>) => {
+      state.picture = action.payload;
+    },
   },
 });
 
-type UserProfile = { name: string; username: string };
-export const createProfile = createAsyncThunk<boolean, UserProfile>(
+export const createProfile = createAsyncThunk<boolean, Pick<User, "name" | "username" | "picture">>(
   "auth/create-profile",
-  async ({ name, username }, { dispatch }) => {
+  async ({ name, username, picture }, { dispatch }) => {
     try {
       await storeUser(auth.currentUser!.uid);
 
-      await register({ name, username });
+      await register({ name, username, picture });
 
       dispatch(setName(name));
       dispatch(setUsername(username));
       dispatch(setUid(auth.currentUser!.uid));
+      dispatch(setPicture(picture));
     } catch (error) {
       void error;
       return false;
@@ -104,7 +111,7 @@ export const fetchProfile = createAsyncThunk("auth/fetch-profile", async (_, { d
   dispatch(setUsername(profile.username));
   dispatch(setName(profile.name));
   dispatch(setUid(auth.currentUser!.uid));
-  return profile as UserProfile;
+  return profile as Partial<User>;
 });
 export const signIn = createAsyncThunk<UserError | void | undefined, { type: AuthType; req?: unknown }>(
   "auth/sign-in",
@@ -173,6 +180,7 @@ export const signInGitHub = createAsyncThunk<UserError | void | undefined>(
   async (_, { dispatch }) => {
     try {
       const userCred = await signInWithPopup(auth, githubAuthProvider);
+      dispatch(setPicture(userCred.user.photoURL ?? ""));
       await dispatch(checkSignedInUser(userCred)).unwrap();
     } catch (error) {
       if ((error as FirebaseError).code === AuthErrorCodes.NEED_CONFIRMATION) {
@@ -200,6 +208,7 @@ export const signInGoogle = createAsyncThunk<UserError | void | undefined>(
   async (_, { dispatch }) => {
     try {
       const userCred = await signInWithPopup(auth, googleAuthProvider);
+      dispatch(setPicture(userCred.user.photoURL ?? ""));
       await dispatch(checkSignedInUser(userCred)).unwrap();
     } catch (error) {
       if ((error as FirebaseError).code === AuthErrorCodes.NEED_CONFIRMATION) {
@@ -227,6 +236,21 @@ export const signInMicrosoft = createAsyncThunk<UserError | void | undefined>(
   async (_, { dispatch }) => {
     try {
       const userCred = await signInWithPopup(auth, microsoftAuthProvider);
+      let picture = "";
+      try {
+        const res = await fetch("https://graph.microsoft.com/v1.0/me/photo/$value", {
+          method: "GET",
+          headers: { Authorization: "" },
+        });
+        const pngBlob = await convertToPng(await res.blob());
+        if (!pngBlob) throw new Error("Could not convert profile image to png");
+        const profileImageRef = ref(storage, `users/${userCred.user.uid}/avatar.png`);
+        await uploadBytes(profileImageRef, pngBlob);
+        picture = await getDownloadURL(profileImageRef);
+      } catch (error) {
+        console.log(error);
+      }
+      dispatch(setPicture(picture));
       await dispatch(checkSignedInUser(userCred)).unwrap();
     } catch (error) {
       if ((error as FirebaseError).code === AuthErrorCodes.NEED_CONFIRMATION) {
@@ -282,10 +306,12 @@ export const signOut = createAsyncThunk("auth/sign-out", async (_, { dispatch })
   }
 });
 
-export const { setStatus, setUsername, setName, setUid } = authSlice.actions;
+export const { setStatus, setUsername, setName, setUid, setPicture } = authSlice.actions;
 
 export const selectStatus = (state: RootState) => state.auth.status;
 export const selectUid = (state: RootState) => state.auth.uid;
 export const selectName = (state: RootState) => state.auth.name;
+export const selectUsername = (state: RootState) => state.auth.username;
+export const selectPicture = (state: RootState) => state.auth.picture;
 
 export default authSlice.reducer;
