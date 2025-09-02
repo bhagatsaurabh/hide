@@ -135,3 +135,22 @@ export const getRandomAccentColor = (opacity = 1) => {
     transparent: `hsl(${hue} ${saturation}% ${lightness}% / ${opacity})`,
   };
 };
+
+export const convertToPng = async (blob: Blob) => {
+  const img = new Image();
+  img.src = URL.createObjectURL(blob);
+  await img.decode();
+
+  const canvas = document.createElement("canvas");
+  canvas.width = img.width;
+  canvas.height = img.height;
+  const ctx = canvas.getContext("2d")!;
+  ctx.drawImage(img, 0, 0);
+
+  return new Promise<Blob | null>((resolve) => {
+    canvas.toBlob((pngBlob) => {
+      URL.revokeObjectURL(img.src);
+      resolve(pngBlob);
+    }, "image/png");
+  });
+};

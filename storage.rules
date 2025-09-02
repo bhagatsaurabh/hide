@@ -2,7 +2,18 @@ rules_version = '2';
 
 service firebase.storage {
   match /b/{bucket}/o {
-    allow read: if true;
-    allow write: if true;
+    function signedIn(request) {
+      return request.auth != null;
+    }
+    function signedInUser(request, userId) {
+      return signedIn(request) && request.auth.uid == userId;
+    }
+
+    match /users/{userId}/profile.png {
+      allow read: if signedIn(request);
+      allow write: if signedInUser(request, userId) &&
+                   request.resource.size < 2 * 1024 * 1024 &&
+                   request.resource.contentType == 'image/png';
+    }
   }
 }

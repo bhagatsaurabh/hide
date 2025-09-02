@@ -4,6 +4,7 @@ export type UsernameAvailabilityDTO = {
 export type CreateUserDTO = {
   name: string;
   username: string;
+  picture: string;
 };
 
 export type UserSearchHighlight = {

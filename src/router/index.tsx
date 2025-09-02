@@ -6,12 +6,12 @@ import { Create } from "@/pages/Create/Create";
 import { Project } from "@/pages/Project/Project";
 import { Environment } from "@/pages/Environment/Environment";
 import { authGuard, noAuthGuard, workspaceLoader } from "./guards";
-import { CreateProfile } from "@/pages/CreateProfile/CreateProfile";
 import SignIn from "@/components/SignIn/SignIn";
 import Providers from "@/components/Providers/Providers";
 import { Status } from "@/pages/Status/Status";
 import User from "@/pages/User/User";
 import CrashBoard from "@/components/common/CrashBoard/CrashBoard";
+import CreateProfile from "@/pages/CreateProfile/CreateProfile";
 
 const router = createBrowserRouter([
   {
