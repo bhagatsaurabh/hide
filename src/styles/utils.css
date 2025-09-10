@@ -63,6 +63,9 @@
 .mb-1 {
   margin-bottom: 1rem;
 }
+.w-min-content {
+  width: min-content;
+}
 .px-0p5.px-0p5 {
   padding-left: 0.5rem;
   padding-right: 0.5rem;
@@ -143,6 +146,12 @@
 }
 .jc-space-between {
   justify-content: space-between;
+}
+.p-2 {
+  padding: 2rem;
+}
+.mb-1 {
+  margin-bottom: 1rem;
 }
 .p-absolute {
   position: absolute;
@@ -266,6 +275,9 @@
 .w-5 {
   width: 5rem;
 }
+.w-6 {
+  width: 6rem;
+}
 .w-3 {
   width: 3rem;
 }
@@ -308,8 +320,15 @@
 .h-2p5 {
   height: 2.5rem;
 }
+.mx-auto {
+  margin-left: auto;
+  margin-right: auto;
+}
 .h-5 {
   height: 5rem;
+}
+.h-6 {
+  height: 6rem;
 }
 
 .br-5t {

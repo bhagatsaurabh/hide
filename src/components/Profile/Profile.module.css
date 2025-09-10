@@ -4,7 +4,7 @@
   justify-content: center;
   align-items: center;
 }
-.profile h2 {
+.profile > h2 {
   text-align: center;
   color: #ececec;
   font-size: 2.5rem;
@@ -37,8 +37,12 @@
   padding: 0.5rem;
   border-radius: 50%;
   overflow: hidden;
-  border: 1px solid #eeeeee;
   cursor: pointer;
+  box-shadow: 0 0 10px 0 #000;
+}
+.avatar.default {
+  border: 1px solid #eeeeee;
+  box-shadow: none;
 }
 .avatarwrap {
   position: relative;
@@ -47,4 +51,60 @@
   right: -0.25rem;
   bottom: -0.25rem;
   background-color: grey;
+}
+.avatarselect {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+.preview > h3 {
+  text-align: center;
+  color: #ececec;
+  font-size: 1rem;
+  margin: 0 0 0.5rem 0;
+  font-weight: 200;
+}
+.preview > img {
+  border-radius: 50%;
+  box-shadow: 0 0 20px 0 #000000ba;
+}
+.crop {
+  position: relative;
+  width: 100%;
+  padding-bottom: 100%;
+}
+.title {
+  text-align: center;
+  color: #ececec;
+  font-size: 1.75rem;
+  margin: 0 0 1.5rem 0;
+  font-weight: 200;
+}
+.actions {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 1rem;
+}
+
+@media (min-width: 768px) {
+  .crop {
+    width: 25rem;
+  }
+}
+@media (min-width: 1024px) {
+  .avatarselect {
+    flex-direction: column-reverse;
+  }
+  .crop {
+    width: 15rem;
+    padding-bottom: 15rem;
+  }
+  .preview > h3 {
+    margin-top: 1rem;
+  }
+  .preview > img {
+    margin-bottom: 0;
+  }
 }

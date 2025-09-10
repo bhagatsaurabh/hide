@@ -2,6 +2,7 @@ import { ReactNode } from "react";
 import { Location } from "react-router";
 import iconMapping from "@/assets/icon-map.json";
 import { FNode } from "@/models/filesystem";
+import { Area } from "react-easy-crop";
 
 type IconMap = {
   fileNames: Record<string, string>;
@@ -33,6 +34,53 @@ export const debounce = <C extends (...args: never[]) => Promise<never> | Promis
     if (timeout) clearTimeout(timeout);
     timeout = setTimeout(() => void func(...args), wait) as unknown as number;
   };
+};
+// Leading + Trailing
+export const throttle = <C extends (...args: unknown[]) => unknown>(func: C, wait: number) => {
+  let lastTime = 0;
+  let timeout: number | null = null;
+  let lastArgs: Parameters<C> | null = null;
+
+  const invoke = (args: Parameters<C>) => {
+    lastTime = Date.now();
+    func(...args);
+  };
+
+  const later = () => {
+    timeout = null;
+    if (lastArgs) {
+      invoke(lastArgs);
+      lastArgs = null;
+    }
+  };
+
+  const throttled = (...args: Parameters<C>) => {
+    const now = Date.now();
+    const remaining = wait - (now - lastTime);
+
+    if (lastTime === 0) {
+      invoke(args);
+    } else if (remaining <= 0) {
+      if (timeout) {
+        clearTimeout(timeout);
+        timeout = null;
+      }
+      invoke(args);
+    } else {
+      lastArgs = args;
+      if (!timeout) {
+        timeout = setTimeout(later, remaining) as unknown as number;
+      }
+    }
+  };
+
+  throttled.cancel = () => {
+    if (timeout) clearTimeout(timeout);
+    timeout = null;
+    lastArgs = null;
+  };
+
+  return throttled;
 };
 
 export const rng = (min: number, max: number) => {
@@ -151,6 +199,71 @@ export const convertToPng = async (blob: Blob) => {
     canvas.toBlob((pngBlob) => {
       URL.revokeObjectURL(img.src);
       resolve(pngBlob);
+    }, "image/png");
+  });
+};
+
+export const getCroppedImg = async (
+  src: string,
+  pixelCrop: Area,
+  rotation = 0,
+  flip = { horizontal: false, vertical: false }
+) => {
+  const image = await new Promise<HTMLImageElement>((res, rej) => {
+    const img = new Image();
+    img.addEventListener("load", () => res(img));
+    img.addEventListener("error", (error) => rej(error));
+    img.setAttribute("crossOrigin", "anonymous");
+    img.src = src;
+  });
+  const canvas = document.createElement("canvas");
+  const ctx = canvas.getContext("2d");
+
+  if (!ctx) {
+    return null;
+  }
+
+  const rotRad = (rotation * Math.PI) / 180;
+  const { width: bBoxWidth, height: bBoxHeight } = {
+    width: Math.abs(Math.cos(rotRad) * image.width) + Math.abs(Math.sin(rotRad) * image.height),
+    height: Math.abs(Math.sin(rotRad) * image.width) + Math.abs(Math.cos(rotRad) * image.height),
+  };
+
+  canvas.width = bBoxWidth;
+  canvas.height = bBoxHeight;
+
+  ctx.translate(bBoxWidth / 2, bBoxHeight / 2);
+  ctx.rotate(rotRad);
+  ctx.scale(flip.horizontal ? -1 : 1, flip.vertical ? -1 : 1);
+  ctx.translate(-image.width / 2, -image.height / 2);
+
+  ctx.drawImage(image, 0, 0);
+
+  const croppedCanvas = document.createElement("canvas");
+  const croppedCtx = croppedCanvas.getContext("2d");
+  if (!croppedCtx) {
+    return null;
+  }
+
+  croppedCanvas.width = pixelCrop.width;
+  croppedCanvas.height = pixelCrop.height;
+
+  croppedCtx.drawImage(
+    canvas,
+    pixelCrop.x,
+    pixelCrop.y,
+    pixelCrop.width,
+    pixelCrop.height,
+    0,
+    0,
+    pixelCrop.width,
+    pixelCrop.height
+  );
+
+  return new Promise<Blob | null>((res, rej) => {
+    croppedCanvas.toBlob((blob) => {
+      if (!blob) rej();
+      res(blob);
     }, "image/png");
   });
 };
