@@ -18,6 +18,7 @@ interface ButtonProps {
   type: "primary" | "secondary" | "tertiary";
   ref: RefObject<Null<HTMLButtonElement>>;
   highlight: boolean;
+  btnType?: "button" | "submit" | "reset";
   onMouseEnter?: (e: MouseEvent) => void;
   onMouseLeave?: () => void;
 }
@@ -35,6 +36,7 @@ const Button = ({
   type = "primary",
   ref,
   highlight = false,
+  btnType,
   onMouseEnter = noop,
   onMouseLeave = noop,
 }: Partial<ButtonProps>) => {
@@ -77,6 +79,7 @@ const Button = ({
 
   return (
     <button
+      type={btnType}
       ref={ref}
       disabled={disabled}
       className={classNames.join(" ")}

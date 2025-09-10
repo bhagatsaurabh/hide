@@ -16,7 +16,7 @@ import { storeUser } from "@/utils/driver";
 import { collection, getDocs, query, where } from "firebase/firestore";
 import { notify } from "./notifications";
 import { checkNetwork, convertToPng } from "@/utils";
-import { register } from "@/services/user";
+import { register, update } from "@/services/user";
 import { InternalNotificationPayload } from "@/models/notification";
 import { verifyEmail } from "@/services/auth";
 import { VerifyEmailDTO } from "@/models/auth";
@@ -111,8 +111,41 @@ export const fetchProfile = createAsyncThunk("auth/fetch-profile", async (_, { d
   dispatch(setUsername(profile.username));
   dispatch(setName(profile.name));
   dispatch(setUid(auth.currentUser!.uid));
+  dispatch(setPicture(profile.picture ?? ""));
   return profile as Partial<User>;
 });
+export const updateProfile = createAsyncThunk<boolean, Partial<Pick<User, "name" | "username" | "picture">>>(
+  "auth/update-profile",
+  async ({ name, username, picture }, { dispatch }) => {
+    try {
+      await update({ name, username, picture, uid: auth.currentUser!.uid });
+
+      if (name) {
+        dispatch(setName(name));
+      }
+      if (username) {
+        dispatch(setUsername(username));
+      }
+      if (picture) {
+        dispatch(setPicture(picture));
+      }
+    } catch (error) {
+      if (isAxiosError(error)) {
+        dispatch(
+          notify({
+            status: "error",
+            title: "Profile update failed",
+            message: "Could not update profile information, please try again",
+          } as InternalNotificationPayload)
+        );
+      } else {
+        console.log(error);
+      }
+      return false;
+    }
+    return true;
+  }
+);
 export const signIn = createAsyncThunk<UserError | void | undefined, { type: AuthType; req?: unknown }>(
   "auth/sign-in",
   async ({ type, req }, { dispatch }) => {
@@ -236,21 +269,16 @@ export const signInMicrosoft = createAsyncThunk<UserError | void | undefined>(
   async (_, { dispatch }) => {
     try {
       const userCred = await signInWithPopup(auth, microsoftAuthProvider);
-      let picture = "";
       try {
         const res = await fetch("https://graph.microsoft.com/v1.0/me/photo/$value", {
           method: "GET",
           headers: { Authorization: "" },
         });
-        const pngBlob = await convertToPng(await res.blob());
-        if (!pngBlob) throw new Error("Could not convert profile image to png");
-        const profileImageRef = ref(storage, `users/${userCred.user.uid}/avatar.png`);
-        await uploadBytes(profileImageRef, pngBlob);
-        picture = await getDownloadURL(profileImageRef);
+        const data = await res.blob();
+        await dispatch(uploadAvatar({ convert: true, data, uid: userCred.user.uid })).unwrap();
       } catch (error) {
         console.log(error);
       }
-      dispatch(setPicture(picture));
       await dispatch(checkSignedInUser(userCred)).unwrap();
     } catch (error) {
       if ((error as FirebaseError).code === AuthErrorCodes.NEED_CONFIRMATION) {
@@ -271,6 +299,21 @@ export const signInMicrosoft = createAsyncThunk<UserError | void | undefined>(
         } as InternalNotificationPayload)
       );
     }
+  }
+);
+export const uploadAvatar = createAsyncThunk<string, { convert?: boolean; data: Blob; uid: string }>(
+  "auth/upload-avatar",
+  async ({ convert = false, data, uid }, { dispatch }) => {
+    let pngBlob: Blob | null = data;
+    if (convert) {
+      pngBlob = await convertToPng(data);
+    }
+    if (!pngBlob) throw new Error("Could not convert profile image to png");
+    const profileImageRef = ref(storage, `users/${uid}/avatar.png`);
+    await uploadBytes(profileImageRef, pngBlob);
+    const picture = await getDownloadURL(profileImageRef);
+    dispatch(setPicture(picture));
+    return picture;
   }
 );
 export const checkSignedInUser = createAsyncThunk<void, UserCredential>(

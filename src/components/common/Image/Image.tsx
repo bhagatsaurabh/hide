@@ -17,8 +17,6 @@ const Image = ({ path, alt, asset = false, className, style = {} }: ImageProps) 
   const [error, setError] = useState(false);
   const classNames = [classes.image, className ?? ""];
 
-  console.log(path, asset);
-
   useEffect(() => {
     if (!asset) return;
     let isMounted = true;

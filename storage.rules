@@ -9,7 +9,7 @@ service firebase.storage {
       return signedIn(request) && request.auth.uid == userId;
     }
 
-    match /users/{userId}/profile.png {
+    match /users/{userId}/avatar.png {
       allow read: if signedIn(request);
       allow write: if signedInUser(request, userId) &&
                    request.resource.size < 2 * 1024 * 1024 &&

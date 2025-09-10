@@ -9,13 +9,13 @@ service cloud.firestore {
     function signedInUid(request, userId) {
     	return signedIn(request) && request.auth.uid == userId;
     }
-    function signedInUsername(request, username) {
-      return signedIn(request) && get(/databases/$(database)/documents/users/$(username)).data.uid == request.auth.uid;
+    function signedInUsername(request) {
+      return signedIn(request) && resource.data.uid == request.auth.uid;
     }
 
     match /users/{username} {
     	allow create: if false
-      allow read: if signedInUsername(request, username)
+      allow read: if signedInUsername(request)
       allow update: if false
       allow delete: if false
     }

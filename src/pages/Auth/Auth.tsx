@@ -39,9 +39,9 @@ export const Auth = () => {
           <AnimatePresence mode="popLayout">
             <motion.section
               key={location.pathname}
-              initial={{ opacity: 0, transform: "scale(0.96)" }}
-              animate={{ opacity: 1, transform: "scale(1)" }}
-              exit={{ opacity: 0, transform: "scale(0.96)" }}
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
               transition={{ duration: 0.15 }}
             >
               {outlet}
