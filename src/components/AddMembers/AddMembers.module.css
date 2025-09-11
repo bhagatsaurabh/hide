@@ -1,14 +1,17 @@
+.memberadd {
+  width: 100%;
+}
 .heading {
   font-weight: 300;
   margin-top: 0;
 }
 .selected {
   width: 100%;
-  height: 5rem;
-  padding: 1rem 0.5rem;
+  padding: 0.5rem;
   overflow-y: hidden;
   overflow-x: auto;
   margin-top: 1rem;
+  margin-bottom: 0.75rem;
 }
 .result {
   width: 100%;
@@ -24,13 +27,13 @@
   padding: 1.5rem 0;
   padding-right: 0.5rem;
   overflow: auto;
-  --scroll-back-color: #414141;
+  --scroll-back-color: #414041;
 }
 .list li {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 1rem;
+  margin-bottom: 0.75rem;
 }
 .info {
   flex: 1 1 auto;
@@ -44,6 +47,7 @@
 .identity svg {
   background-color: #f5f5dc40;
   flex-shrink: 0;
+  padding: 0.35rem;
 }
 .identity .details {
   margin-left: 1rem;
@@ -51,8 +55,8 @@
   min-width: 0;
 }
 .identity .name {
-  font-weight: 400;
-  font-size: 0.95rem;
+  font-weight: 300;
+  font-size: 0.85rem;
   overflow: hidden;
   white-space: nowrap;
   text-overflow: ellipsis;
@@ -60,7 +64,7 @@
   margin-right: 1rem;
 }
 .identity .username {
-  font-weight: 400;
+  font-weight: 300;
   font-size: 0.8rem;
   color: #f5f5dcbf;
 }
@@ -72,4 +76,19 @@
   justify-content: flex-end;
   width: 100%;
   gap: 1rem;
+}
+.extra {
+  font-size: 0.85rem;
+}
+
+@media (min-width: 768px) {
+  .memberadd {
+    width: 35rem;
+  }
+}
+
+@media (min-width: 1024px) {
+  .memberadd {
+    width: 45rem;
+  }
 }

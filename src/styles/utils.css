@@ -98,6 +98,9 @@
 .fs-1p5.fs-1p5 {
   font-size: 1.5rem;
 }
+.fs-1p25.fs-1p25 {
+  font-size: 1.25rem;
+}
 .fs-0p85.fs-0p85 {
   font-size: 0.85rem;
 }
@@ -200,7 +203,7 @@
 .p-1p5 {
   padding: 1.5rem;
 }
-.p-1 {
+.p-1.p-1 {
   padding: 1rem;
 }
 .pointer-events-none {
@@ -351,6 +354,9 @@
   .sm\:w-3 {
     width: 3rem;
   }
+  .sm\:w-2 {
+    width: 2rem;
+  }
   .sm\:w-4 {
     width: 4rem;
   }
@@ -359,6 +365,9 @@
   }
   .sm\:h-3 {
     height: 3rem;
+  }
+  .sm\:h-2 {
+    height: 2rem;
   }
   .sm\:h-4 {
     height: 4rem;
@@ -377,6 +386,12 @@
   .md\:w-4 {
     width: 4rem;
   }
+  .md\:w-3 {
+    width: 3rem;
+  }
+  .md\:w-2 {
+    width: 2rem;
+  }
   .md\:w-5 {
     width: 5rem;
   }
@@ -385,6 +400,12 @@
   }
   .md\:h-4 {
     height: 4rem;
+  }
+  .md\:h-3 {
+    height: 3rem;
+  }
+  .md\:h-2 {
+    height: 2rem;
   }
   .md\:h-5 {
     height: 5rem;

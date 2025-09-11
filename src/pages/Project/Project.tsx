@@ -22,6 +22,7 @@ import {
 import AddMembers from "@/components/AddMembers/AddMembers";
 import Spinner from "@/components/common/Spinner/Spinner";
 import Icon from "@/components/common/Icon/Icon";
+import { getSSHKey } from "@/utils/driver";
 
 export const Project = () => {
   const workspaceId = useLoaderData<typeof workspaceLoader>();
@@ -75,11 +76,13 @@ export const Project = () => {
     }
 
     setUpdateBusy(true);
+    const sshKey = await getSSHKey(auth.currentUser!.uid, workspace.uuid);
     await dispatch(
       updateExistingWorkspace({
         id: workspace.id,
         name: newName,
         description: newDesc,
+        sshKey,
       })
     );
     setUpdateBusy(false);
@@ -102,8 +105,9 @@ export const Project = () => {
       1
     );
     setRemoveBusy(true);
+    const sshKey = await getSSHKey(auth.currentUser!.uid, workspace.uuid);
     await dispatch(
-      updateExistingWorkspace({ name: newName, description: newDesc, id: workspace.id, members: newMembers })
+      updateExistingWorkspace({ name: newName, description: newDesc, id: workspace.id, members: newMembers, sshKey })
     );
     setRemoveBusy(false);
     diagRef.current?.close();
@@ -175,7 +179,7 @@ export const Project = () => {
           layer={2}
           className="p-1p5"
         >
-          <AddMembers workspace={workspace} onBack={() => setShowAdd(false)} />
+          <AddMembers workspace={workspace} onBack={() => addDiagRef.current?.close()} />
         </Modal>
       )}
       <Backdrop show={show} onDismiss={handleDismiss} />
@@ -188,8 +192,8 @@ export const Project = () => {
             value={newName}
             onChange={setNewName}
             type="text"
-            displayClassName="fs-1p5"
-            inputClassName="fs-1p5"
+            displayClassName="fs-1p25"
+            inputClassName="fs-1p25"
           />
           <span className={classes.creation}>Created&nbsp;{timeExpression(new Date(workspace.createdAt))}</span>
           <EditableField
@@ -210,7 +214,7 @@ export const Project = () => {
         <div className={classes.status}>
           <span>Status:&nbsp;</span>
           <span className={classes.stattext}>{isReady ? "Ready" : "Not Ready"}&nbsp;</span>
-          {isReady ? <Icon name="success" status size={1} /> : <Spinner size={1} />}
+          {isReady ? <Icon name="success" status size={0.9} /> : <Spinner size={1} />}
         </div>
         <div className={classes.actions}>
           <Button

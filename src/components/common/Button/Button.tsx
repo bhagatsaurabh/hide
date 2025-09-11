@@ -50,7 +50,7 @@ const Button = ({
 
   if (children) {
     content.push(
-      isText(children) ? <span style={!fit ? { lineHeight: `${size * 1.5}rem` } : {}}>{children}</span> : children
+      isText(children) ? <span style={!fit ? { lineHeight: `${size * 1.25}rem` } : {}}>{children}</span> : children
     );
   }
   if (icon) {

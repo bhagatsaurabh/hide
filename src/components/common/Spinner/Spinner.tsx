@@ -5,7 +5,7 @@ interface SpinnerProps {
   size: number;
   children: ReactNode;
   className: string;
-  ref: RefObject<HTMLDivElement>;
+  ref: RefObject<HTMLDivElement | null>;
 }
 
 const Spinner = ({ size, className, children, ref }: Partial<SpinnerProps>) => {

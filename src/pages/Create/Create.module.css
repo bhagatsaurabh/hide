@@ -13,3 +13,16 @@
   justify-content: space-between;
   align-items: center;
 }
+.create > label {
+  width: 100%;
+}
+
+@media (min-width: 768px) {
+  .create {
+    width: 40rem;
+  }
+  .create > label {
+    display: block;
+    width: 20rem;
+  }
+}

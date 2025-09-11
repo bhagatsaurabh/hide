@@ -13,8 +13,9 @@
 }
 .pill > svg {
   background-color: #8080804f;
+  padding: 0.35rem;
 }
 .text {
-  font-size: 0.9rem;
-  margin: 0 0.5rem;
+  font-size: 0.8rem;
+  margin: 0 0.25rem 0 0.5rem;
 }

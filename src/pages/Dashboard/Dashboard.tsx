@@ -23,7 +23,7 @@ export const Dashboard = () => {
   const { workspaces, connected } = useSelector(selectWorkspaces);
   const recent = useSelector(selectRecent);
   const [busy, setBusy] = useState(true);
-  const bodyRef = useRef<HTMLHeadingElement>(null);
+  const bodyRef = useRef<HTMLDivElement>(null);
   const outlet = useOutlet();
 
   const init = useCallback(async () => {

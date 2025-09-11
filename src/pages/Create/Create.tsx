@@ -10,6 +10,7 @@ import Button from "@/components/common/Button/Button";
 import ChipGroup, { Chip } from "@/components/common/ChipGroup/ChipGroup";
 import templates from "@/assets/templates.json";
 import { auth } from "@/config/firebase";
+import { Textarea, TextareaRef } from "@/components/common/Textarea/Textarea";
 
 interface Template {
   path: string;
@@ -22,7 +23,7 @@ export const Create = () => {
   const [description, setDescription] = useState("");
   const [busy, setBusy] = useState(false);
   const nameInput = useRef<InputRef>(null);
-  const descInput = useRef<InputRef>(null);
+  const descInput = useRef<TextareaRef>(null);
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
   const [show, setShow] = useState(true);
@@ -120,7 +121,8 @@ export const Create = () => {
           validator={validateName}
           ref={nameInput}
         />
-        <Input
+        <Textarea
+          className="scrollable"
           attrs={{ spellCheck: false, autoComplete: "off" }}
           placeholder="Description"
           type="text"
@@ -128,7 +130,6 @@ export const Create = () => {
           onChange={setDescription}
           ref={descInput}
         />
-        <br />
         <div className={classes.chips}>
           <ChipGroup onChange={(chip) => setImage(chip)} value={image.id} chips={imageChips} />
         </div>

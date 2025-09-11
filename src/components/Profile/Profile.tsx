@@ -228,11 +228,7 @@ const Profile = ({ profile, save, action }: ProfileProps) => {
               </div>
             </div>
             <div className={classes.actions}>
-              <Button
-                onClick={() => avatarModalRef.current?.close()}
-                size={1.1}
-                className="mt-1p5 px-1 py-0p5"
-              >
+              <Button onClick={() => avatarModalRef.current?.close()} size={1.1} className="mt-1p5 px-1 py-0p5">
                 Back
               </Button>
               <Button

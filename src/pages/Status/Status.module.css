@@ -17,3 +17,15 @@
   color: beige;
   font-size: 0.9rem;
 }
+
+@media (min-width: 768px) {
+  .status {
+    width: unset;
+    min-width: 15rem;
+  }
+}
+@media (min-width: 1024px) {
+  .status {
+    min-width: 20rem;
+  }
+}
