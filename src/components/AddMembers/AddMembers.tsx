@@ -14,6 +14,7 @@ import { updateExistingWorkspace } from "@/store/workspace";
 import { getSSHKey } from "@/utils/driver";
 import { auth } from "@/config/firebase";
 import { InternalNotificationPayload } from "@/models/notification";
+import classNames from "classnames";
 
 interface AddMembersProps {
   workspace: WorkspaceDTO;
@@ -107,7 +108,7 @@ const AddMembers = ({ workspace, onBack }: AddMembersProps) => {
       );
     }
     return (
-      <Button className="py-0p25 px-0p75" onClick={() => handleAdd(hit.doc)} size={1.2} type="primary">
+      <Button className="py-0p25 px-0p75" onClick={() => handleAdd(hit.doc)} size={1} type="primary">
         Add
       </Button>
     );
@@ -124,13 +125,13 @@ const AddMembers = ({ workspace, onBack }: AddMembersProps) => {
     } else {
       centered = false;
       result = (
-        <ul className={[classes.list, "scroll-shadows"].join(" ")}>
+        <ul className={[classes.list, "scroll-shadows", "scrollable"].join(" ")}>
           {hits.map((hit) => (
             <li key={hit.doc.uid}>
               <div className={classes.info}>
                 <div className={classes.identity}>
                   <Image
-                    className="p-0p35 w-3 h-3 sm:w-7p5 sm:h-6 md:w-10 md:h-8 of-contain br-5t"
+                    className="w-3 h-3 sm:w-3 sm:h-3 md:w-3 md:h-3 of-contain br-5t"
                     path={hit.doc.picture || "../../../assets/icons/guest.svg"}
                     alt={hit.doc.name}
                     asset={!hit.doc.picture}
@@ -150,11 +151,11 @@ const AddMembers = ({ workspace, onBack }: AddMembersProps) => {
   }
 
   return (
-    <>
+    <div className={classes.memberadd}>
       <h2 className={classes.heading}>Add members to {workspace.name}</h2>
       <Search onSearch={handleSearch} placeholder="Find members" />
       <div className={[classes.result, centered ? "d-flex flex-center flex-column" : ""].join(" ")}>{result}</div>
-      <div className={classes.selected}>
+      <div className={classNames([classes.selected, "scrollable"])}>
         <PillGroup pills={[...added.values()]} onRemove={handleRemove} />
       </div>
       <div className={classes.controls}>
@@ -165,7 +166,7 @@ const AddMembers = ({ workspace, onBack }: AddMembersProps) => {
         )}
         <Button onClick={onBack}>Back</Button>
       </div>
-    </>
+    </div>
   );
 };
 

@@ -9,7 +9,7 @@
 .heading {
   padding-bottom: 1rem;
   border-bottom: 1px solid beige;
-  margin-bottom: 2rem;
+  margin-bottom: 1rem;
 }
 .heading .name {
   font-weight: 300;
@@ -24,14 +24,14 @@
   color: #f5f5dc87;
 }
 .memberlist {
-  margin-bottom: 2rem;
+  margin-bottom: 1rem;
 }
 .memberlist .heading {
   font-weight: 200;
   border: none;
   margin: 0;
   padding: 0;
-  margin-bottom: 1rem;
+  margin-bottom: 0.5rem;
   margin-top: 1rem;
 }
 .actions {
@@ -44,13 +44,22 @@
   display: flex;
   align-items: center;
   font-weight: 300;
-  font-size: 0.95rem;
-  margin-bottom: 1.5rem;
+  font-size: 0.85rem;
+  margin-bottom: 1rem;
 }
 .status .stattext {
+  font-size: 0.8rem;
   font-weight: 200;
 }
-.status h4 {
-  margin: 0;
-  font-size: 0.9rem;
+
+@media (min-width: 768px) {
+  .project {
+    width: 35rem;
+  }
+}
+
+@media (min-width: 1024px) {
+  .project {
+    width: 45rem;
+  }
 }

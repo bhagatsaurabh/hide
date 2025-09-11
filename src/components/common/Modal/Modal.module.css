@@ -15,6 +15,10 @@
 .modal.slide {
 }
 .modal.pop {
+  width: 100%;
+  left: unset;
+  right: unset;
+  margin: 0 auto;
 }
 .modal.menu {
   position: absolute;
@@ -23,7 +27,6 @@
   height: auto !important;
   padding: 0;
   box-shadow: rgb(14 14 14 / 12%) 0px 8px 16px, rgb(14 14 14 / 12%) 0px 8px 16px !important;
-  min-width: 39vw;
   margin-top: 0.5rem;
 }
 .modal.full {
@@ -44,4 +47,10 @@
 }
 .modal.layer2 {
   z-index: 111;
+}
+
+@media (min-width: 768px) {
+  .modal.pop {
+    width: min-content;
+  }
 }

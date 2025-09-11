@@ -21,13 +21,13 @@ const PillGroup = ({ pills, onRemove }: PillGroupProps) => {
       {pills.map((pill) => (
         <div key={pill.id} className={classes.pill}>
           <Image
-            className="p-0p35 w-2 h-2 sm:w-7p5 sm:h-6 md:w-10 md:h-8 of-contain br-5t"
+            className="w-2 h-2 sm:w-2 sm:h-2 md:w-2 md:h-2 of-contain br-5t"
             path={pill.image || "../../../assets/icons/guest.svg"}
             alt={pill.text}
             asset={!pill.image}
           />
           <span className={classes.text}>{pill.text}</span>
-          <Button className="p-0p5" icon="close" size={1.2} onClick={() => onRemove(pill)} fit />
+          <Button className="p-0p5" icon="close" size={1} onClick={() => onRemove(pill)} fit />
         </div>
       ))}
     </div>

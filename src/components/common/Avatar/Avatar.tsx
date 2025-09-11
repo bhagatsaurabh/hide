@@ -5,7 +5,7 @@ import classes from "./Avatar.module.css";
 import Modal, { ModalRef } from "../Modal/Modal";
 import Button from "../Button/Button";
 import Icon from "../Icon/Icon";
-import { Link, useNavigate } from "react-router";
+import { useNavigate } from "react-router";
 
 export const Avatar = () => {
   const authStatus = useAppSelector(selectStatus);

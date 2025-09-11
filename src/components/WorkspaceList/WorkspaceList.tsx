@@ -53,7 +53,7 @@ const WorkspaceList = ({ workspaces, children }: WorkspaceListProps) => {
                     path={membership.picture || "../../../assets/icons/guest.svg"}
                     alt="member avatar"
                     asset={!membership.picture}
-                    className="w-1p5 h-1p5 sm:w-7p5 sm:h-6 md:w-10 md:h-8 of-contain"
+                    className="w-1p5 h-1p5 sm:w-1p5 sm:h-1p5 md:w-2 md:h-2 of-contain"
                   />
                 ))}
               </div>
