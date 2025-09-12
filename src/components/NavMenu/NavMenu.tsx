@@ -1,4 +1,4 @@
-import { useEffect, useLayoutEffect, useRef, useState } from "react";
+import { useLayoutEffect, useRef, useState } from "react";
 import classes from "./NavMenu.module.css";
 import Icon from "../common/Icon/Icon";
 import { motion } from "motion/react";

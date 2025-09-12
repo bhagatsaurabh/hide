@@ -1,50 +1,44 @@
 {
   "id": "root",
-  "direction": "column",
   "type": "panel",
+  "direction": "column",
+  "size": 1,
   "children": [
     {
       "id": "title",
       "type": "view",
-      "resizable": false,
-      "collapsible": false,
+      "size": "2.25rem",
       "viewId": "title"
     },
     {
       "id": "w1",
-      "direction": "column",
       "type": "panel",
-      "resizable": false,
-      "collapsible": false,
+      "size": 1,
+      "direction": "column",
       "children": [
         {
           "id": "explorer",
           "type": "view",
-          "resizable": true,
-          "collapsible": true,
-          "viewId": "explorer"
-        },
-        {
-          "id": "tabgroup",
-          "type": "view",
-          "resizable": true,
-          "collapsible": true,
-          "viewId": "tabgroup"
+          "size": 1,
+          "minSize": "10rem",
+          "viewId": "explorer",
+          "resizable": true
         },
         {
           "id": "terminal",
           "type": "view",
-          "resizable": true,
+          "size": "13rem",
+          "minSize": "7.25rem",
+          "viewId": "terminal",
           "collapsible": true,
-          "viewId": "terminal"
+          "title": "Terminal"
         }
       ]
     },
     {
       "id": "status",
       "type": "view",
-      "resizable": false,
-      "collapsible": false,
+      "size": "1.4rem",
       "viewId": "status"
     }
   ]

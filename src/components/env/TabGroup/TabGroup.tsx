@@ -69,7 +69,8 @@ const TabGroup = ({ ref }: TabGroupProps) => {
       if (msg.action !== "sync") return;
       const tab = tabs.current[msg.payload.ino];
       if (!tab) return;
-      tab.provider.receive(base64ToU8(msg.payload.buf));
+      tab.provider.receive(base64ToU8(msg.payload.buf).buffer);
+      // ??? tab.provider.receive(base64ToU8(msg.payload.buf));
     };
 
     socket?.on("fs", handleSyncMessage);

@@ -233,7 +233,7 @@
 .bottom-0 {
   bottom: 0;
 }
-.p-0p25.p-0p25 {
+.p-0p25.p-0p25.p-0p25 {
   padding: 0.25rem;
 }
 .p-0p35.p-0p35 {
@@ -466,6 +466,13 @@
 }
 .w-16 {
   width: 16rem;
+}
+
+.c-dark.c-dark {
+  color: #000;
+}
+.rotate-90 {
+  transform: rotate(90deg);
 }
 
 @supports selector(::-webkit-scrollbar) {

@@ -1,4 +1,3 @@
-import { useEffect } from "react";
 import classes from "./StatusBar.module.css";
 
 const StatusBar = () => {

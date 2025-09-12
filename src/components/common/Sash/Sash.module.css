@@ -7,6 +7,17 @@
   transition: opacity 0.15s linear;
   transition-delay: 0.2s;
 }
+.thumb {
+  position: absolute;
+  font-size: 0;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  background-color: #aaa;
+  border-radius: 50%;
+  padding: 0.25rem;
+  opacity: 1;
+}
 .sash.row {
   cursor: ew-resize;
   width: 0.25rem;
@@ -21,6 +32,9 @@
   background: #aaa;
 }
 .sash.dragging {
+  opacity: 1;
+}
+.handheld {
   opacity: 1;
 }
 
