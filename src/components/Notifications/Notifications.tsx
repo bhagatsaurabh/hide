@@ -37,7 +37,13 @@ const iconMap = {
   "info-warning": info,
 };
 
-export const NotificationBar = () => {
+interface NotificationBarProps {
+  size?: number;
+  className?: string;
+  headerHeight?: number;
+}
+
+export const NotificationBar = ({ size = 1.25, className = "", headerHeight }: NotificationBarProps) => {
   const authStatus = useAppSelector(selectStatus);
   const dispatch = useAppDispatch();
   const ntfns = useAppSelector(selectNotifications);
@@ -208,14 +214,14 @@ export const NotificationBar = () => {
       <>
         <Button
           icon="notifications"
-          size={1.25}
+          size={size}
           iconProps={{ strokeWidth: 2 }}
           onClick={handleClick}
           className={classNames({
-            "p-0p5": true,
             "position-relative": true,
             [classes.ntfnicon]: true,
             [classes.menuopen]: !isHandheld && isDesktopOpen,
+            [className]: true,
           })}
           highlight={isHandheldOpen || isDesktopOpen}
           fit

@@ -1,6 +1,6 @@
 import { AnimatePresence, motion } from "motion/react";
 import classes from "./Backdrop.module.css";
-import { ReactNode } from "react";
+import { CSSProperties, ReactNode } from "react";
 
 interface BackdropProps {
   show: boolean;
@@ -11,7 +11,14 @@ interface BackdropProps {
   onDismiss: () => void;
 }
 
-const Backdrop = ({ show, clear, layer, onDismiss, ignoreHeader = false, children }: Partial<BackdropProps>) => {
+const Backdrop = ({
+  show,
+  clear,
+  layer,
+  onDismiss,
+  ignoreHeader = false,
+  children,
+}: Partial<BackdropProps>) => {
   const classNames = [classes.backdrop];
   const layerLevel = layer ?? 0;
 

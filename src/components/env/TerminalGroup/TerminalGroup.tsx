@@ -13,7 +13,7 @@ const TerminalGroup = () => {
   const { hideTooltip, showTooltip } = useContext(TooltipContext)!;
   const [terms, setTerms] = useState<string[]>([]);
   const [activeId, setActiveId] = useState("");
-  const { workspace } = useContext(ViewContext)!;
+  const { workspace, isMobile } = useContext(ViewContext)!;
   const termRefs = useRef<Record<string, TerminalRef>>({});
   const termMap = useRef<Map<string, string>>(new Map());
 
@@ -34,6 +34,9 @@ const TerminalGroup = () => {
       updated.delete(termId);
       delete termRefs.current[termId];
       if (activeId) setActiveId(activeId);
+      if (updated.size === 0 && isMobile) {
+        setTimeout(() => handleNewTerminal(), 0);
+      }
       return [...updated];
     });
   };
@@ -68,21 +71,23 @@ const TerminalGroup = () => {
 
   return (
     <div className={classes.termgroup}>
-      <div className={classes.heading}>
-        <div className={classes.section}>
-          <span className={classes.title}>TERMINAL</span>
+      {!isMobile && (
+        <div className={classes.heading}>
+          <div className={classes.section}>
+            <span className={classes.title}>TERMINAL</span>
+          </div>
+          <div className={[classes.section, classes.actions].join(" ")}>
+            <button
+              onClick={handleNewTerminal}
+              onMouseEnter={(e: MouseEvent) => showTooltip("New Terminal", e.clientX, e.clientY)}
+              onMouseLeave={hideTooltip}
+              className="p-0p1"
+            >
+              <Icon name="plus" />
+            </button>
+          </div>
         </div>
-        <div className={[classes.section, classes.actions].join(" ")}>
-          <button
-            onClick={handleNewTerminal}
-            onMouseEnter={(e: MouseEvent) => showTooltip("New Terminal", e.clientX, e.clientY)}
-            onMouseLeave={hideTooltip}
-            className="p-0p1"
-          >
-            <Icon name="plus" />
-          </button>
-        </div>
-      </div>
+      )}
       <div className={classes.content}>
         <div className={classes.terminal}>
           {terms.map((termId) => (
@@ -98,30 +103,32 @@ const TerminalGroup = () => {
             />
           ))}
         </div>
-        <ul className={classes.list}>
-          {terms.map((termId) => (
-            <li
-              onClick={() => setActiveId(termId)}
-              className={classNames({ [classes.active]: activeId === termId })}
-              key={termId}
-            >
-              <div className={classes.itemsect}>
-                <Icon name="terminal" className="mr-0p25" />
-                <span>shell</span>
-              </div>
-              <div className={[classes.itemsect, classes.actions].join(" ")}>
-                <button
-                  onClick={() => handleRemoveTerminal(termId)}
-                  onMouseEnter={(e: MouseEvent) => showTooltip("Delete", e.clientX, e.clientY)}
-                  onMouseLeave={hideTooltip}
-                  className="p-0p1"
-                >
-                  <Icon name="bin" />
-                </button>
-              </div>
-            </li>
-          ))}
-        </ul>
+        {!isMobile && (
+          <ul className={classes.list}>
+            {terms.map((termId) => (
+              <li
+                onClick={() => setActiveId(termId)}
+                className={classNames({ [classes.active]: activeId === termId })}
+                key={termId}
+              >
+                <div className={classes.itemsect}>
+                  <Icon name="terminal" className="mr-0p25" />
+                  <span>shell</span>
+                </div>
+                <div className={[classes.itemsect, classes.actions].join(" ")}>
+                  <button
+                    onClick={() => handleRemoveTerminal(termId)}
+                    onMouseEnter={(e: MouseEvent) => showTooltip("Delete", e.clientX, e.clientY)}
+                    onMouseLeave={hideTooltip}
+                    className="p-0p1"
+                  >
+                    <Icon name="bin" />
+                  </button>
+                </div>
+              </li>
+            ))}
+          </ul>
+        )}
       </div>
     </div>
   );

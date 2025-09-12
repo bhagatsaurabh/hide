@@ -1,4 +1,5 @@
 import { useLoaderData, useNavigate } from "react-router";
+import { use, useEffect, useRef, useState } from "react";
 
 import classes from "./Environment.module.css";
 import { workspaceLoader } from "@/router/guards";
@@ -11,8 +12,6 @@ import TabGroup, { TabGroupRef } from "@/components/env/TabGroup/TabGroup";
 import TerminalGroup from "@/components/env/TerminalGroup/TerminalGroup";
 import StatusBar from "@/components/env/StatusBar/StatusBar";
 import Explorer, { ExplorerRef } from "@/components/env/Explorer/Explorer";
-
-import { useEffect, useRef, useState } from "react";
 
 import layoutDesktop from "@/assets/layouts/desktop.json";
 import layoutMobile from "@/assets/layouts/mobile.json";
@@ -34,7 +33,7 @@ import Modal, { ModalRef } from "@/components/common/Modal/Modal";
 import Button from "@/components/common/Button/Button";
 import Logo from "@/components/common/Logo/Logo";
 import { InternalNotificationPayload } from "@/models/notification";
-// const schemaMobile = layoutMobile as PanelSchema;
+const schemaMobile = layoutMobile as PanelSchema;
 const schemaDesktop = layoutDesktop as PanelSchema;
 
 const views = {
@@ -50,7 +49,7 @@ export const Environment = () => {
   const workspaceId = useLoaderData<typeof workspaceLoader>();
   const workspace = useAppSelector((state) => selectWorkspaceById(state, workspaceId))!;
   const isMobile = useMediaQuery("(max-width: 768px)");
-  const schema = isMobile ? /* schemaMobile */ schemaDesktop : schemaDesktop;
+  const schema = isMobile ? schemaMobile : schemaDesktop;
   const [dimension, setDimension] = useState({ width: window.innerWidth, height: window.innerHeight });
   const containerRef = useRef<HTMLDivElement>(null);
   const dispatch = useAppDispatch();
@@ -224,14 +223,23 @@ export const Environment = () => {
           </div>
         </Modal>
       )}
-      <ViewContext.Provider value={{ getNode, workspace, loadFile, closeFile, awareness }}>
+      <ViewContext.Provider value={{ getNode, workspace, loadFile, closeFile, awareness, isMobile }}>
         <div ref={containerRef} className={[classes.environment, "scrollbar"].join(" ")}>
-          <Panel
-            style={{ width: "100%", height: "100%" }}
-            dimension={dimension}
-            position={{ top: 0, left: 0 }}
-            schema={schema}
-          />
+          {isMobile ? (
+            <Panel
+              style={{ width: "100%", height: "100%" }}
+              dimension={dimension}
+              position={{ top: 0, left: 0 }}
+              schema={schemaMobile}
+            />
+          ) : (
+            <Panel
+              style={{ width: "100%", height: "100%" }}
+              dimension={dimension}
+              position={{ top: 0, left: 0 }}
+              schema={schemaDesktop}
+            />
+          )}
 
           {Object.entries(views).map(([viewId, View]) => (
             <InPortal key={viewId} node={getNode(viewId)}>

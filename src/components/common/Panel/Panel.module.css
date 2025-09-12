@@ -2,3 +2,24 @@
   display: flex;
   position: absolute;
 }
+.collapsible {
+  background-color: #efefd0;
+  align-items: center;
+  display: flex;
+  padding: 0 0.75rem;
+  cursor: pointer;
+  border-bottom: 1px solid rgb(0 0 0 / 79%);
+  flex-shrink: 0;
+}
+.collapsible svg {
+  color: #000;
+}
+.collapsible .title {
+  margin: 0;
+  font-weight: 300;
+  color: #1f1f1f;
+  font-family: "Inter";
+  font-size: 0.85rem;
+  margin-left: 0.5rem;
+  text-transform: uppercase;
+}

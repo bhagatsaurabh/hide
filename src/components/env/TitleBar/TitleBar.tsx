@@ -3,6 +3,7 @@ import classes from "./TitleBar.module.css";
 import Logo from "@/components/common/Logo/Logo";
 import { ViewContext } from "@/context/view/view.context";
 import Image from "@/components/common/Image/Image";
+import { NotificationBar } from "@/components/Notifications/Notifications";
 
 const TitleBar = () => {
   const { workspace, awareness } = useContext(ViewContext)!;
@@ -28,6 +29,7 @@ const TitleBar = () => {
             />
           </div>
         ))}
+        <NotificationBar size={1.1} className="p-0p25 ml-0p5 c-dark" />
       </div>
     </div>
   );

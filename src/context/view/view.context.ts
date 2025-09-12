@@ -7,6 +7,7 @@ type ViewContextType = {
   getNode(viewId: string): ReturnType<typeof createHtmlPortalNode>;
   workspace: WorkspaceDTO;
   awareness: { profile: MembershipDTO; color: { default: string; transparent: string } }[];
+  isMobile: boolean;
   loadFile: (fnode: FNodeOf<"file">, conflict?: { isConflicting?: boolean; conflictResolver?: string }) => void;
   closeFile: (fnode: FNodeOf<"file">) => void;
 };
