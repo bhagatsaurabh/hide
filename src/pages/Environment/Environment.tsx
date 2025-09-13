@@ -78,7 +78,7 @@ export const Environment = () => {
       const rect = containerRef.current.getBoundingClientRect();
       setDimension({ width: rect.width, height: rect.height });
       bus.emit("internal.env.resize");
-    }, 750);
+    }, 500);
 
     window.addEventListener("resize", handleResize);
     return () => window.removeEventListener("resize", handleResize);
