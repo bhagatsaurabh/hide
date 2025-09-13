@@ -36,7 +36,7 @@ const MemberList = ({ members, onRemove, role }: MemberListProps) => {
                 iconProps={{ "data-position": "right" }}
                 className="py-0p5 px-0p75"
                 onClick={() => onRemove(member)}
-                size={1.2}
+                size={1}
                 type="tertiary"
               >
                 Remove

@@ -83,9 +83,9 @@ const Modal = ({
     animate = { opacity: 1 };
     exit = { opacity: 0 };
   } else {
-    initial = { opacity: 0, transform: "translateY(-50%) scale(0.95)" };
-    animate = { opacity: 1, transform: "translateY(-50%) scale(1)" };
-    exit = { opacity: 0, transform: "translateY(-50%) scale(0.95)" };
+    initial = { opacity: 0, transform: "translate(-50%, -50%) scale(0.95)" };
+    animate = { opacity: 1, transform: "translate(-50%, -50%) scale(1)" };
+    exit = { opacity: 0, transform: "translate(-50%, -50%) scale(0.95)" };
   }
 
   const trapFocus = useCallback((event: KeyboardEvent) => {

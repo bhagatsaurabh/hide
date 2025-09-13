@@ -71,6 +71,7 @@
 }
 .members {
   font-size: 0;
+  display: flex;
 }
 .members svg {
   border-radius: 50%;

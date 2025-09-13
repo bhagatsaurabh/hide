@@ -51,10 +51,26 @@
   font-size: 0.8rem;
   font-weight: 200;
 }
+.toremove {
+  font-size: 0.85rem;
+  background-color: #00000073;
+  padding: 0.2rem 0.5rem;
+  border-radius: 1rem;
+}
+.toremovewrspc {
+  border-bottom: 1px solid #00e3ff;
+  font-size: 0.9rem;
+}
 
 @media (min-width: 768px) {
   .project {
     width: 35rem;
+  }
+  .deletedialog {
+    width: 20rem;
+  }
+  .removedialog {
+    width: 20rem;
   }
 }
 

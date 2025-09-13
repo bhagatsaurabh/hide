@@ -33,6 +33,7 @@ import Modal, { ModalRef } from "@/components/common/Modal/Modal";
 import Button from "@/components/common/Button/Button";
 import Logo from "@/components/common/Logo/Logo";
 import { InternalNotificationPayload } from "@/models/notification";
+import EnvAbout from "@/components/EnvAbout/EnvAbout";
 const schemaMobile = layoutMobile as PanelSchema;
 const schemaDesktop = layoutDesktop as PanelSchema;
 
@@ -205,38 +206,7 @@ export const Environment = () => {
     <>
       {showAbout && (
         <Modal type="pop" title="about" onDismiss={() => setShowAbout(false)} ref={aboutRef} className="p-1p5">
-          <div className={classes.about}>
-            <div className={classes.abheader}>
-              <Logo size={1.5} />
-              <Button className="float-right p-0p5" icon="close" fit onClick={() => aboutRef.current?.close()} />
-            </div>
-            <div className={classes.abcontent}>
-              <div className={classes.abinfo}>
-                <div className={classes.abtitle}></div>
-                <div className={classes.abvalues}>
-                  <span>
-                    Version:&nbsp;{document.querySelector('head meta[name="version"]')?.getAttribute("content")}
-                  </span>
-                  <span>
-                    Date:&nbsp;{document.querySelector('head meta[name="builddate"]')?.getAttribute("content")}
-                  </span>
-                  <span className="platform">Platform:&nbsp;{navigator.userAgent}</span>
-                </div>
-              </div>
-            </div>
-            <div className={classes.abactions}>
-              <Button
-                type="secondary"
-                size={1}
-                onClick={() => window.open("https://github.com/bhagatsaurabh/hide/issues", "_blank")}
-              >
-                Report Bug
-              </Button>
-              <Button type="secondary" size={1} onClick={() => aboutRef.current?.close()}>
-                OK
-              </Button>
-            </div>
-          </div>
+          <EnvAbout close={() => aboutRef.current?.close()} />
         </Modal>
       )}
       <ViewContext.Provider value={{ getNode, workspace, loadFile, closeFile, awareness, isMobile }}>
