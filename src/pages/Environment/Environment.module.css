@@ -3,6 +3,7 @@
   height: 100vh;
   color: beige;
   position: relative;
+  overflow: hidden;
 }
 
 .wrapper {

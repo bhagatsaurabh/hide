@@ -12,6 +12,7 @@ import { FitAddon } from "@xterm/addon-fit";
 import { ClipboardAddon } from "@xterm/addon-clipboard";
 import { WebLinksAddon } from "@xterm/addon-web-links";
 import Spinner from "../common/Spinner/Spinner";
+import bus from "@/config/bus";
 
 export interface TerminalRef {
   handleSSHMessage: (msg: InSocketMessage<"ssh">) => void;
@@ -29,6 +30,7 @@ const Terminal = ({ id: guid, show, ref, onClose }: TerminalProps) => {
   const term = useRef<XTerm>(null);
   const wrapperEl = useRef<HTMLDivElement>(null);
   const [busy, setBusy] = useState(true);
+  const fitAddon = useRef<FitAddon>(null);
 
   useEffect(() => {
     init();
@@ -77,14 +79,14 @@ const Terminal = ({ id: guid, show, ref, onClose }: TerminalProps) => {
         selectionBackground: "#b3b3b3ff",
       },
     });
-    const fitAddon = new FitAddon();
+    fitAddon.current = new FitAddon();
     const clipboardAddon = new ClipboardAddon();
-    term.current.loadAddon(fitAddon);
+    term.current.loadAddon(fitAddon.current);
     term.current.loadAddon(clipboardAddon);
     term.current.loadAddon(new WebLinksAddon());
 
     term.current.open(wrapperEl.current!);
-    fitAddon.fit();
+    fitAddon.current.fit();
     term.current.write("Connecting...");
     term.current.onData((data) => {
       socket.emit("msg", {
@@ -110,6 +112,15 @@ const Terminal = ({ id: guid, show, ref, onClose }: TerminalProps) => {
       },
     });
   };
+  useEffect(() => {
+    const handleResize = () => {
+      fitAddon.current?.fit();
+      console.log("Resized Terminal");
+    };
+
+    const unsub = bus.on("internal.env.resize", () => handleResize());
+    return () => unsub();
+  }, []);
   const handleSSHOpen = (payload: SSHOpen) => {
     sshSessionId.current = payload.sshSessionId;
     setBusy(false);

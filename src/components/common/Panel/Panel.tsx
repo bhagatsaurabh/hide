@@ -6,6 +6,7 @@ import Sash from "../Sash/Sash";
 import { parseSizetoPx } from "@/utils";
 import Icon from "../Icon/Icon";
 import classNames from "classnames";
+import bus from "@/config/bus";
 
 export type PanelSchema = {
   id: string;
@@ -93,15 +94,6 @@ export const Panel = ({ className = "", schema, dimension, position, style = {} 
   useEffect(() => {
     setRects(childPos.map((pos, idx) => ({ pos, size: childSizes[idx] })));
   }, [childPos, childSizes]);
-
-  console.log(
-    schema.id,
-    JSON.parse(JSON.stringify(schema)),
-    position,
-    rects.length,
-    children.length,
-    childPos.length
-  );
   const collapsibles = useRef<Map<string, { collapsed: boolean; oldSize: number }>>(new Map());
 
   useEffect(() => {
@@ -186,6 +178,69 @@ export const Panel = ({ className = "", schema, dimension, position, style = {} 
     return -1;
   };
 
+  const getView = (idx: number, node: PanelSchema) => {
+    const collapsibleStyle = {} as CSSProperties;
+    if (node.collapsible) {
+      collapsibleStyle.width = schema.direction === "row" ? "2.25rem" : "100%";
+      collapsibleStyle.height = schema.direction === "row" ? "100%" : "2.25rem";
+    }
+
+    return (
+      <div
+        className={[classes.panel, className].join(" ")}
+        style={{
+          width: direction === "row" ? `${rects[idx].size}px` : "100%",
+          height: direction === "row" ? "100%" : `${rects[idx].size}px`,
+          top: `${rects[idx].pos.top}px`,
+          left: `${rects[idx].pos.left}px`,
+          flexDirection: schema.direction,
+        }}
+      >
+        {node.collapsible && (
+          <div className={classes.collapsible} style={collapsibleStyle} onClick={() => handleCollapse(idx, node)}>
+            <Icon
+              name="chevron-right"
+              size={1}
+              className={classNames({ "rotate-90": !collapsibles.current.get(node.id)?.collapsed })}
+            />
+            <h3 className={classes.title}>{node.title}</h3>
+          </div>
+        )}
+        <OutPortal node={getNode(node.viewId!)} schema={node} />
+      </div>
+    );
+  };
+  const getPanel = (idx: number, node: PanelSchema) => {
+    return (
+      <Panel
+        style={{
+          width: direction === "row" ? `${rects[idx].size}px` : "100%",
+          height: direction === "row" ? "100%" : `${rects[idx].size}px`,
+        }}
+        dimension={{
+          width: direction === "row" ? rects[idx].size : dimension.width,
+          height: direction === "row" ? dimension.height : rects[idx].size,
+        }}
+        position={rects[idx].pos}
+        schema={node}
+      />
+    );
+  };
+  const getSash = (idx: number, node: PanelSchema) => {
+    return (
+      <Sash
+        style={{
+          left: direction === "row" ? rects[idx].pos.left + rects[idx].size - 2 : 0,
+          top: direction === "row" ? 0 : rects[idx].pos.top + rects[idx].size - 2,
+        }}
+        direction={direction}
+        active={!!node.resizable}
+        onDrag={(start, current) => node.resizable && handleResize(start, current, idx)}
+        onDragStart={() => handleResizeStart(idx)}
+      />
+    );
+  };
+
   const posStyle: CSSProperties = {};
   if (typeof position.left === "number") posStyle.left = `${position.left}px`;
   if (typeof position.top === "number") posStyle.top = `${position.top}px`;
@@ -194,67 +249,10 @@ export const Panel = ({ className = "", schema, dimension, position, style = {} 
     <div className={[classes.panel, className].join(" ")} style={{ ...style, ...posStyle }}>
       {rects.length === children.length &&
         children.map((node, idx) => {
-          const collapsibleStyle = {} as CSSProperties;
-          if (node.collapsible) {
-            collapsibleStyle.width = schema.direction === "row" ? "2.25rem" : "100%";
-            collapsibleStyle.height = schema.direction === "row" ? "100%" : "2.25rem";
-          }
-
           return (
             <Fragment key={idx}>
-              {node.viewId ? (
-                <div
-                  className={[classes.panel, className].join(" ")}
-                  style={{
-                    width: direction === "row" ? `${rects[idx].size}px` : "100%",
-                    height: direction === "row" ? "100%" : `${rects[idx].size}px`,
-                    top: `${rects[idx].pos.top}px`,
-                    left: `${rects[idx].pos.left}px`,
-                    flexDirection: schema.direction,
-                  }}
-                >
-                  {node.collapsible && (
-                    <div
-                      className={classes.collapsible}
-                      style={collapsibleStyle}
-                      onClick={() => handleCollapse(idx, node)}
-                    >
-                      <Icon
-                        name="chevron-right"
-                        size={1}
-                        className={classNames({ "rotate-90": !collapsibles.current.get(node.id)?.collapsed })}
-                      />
-                      <h3 className={classes.title}>{node.title}</h3>
-                    </div>
-                  )}
-                  {/* <OutPortal node={getNode(node.viewId!)} schema={node} /> */}
-                </div>
-              ) : (
-                <Panel
-                  style={{
-                    width: direction === "row" ? `${rects[idx].size}px` : "100%",
-                    height: direction === "row" ? "100%" : `${rects[idx].size}px`,
-                  }}
-                  dimension={{
-                    width: direction === "row" ? rects[idx].size : dimension.width,
-                    height: direction === "row" ? dimension.height : rects[idx].size,
-                  }}
-                  position={rects[idx].pos}
-                  schema={node}
-                />
-              )}
-              {idx < children.length - 1 && node.resizable && (
-                <Sash
-                  style={{
-                    left: direction === "row" ? rects[idx].pos.left + rects[idx].size - 2 : 0,
-                    top: direction === "row" ? 0 : rects[idx].pos.top + rects[idx].size - 2,
-                  }}
-                  direction={direction}
-                  active={!!node.resizable}
-                  onDrag={(start, current) => node.resizable && handleResize(start, current, idx)}
-                  onDragStart={() => handleResizeStart(idx)}
-                />
-              )}
+              {node.viewId ? getView(idx, node) : getPanel(idx, node)}
+              {idx < children.length - 1 && node.resizable ? getSash(idx, node) : null}
             </Fragment>
           );
         })}

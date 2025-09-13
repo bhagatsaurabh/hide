@@ -1,5 +1,5 @@
 import { useLoaderData, useNavigate } from "react-router";
-import { use, useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 import classes from "./Environment.module.css";
 import { workspaceLoader } from "@/router/guards";
@@ -26,7 +26,7 @@ import { socket } from "@/config/socket";
 import { FNodeOf } from "@/models/filesystem";
 import { InSocketMessage } from "@/models/common";
 import { auth } from "@/config/firebase";
-import { getRandomAccentColor } from "@/utils";
+import { getRandomAccentColor, throttle } from "@/utils";
 import { Unsubscribe } from "nanoevents";
 import bus from "@/config/bus";
 import Modal, { ModalRef } from "@/components/common/Modal/Modal";
@@ -70,6 +70,19 @@ export const Environment = () => {
   ]);
   const [showAbout, setShowAbout] = useState(false);
   const aboutRef = useRef<ModalRef>(null);
+
+  useEffect(() => {
+    const handleResize = throttle(() => {
+      if (!containerRef.current) return;
+
+      const rect = containerRef.current.getBoundingClientRect();
+      setDimension({ width: rect.width, height: rect.height });
+      bus.emit("internal.env.resize");
+    }, 750);
+
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
 
   useEffect(() => {
     if (provStatus?.action === "error") {
@@ -163,6 +176,9 @@ export const Environment = () => {
 
     return () => unsubs.forEach((unsub) => unsub());
   }, []);
+  useEffect(() => {
+    bus.emit("internal.env.resize");
+  }, [schema]);
 
   const nodes = useRef(new Map<string, ReturnType<typeof createHtmlPortalNode>>());
   const tabGroupRef = useRef<TabGroupRef>(null);
@@ -225,21 +241,12 @@ export const Environment = () => {
       )}
       <ViewContext.Provider value={{ getNode, workspace, loadFile, closeFile, awareness, isMobile }}>
         <div ref={containerRef} className={[classes.environment, "scrollbar"].join(" ")}>
-          {isMobile ? (
-            <Panel
-              style={{ width: "100%", height: "100%" }}
-              dimension={dimension}
-              position={{ top: 0, left: 0 }}
-              schema={schemaMobile}
-            />
-          ) : (
-            <Panel
-              style={{ width: "100%", height: "100%" }}
-              dimension={dimension}
-              position={{ top: 0, left: 0 }}
-              schema={schemaDesktop}
-            />
-          )}
+          <Panel
+            style={{ width: "100%", height: "100%" }}
+            dimension={dimension}
+            position={{ top: 0, left: 0 }}
+            schema={schema}
+          />
 
           {Object.entries(views).map(([viewId, View]) => (
             <InPortal key={viewId} node={getNode(viewId)}>

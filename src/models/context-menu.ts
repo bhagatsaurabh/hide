@@ -8,6 +8,7 @@ export interface CommandMap {
   "internal.file.displaced": (ctx: { ino: number }) => void;
   "internal.file.conflict": (ctx: { ino: number; resolverUid: string }) => void;
   "internal.file.conflict.resolved": (ctx: { ino: number }) => void;
+  "internal.env.resize": () => void;
   "file.new": (ctx: { path: string }) => void;
   "folder.new": (ctx: { path: string }) => void;
   "edit.undo": () => void;
