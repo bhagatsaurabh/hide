@@ -77,6 +77,15 @@ const TabGroup = ({ ref }: TabGroupProps) => {
     return () => void socket?.off("fs", handleSyncMessage);
   }, []);
   useEffect(() => {
+    const handleResize = () => {
+      editor.current?.layout();
+      console.log("Resized Editor");
+    };
+
+    const unsub = bus.on("internal.env.resize", () => handleResize());
+    return () => unsub();
+  }, []);
+  useEffect(() => {
     const handleExtAction = (action: "undo" | "redo" | "find" | "replace") => {
       if (!active) return;
       if (action === "undo" || action === "redo") {
