@@ -88,21 +88,26 @@ export const Panel = ({ className = "", schema, dimension, position, style = {} 
     return childPos;
   }, [childSizes, children, prop]);
 
-  // const [rects, setRects] = useState<Rect[]>(childPos.map((pos, idx) => ({ pos, size: childSizes[idx] })));
-  const [rects, setRects] = useState<Rect[]>([]);
+  const [rects, setRects] = useState<Rect[]>(childPos.map((pos, idx) => ({ pos, size: childSizes[idx] })));
 
   useEffect(() => {
     setRects(childPos.map((pos, idx) => ({ pos, size: childSizes[idx] })));
   }, [childPos, childSizes]);
-  const collapsibles = useRef<Map<string, { collapsed: boolean; oldSize: number }>>(new Map());
 
+  const collapsibles = useRef<Map<string, { collapsed: boolean; oldSize: number }>>(new Map());
   useEffect(() => {
     children.forEach((child, idx) => {
       if (child.collapsible && rects[idx]) {
-        collapsibles.current.set(child.id, { collapsed: false, oldSize: rects[idx].size });
+        collapsibles.current.set(child.id, {
+          collapsed: false,
+          oldSize: collapsibles.current.get(child.id)?.oldSize || rects[idx].size,
+        });
       }
     });
-  }, [schema]);
+  }, [children, rects, schema]);
+  useEffect(() => {
+    bus.emit("internal.env.resize", { viewId: schema.viewId });
+  }, [dimension, schema.viewId]);
 
   const initialSizes = useRef([0, 0]);
   const handleResizeStart = (idx: number) => {

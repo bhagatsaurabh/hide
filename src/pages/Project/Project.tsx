@@ -135,17 +135,21 @@ export const Project = () => {
           layer={2}
           className="p-1p5"
         >
-          <h2>Are you sure ?</h2>
-          <p>
-            Do you want to remove user @{toRemove.username} from {workspace.name} workspace ?
-          </p>
-          <div className="d-flex justify-content-end gap-1">
-            <Button onClick={handleMemberRemove} busy={removeBusy}>
-              Yes
-            </Button>
-            <Button type="secondary" onClick={() => diagRef?.current?.close()} disabled={removeBusy}>
-              Cancel
-            </Button>
+          <div className={classes.removedialog}>
+            <h2>Are you sure ?</h2>
+            <p>
+              Do you want to remove user <span className={classes.toremove}>@{toRemove.username}</span> from{" "}
+              <span className={classes.toremovewrspc}>{workspace.name}</span> workspace ?
+            </p>
+            <br />
+            <div className="d-flex justify-content-end gap-1">
+              <Button onClick={handleMemberRemove} busy={removeBusy}>
+                Yes
+              </Button>
+              <Button type="secondary" onClick={() => diagRef?.current?.close()} disabled={removeBusy}>
+                Cancel
+              </Button>
+            </div>
           </div>
         </Modal>
       )}
@@ -158,15 +162,17 @@ export const Project = () => {
           layer={2}
           className="p-1p5"
         >
-          <h2>Are you sure ?</h2>
-          <p>Do you want to delete this workspace ?</p>
-          <div className="d-flex justify-content-end gap-1">
-            <Button onClick={handleWorkspaceDelete} busy={deleteBusy}>
-              Yes
-            </Button>
-            <Button type="secondary" onClick={() => diagDelRef?.current?.close()} disabled={deleteBusy}>
-              Cancel
-            </Button>
+          <div className={classes.deletedialog}>
+            <h2>Are you sure ?</h2>
+            <p>Do you want to delete this workspace ?</p>
+            <div className="d-flex justify-content-end gap-1">
+              <Button onClick={handleWorkspaceDelete} busy={deleteBusy}>
+                Yes
+              </Button>
+              <Button type="secondary" onClick={() => diagDelRef?.current?.close()} disabled={deleteBusy}>
+                Cancel
+              </Button>
+            </div>
           </div>
         </Modal>
       )}

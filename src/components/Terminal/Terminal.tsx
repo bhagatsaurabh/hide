@@ -113,12 +113,13 @@ const Terminal = ({ id: guid, show, ref, onClose }: TerminalProps) => {
     });
   };
   useEffect(() => {
-    const handleResize = () => {
-      fitAddon.current?.fit();
-      console.log("Resized Terminal");
+    const handleResize = (viewId?: string) => {
+      if (!viewId || viewId === "terminal") {
+        fitAddon.current?.fit();
+      }
     };
 
-    const unsub = bus.on("internal.env.resize", () => handleResize());
+    const unsub = bus.on("internal.env.resize", (ctx) => handleResize(ctx?.viewId));
     return () => unsub();
   }, []);
   const handleSSHOpen = (payload: SSHOpen) => {

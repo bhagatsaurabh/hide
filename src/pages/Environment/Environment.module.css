@@ -19,31 +19,3 @@
   align-items: center;
   color: beige;
 }
-
-.about {
-}
-.abheader {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 1rem;
-}
-.abcontent {
-}
-.abinfo {
-}
-.abtitle {
-}
-.abvalues {
-  display: flex;
-  flex-direction: column;
-  margin-bottom: 1rem;
-}
-.abactions {
-  display: flex;
-  justify-content: flex-end;
-  gap: 1rem;
-}
-.platform {
-  max-width: 25rem;
-}

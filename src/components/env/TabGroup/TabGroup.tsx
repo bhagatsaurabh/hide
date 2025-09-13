@@ -77,12 +77,13 @@ const TabGroup = ({ ref }: TabGroupProps) => {
     return () => void socket?.off("fs", handleSyncMessage);
   }, []);
   useEffect(() => {
-    const handleResize = () => {
-      editor.current?.layout();
-      console.log("Resized Editor");
+    const handleResize = (viewId?: string) => {
+      if (!viewId || viewId === "tabgroup") {
+        editor.current?.layout();
+      }
     };
 
-    const unsub = bus.on("internal.env.resize", () => handleResize());
+    const unsub = bus.on("internal.env.resize", (ctx) => handleResize(ctx?.viewId));
     return () => unsub();
   }, []);
   useEffect(() => {

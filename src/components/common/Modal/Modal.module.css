@@ -16,7 +16,7 @@
 }
 .modal.pop {
   width: 100%;
-  left: unset;
+  left: 50%;
   right: unset;
   margin: 0 auto;
 }

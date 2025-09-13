@@ -1,0 +1,42 @@
+.abheader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+.abvalues {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 1rem;
+}
+.abactions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 1rem;
+}
+.platform {
+  max-width: 25rem;
+}
+.key,
+.value {
+  width: min-content;
+  font-size: 0.85rem;
+}
+.key {
+  display: inline-block;
+  font-weight: 500;
+}
+.value {
+  font-weight: 300;
+}
+
+@media (min-width: 768px) {
+  .about {
+    width: 25rem;
+  }
+}
+@media (min-width: 1024px) {
+  .about {
+    width: 35rem;
+  }
+}
