@@ -1,8 +1,8 @@
-import api from "@/config/axios";
+import api, { publicApi } from "@/config/axios";
 import { socket } from "@/config/socket";
 import { InSocketMessage, InSocketMessagePayload } from "@/models/common";
 import { CommandMap } from "@/models/context-menu";
-import { EnvCloseDTO, EnvOpenDTO } from "@/models/env";
+import { EnvCloseDTO, EnvOpenDTO, Template } from "@/models/env";
 import { WorkspaceWaitDTO } from "@/models/workspace";
 import { uuidv4 as uuid } from "lib0/random.js";
 
@@ -55,3 +55,7 @@ export const runCommand = async <K extends keyof CommandMap>(
       correlationId,
     });
   });
+
+export const getTemplates = async () => {
+  return await publicApi.get<Template[]>("/templates");
+};

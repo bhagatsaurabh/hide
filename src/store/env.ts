@@ -1,19 +1,21 @@
 import { createAsyncThunk, createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { State } from "@/utils/types";
 import { RootState } from ".";
-import { close, open } from "@/services/env";
+import { close, getTemplates, open } from "@/services/env";
 import { notify } from "./notifications";
-import { EnvCloseDTO, EnvOpenDTO } from "@/models/env";
+import { EnvCloseDTO, EnvOpenDTO, Template } from "@/models/env";
 import { InternalNotificationPayload } from "@/models/notification";
 
 type EnvState = {
   uuid: string;
   state: State;
+  templates: Template[];
 };
 
 const initialState: EnvState = {
   uuid: "",
   state: State.INIT,
+  templates: [],
 };
 
 export const envSlice = createSlice({
@@ -22,6 +24,9 @@ export const envSlice = createSlice({
   reducers: {
     setUuid: (state, action: PayloadAction<string>) => {
       state.uuid = action.payload;
+    },
+    setTemplates: (state, action: PayloadAction<Template[]>) => {
+      state.templates = action.payload;
     },
   },
 });
@@ -52,9 +57,20 @@ export const closeEnv = createAsyncThunk<void, EnvCloseDTO>("env/close", async (
     console.log(error);
   }
 });
+export const fetchTemplates = createAsyncThunk<Template[], void>("fetch/templates", async (_, { dispatch }) => {
+  try {
+    const res = await getTemplates();
+    dispatch(setTemplates(res.data));
+    return res.data;
+  } catch (error) {
+    console.log(error);
+  }
+  return [];
+});
 
-export const { setUuid } = envSlice.actions;
+export const { setUuid, setTemplates } = envSlice.actions;
 
 export const selectActiveUuid = (state: RootState) => state.env.uuid;
+export const selectTemplates = (state: RootState) => state.env.templates;
 
 export default envSlice.reducer;

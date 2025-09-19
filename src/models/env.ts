@@ -48,3 +48,9 @@ export interface EnvCloseDTO {
   uuid: string;
   sessionId: string;
 }
+
+export interface Template {
+  name: string;
+  image: string;
+  [key: string]: unknown;
+}

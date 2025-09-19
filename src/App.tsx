@@ -9,19 +9,23 @@ import Toast from "./components/common/Toast/Toast";
 import ContextMenu from "./components/common/ContextMenu/ContextMenu";
 import { useMediaQuery } from "./hooks/media-query";
 import Banner from "./components/common/Banner/Banner";
+import { useAppDispatch } from "./hooks/store";
+import { fetchTemplates } from "./store/env";
 
 function App() {
   const [ready, setReady] = useState(false);
   const isHandheld = useMediaQuery("(max-width: 1024px)");
+  const dispatch = useAppDispatch();
 
   useEffect(() => {
-    init();
-  }, []);
+    const init = async () => {
+      await openDB();
+      await dispatch(fetchTemplates());
+      setReady(true);
+    };
 
-  const init = async () => {
-    await openDB();
-    setReady(true);
-  };
+    init();
+  }, [dispatch]);
 
   return (
     <>
