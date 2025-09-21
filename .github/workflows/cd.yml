@@ -23,7 +23,7 @@ jobs:
         env:
           VITE_HIDE_FIREBASE_PUBLIC_KEY: ${{ secrets.VITE_HIDE_FIREBASE_PUBLIC_KEY }}
 
-      - name: Upload dist artifacts
+      - name: Upload artifacts
         uses: actions/upload-artifact@v4
         with:
           name: hide-dist
@@ -35,7 +35,7 @@ jobs:
     steps:
       - uses: actions/checkout@v3
 
-      - name: Download dist artifacts
+      - name: Download artifacts
         uses: actions/download-artifact@v4
         with:
           name: hide-dist
@@ -43,17 +43,16 @@ jobs:
 
       - uses: FirebaseExtended/action-hosting-deploy@v0
         with:
-          repoToken: "${{ secrets.GITHUB_TOKEN }}"
-          firebaseServiceAccount: "${{ secrets.FIREBASE_SERVICE_ACCOUNT_OPENCHAT_A5CEC }}"
-          channelId: live
-          projectId: openchat-a5cec
+          repoToken: ${{ secrets.GITHUB_TOKEN }}
+          firebaseServiceAccount: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_HIDE_43A4B }}
+          projectId: hide-43a4b
 
   Cleanup:
     needs: [Deploy-Firebase]
     if: always()
     runs-on: ubuntu-latest
     steps:
-      - name: Delete dist artifacts
+      - name: Delete artifacts
         uses: GeekyEggo/delete-artifact@v5.0.0
         with:
           name: hide-dist

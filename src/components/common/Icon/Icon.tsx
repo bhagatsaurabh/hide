@@ -12,11 +12,9 @@ interface IconProps {
   style?: CSSProperties;
   strokeWidth?: number;
   fs?: boolean;
-  path?: string;
 }
 
 const Icon = ({
-  path,
   strokeWidth = 1,
   size = 1,
   name,
@@ -32,14 +30,9 @@ const Icon = ({
   const [svg, setSvg] = useState("");
 
   useEffect(() => {
-    if (path) return;
+    if (fs) return;
     let isMounted = true;
-    let promise;
-    if (fs) {
-      promise = import(`../../../assets/icons/editor/${name}.svg?react`);
-    } else {
-      promise = import(`../../../assets/icons/${name}.svg?react`);
-    }
+    const promise = import(`../../../assets/icons/${name}.svg?react`);
     promise
       .then((module) => {
         if (isMounted) {
@@ -56,9 +49,9 @@ const Icon = ({
     return () => {
       isMounted = false;
     };
-  }, [fs, name, path]);
+  }, [name, fs]);
   useEffect(() => {
-    if (!path) return;
+    if (!fs) return;
     const loadSvg = async () => {
       try {
         const data = await (await fetch(`/icons/editor/${name}.svg`)).text();
@@ -71,7 +64,7 @@ const Icon = ({
     };
 
     loadSvg();
-  }, [name, path]);
+  }, [name, fs]);
 
   if (error) {
     return (
@@ -83,7 +76,7 @@ const Icon = ({
       />
     );
   }
-  if ((!Component && !path) || (path && !isLoaded)) {
+  if ((!Component && !fs) || (fs && !isLoaded)) {
     return <PointSkeleton className={className} style={style} size={size} />;
   }
   return (
