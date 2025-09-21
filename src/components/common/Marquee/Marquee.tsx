@@ -1,10 +1,10 @@
 import React, { CSSProperties } from "react";
 import classes from "./Marquee.module.css";
+import { ImageProps } from "../Image/Image";
 
 interface MarqueeProps {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  Component: React.FC<any>;
-  props: Record<string, unknown>[];
+  Component: React.FC<ImageProps>;
+  props: ImageProps[];
   height: number;
   className?: string;
   spacing?: number;
@@ -17,7 +17,7 @@ const Marquee = ({ Component, props, height, className, spacing = 1 }: MarqueePr
       className={[classes.marquee, className ?? ""].join(" ")}
     >
       {props.map((prop, idx) => (
-        <Component style={{ "--item-pos": idx + 1 }} key={idx} {...prop} />
+        <Component style={{ "--item-pos": idx + 1 } as CSSProperties} key={idx} {...prop} />
       ))}
     </div>
   );

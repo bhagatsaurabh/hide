@@ -1,5 +1,4 @@
 import Profile from "@/components/Profile/Profile";
-import classes from "./User.module.css";
 import { useAppDispatch, useAppSelector } from "@/hooks/store";
 import { selectName, selectPicture, selectUsername, updateProfile } from "@/store/auth";
 import { notify } from "@/store/notifications";

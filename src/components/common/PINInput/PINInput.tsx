@@ -2,7 +2,7 @@ import { RefObject, useImperativeHandle, useRef, useState } from "react";
 import classes from "./PINInput.module.css";
 import { noop } from "@/utils";
 import { Null } from "@/utils/types";
-import { AnimatePresence, motion } from "motion/react";
+import { motion } from "motion/react";
 import classNames from "classnames";
 
 export interface PINInputRef {

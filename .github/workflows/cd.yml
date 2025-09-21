@@ -1,0 +1,59 @@
+name: Deploy
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  Build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 22.x
+
+      - name: Build
+        run: |
+          npm ci
+          npm run build
+        env:
+          VITE_HIDE_FIREBASE_PUBLIC_KEY: ${{ secrets.VITE_HIDE_FIREBASE_PUBLIC_KEY }}
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: hide-dist
+          path: dist
+
+  Deploy-Firebase:
+    needs: [Build]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Download artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: hide-dist
+          path: dist
+
+      - uses: FirebaseExtended/action-hosting-deploy@v0
+        with:
+          repoToken: ${{ secrets.GITHUB_TOKEN }}
+          firebaseServiceAccount: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_HIDE_43A4B }}
+          projectId: hide-43a4b
+
+  Cleanup:
+    needs: [Deploy-Firebase]
+    if: always()
+    runs-on: ubuntu-latest
+    steps:
+      - name: Delete artifacts
+        uses: GeekyEggo/delete-artifact@v5.0.0
+        with:
+          name: hide-dist
+          failOnError: false

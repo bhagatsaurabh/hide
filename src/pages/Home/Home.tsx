@@ -9,18 +9,19 @@ import Link from "@/components/common/Link/Link";
 import Button from "@/components/common/Button/Button";
 import Marquee from "@/components/common/Marquee/Marquee";
 import Image from "@/components/common/Image/Image";
-import templates from "@/assets/templates.json";
 import Features from "@/components/Features/Features";
 import Usecases from "@/components/Usecases/Usecases";
 import Templates from "@/components/Templates/Templates";
 import { useAppSelector } from "@/hooks/store";
 import { AuthStatus, selectStatus } from "@/store/auth";
 import { useNavigate } from "react-router";
+import { selectTemplates } from "@/store/env";
 
 export const Home = () => {
   const bodyRef = useRef<HTMLElement>(null);
   const status = useAppSelector(selectStatus);
   const navigate = useNavigate();
+  const templates = useAppSelector(selectTemplates);
 
   const handleAction = () => {
     if (status === AuthStatus.INCOMPLETE_PROFILE) {
@@ -68,11 +69,15 @@ export const Home = () => {
             Component={Image}
             className="var-w-5 sm:var-w-6 md:var-w-7"
             spacing={2}
-            props={templates.map((template) => ({
-              ...template,
-              className: "w-5 h-4 sm:w-6 sm:h-4p8 md:w-7 md:h-5p6 of-contain",
-              asset: true,
-            }))}
+            props={templates
+              .map((template) => ({
+                ...template,
+                path: `../../../assets/icons/${template.image.substring(template.image.lastIndexOf("-") + 1)}.svg`,
+                alt: template.name,
+                className: "w-5 h-4 sm:w-6 sm:h-4p8 md:w-7 md:h-5p6 of-contain",
+                asset: true,
+              }))
+              .slice(1)}
             height={9}
           />
         </section>

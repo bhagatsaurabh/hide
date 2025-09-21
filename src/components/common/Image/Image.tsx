@@ -3,7 +3,7 @@ import classes from "./Image.module.css";
 import DefaultSVG from "../../../assets/icons/default.svg?react";
 import ImageSkeleton from "../skeletons/ImageSkeleton/ImageSkeleton";
 
-interface ImageProps {
+export interface ImageProps {
   path: string;
   alt: string;
   asset?: boolean;

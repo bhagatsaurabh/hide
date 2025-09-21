@@ -1,6 +1,6 @@
 import { Input, InputRef } from "@/components/common/Input/Input";
 import classes from "./Create.module.css";
-import { useAppDispatch } from "@/hooks/store";
+import { useAppDispatch, useAppSelector } from "@/hooks/store";
 import { createNewWorkspace } from "@/store/workspace";
 import { nameRegex } from "@/utils/constants";
 import { useCallback, useRef, useState } from "react";
@@ -8,15 +8,10 @@ import { useNavigate } from "react-router";
 import Backdrop from "@/components/common/Backdrop/Backdrop";
 import Button from "@/components/common/Button/Button";
 import ChipGroup, { Chip } from "@/components/common/ChipGroup/ChipGroup";
-import templates from "@/assets/templates.json";
 import { auth } from "@/config/firebase";
 import { Textarea, TextareaRef } from "@/components/common/Textarea/Textarea";
-
-interface Template {
-  path: string;
-  alt: string;
-  image: string;
-}
+import { selectTemplates } from "@/store/env";
+import { Template } from "@/models/env";
 
 export const Create = () => {
   const [name, setName] = useState("");
@@ -29,15 +24,13 @@ export const Create = () => {
   const [show, setShow] = useState(true);
   const node = useRef<Node>(null);
   const bound = useRef<{ first: HTMLElement | null; last: HTMLElement | null }>(null);
+  const templates = useAppSelector(selectTemplates);
   const imageChips = [
-    {
-      path: "../../../assets/icons/container.svg",
-      alt: "Empty",
-      image: import.meta.env.DEV ? "hide-env-dev" : "hide-env",
-    },
     ...templates.map((template) => ({
       ...template,
-      image: import.meta.env.DEV ? `${template.image}-dev` : template.image,
+      alt: template.name,
+      path: `../../../assets/icons/${template.image.substring(template.image.lastIndexOf("-") + 1)}.svg`,
+      image: import.meta.env.VITE_HIDE_IMAGE_DEV ? `${template.image}-dev` : template.image,
     })),
   ].map((template, idx) => ({
     ...template,

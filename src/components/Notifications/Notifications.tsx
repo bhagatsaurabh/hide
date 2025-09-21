@@ -43,7 +43,7 @@ interface NotificationBarProps {
   headerHeight?: number;
 }
 
-export const NotificationBar = ({ size = 1.25, className = "", headerHeight }: NotificationBarProps) => {
+export const NotificationBar = ({ size = 1.25, className = "", headerHeight: _ }: NotificationBarProps) => {
   const authStatus = useAppSelector(selectStatus);
   const dispatch = useAppDispatch();
   const ntfns = useAppSelector(selectNotifications);

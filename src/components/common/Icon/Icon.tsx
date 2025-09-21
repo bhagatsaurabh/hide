@@ -26,15 +26,13 @@ const Icon = ({
 }: IconProps) => {
   const [Component, setComponent] = useState<React.FC<React.SVGProps<SVGSVGElement>> | null>(null);
   const [error, setError] = useState(false);
+  const [isLoaded, setIsLoaded] = useState(false);
+  const [svg, setSvg] = useState("");
 
   useEffect(() => {
+    if (fs) return;
     let isMounted = true;
-    let promise;
-    if (fs) {
-      promise = import(`../../../assets/icons/editor/${name}.svg?react`);
-    } else {
-      promise = import(`../../../assets/icons/${name}.svg?react`);
-    }
+    const promise = import(`../../../assets/icons/${name}.svg?react`);
     promise
       .then((module) => {
         if (isMounted) {
@@ -51,7 +49,22 @@ const Icon = ({
     return () => {
       isMounted = false;
     };
-  }, [fs, name]);
+  }, [name, fs]);
+  useEffect(() => {
+    if (!fs) return;
+    const loadSvg = async () => {
+      try {
+        const data = await (await fetch(`/icons/editor/${name}.svg`)).text();
+        setIsLoaded(true);
+        setSvg(data);
+      } catch (error) {
+        console.log(error);
+        setError(true);
+      }
+    };
+
+    loadSvg();
+  }, [name, fs]);
 
   if (error) {
     return (
@@ -63,16 +76,27 @@ const Icon = ({
       />
     );
   }
-  if (!Component) {
+  if ((!Component && !fs) || (fs && !isLoaded)) {
     return <PointSkeleton className={className} style={style} size={size} />;
   }
   return (
-    <Component
-      className={[className, status ? classes[name] : ""].join(" ")}
-      width={`${size}rem`}
-      height={`${size}rem`}
-      style={{ fill: color, stroke: color, strokeWidth, ...style }}
-    />
+    <>
+      {Component && (
+        <Component
+          className={[className, status ? classes[name] : ""].join(" ")}
+          width={`${size}rem`}
+          height={`${size}rem`}
+          style={{ fill: color, stroke: color, strokeWidth, ...style }}
+        />
+      )}
+      {!Component && isLoaded && (
+        <span
+          dangerouslySetInnerHTML={{ __html: svg }}
+          className={[className, status ? classes[name] : ""].join(" ")}
+          style={{ fill: color, stroke: color, strokeWidth, ...style, width: `${size}rem`, height: `${size}rem` }}
+        />
+      )}
+    </>
   );
 };
 
