@@ -19,6 +19,7 @@ export default defineConfig({
       registerType: "autoUpdate",
       workbox: {
         globPatterns: ["**/*.{js,css,html,ico,png}"],
+        globIgnores: ["**/index-*.js", "**/*.worker*.js"],
       },
       includeAssets: ["assets/favicon.ico", "assets/images/logo192.png"],
       manifest: {
@@ -29,12 +30,12 @@ export default defineConfig({
         background_color: "#000000",
         icons: [
           {
-            src: "assets/images/logo192.png",
+            src: "images/logo192.png",
             sizes: "192x192",
             type: "image/png",
           },
           {
-            src: "assets/images/logo512.png",
+            src: "images/logo512.png",
             sizes: "512x512",
             type: "image/png",
           },
