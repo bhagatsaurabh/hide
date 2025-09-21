@@ -45,6 +45,7 @@ jobs:
         with:
           repoToken: ${{ secrets.GITHUB_TOKEN }}
           firebaseServiceAccount: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_HIDE_43A4B }}
+          channelId: live
           projectId: hide-43a4b
 
   Cleanup:
