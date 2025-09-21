@@ -55,7 +55,7 @@ const EmailProvider = () => {
       }
 
       try {
-        const res = await registerEmail(email);
+        await registerEmail(email);
         setpinRequested(true);
       } catch (error) {
         if (!isAxiosError(error) || !errorMap[error.response?.data.message]) {

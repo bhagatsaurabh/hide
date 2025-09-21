@@ -17,6 +17,10 @@ const getSingleton = async <T>(name: string) => {
 };
 const updateSingleton = async (name: string, value: string) => {
   return new Promise<void>((resolve, reject) => {
+    if (!db) {
+      reject("DB not connected");
+      return;
+    }
     try {
       const request = db.transaction(name, "readwrite").objectStore(name).put(value, "default");
       request.onsuccess = () => resolve();
@@ -44,6 +48,10 @@ const getObject = async <T>(objectStore: string, key: string) => {
 };
 const updateObject = async <T>(objectStore: string, key: string, value: T) => {
   return new Promise<void>((resolve, reject) => {
+    if (!db) {
+      reject("DB not connected");
+      return;
+    }
     try {
       const request = db.transaction(objectStore, "readwrite").objectStore(objectStore).put(value, key);
       request.onsuccess = () => resolve();
@@ -55,6 +63,10 @@ const updateObject = async <T>(objectStore: string, key: string, value: T) => {
 };
 const deleteObject = async (objectStore: string, key: string) => {
   return new Promise<void>((resolve, reject) => {
+    if (!db) {
+      reject("DB not connected");
+      return;
+    }
     try {
       const request = db.transaction(objectStore, "readwrite").objectStore(objectStore).delete(key);
       request.onsuccess = () => resolve();
@@ -97,6 +109,10 @@ const getAllKeys = (objectStore: string) => {
 
 const iterateCursor = <T>(objectStoreName: string, indexName: string, batchSize = 20, position: number) => {
   return new Promise<{ results: T[]; cursorPosition: IDBValidKey | null }>((resolve, reject) => {
+    if (!db) {
+      reject("DB not connected");
+      return;
+    }
     const results: T[] = [];
     const store = db.transaction(objectStoreName).objectStore(objectStoreName);
     let advanceBy = position;

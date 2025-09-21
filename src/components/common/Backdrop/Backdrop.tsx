@@ -1,6 +1,6 @@
 import { AnimatePresence, motion } from "motion/react";
 import classes from "./Backdrop.module.css";
-import { CSSProperties, ReactNode } from "react";
+import { ReactNode } from "react";
 
 interface BackdropProps {
   show: boolean;

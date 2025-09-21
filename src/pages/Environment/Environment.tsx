@@ -30,8 +30,6 @@ import { getRandomAccentColor, throttle } from "@/utils";
 import { Unsubscribe } from "nanoevents";
 import bus from "@/config/bus";
 import Modal, { ModalRef } from "@/components/common/Modal/Modal";
-import Button from "@/components/common/Button/Button";
-import Logo from "@/components/common/Logo/Logo";
 import { InternalNotificationPayload } from "@/models/notification";
 import EnvAbout from "@/components/EnvAbout/EnvAbout";
 const schemaMobile = layoutMobile as PanelSchema;

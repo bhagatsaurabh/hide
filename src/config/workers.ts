@@ -1,7 +1,7 @@
 import "monaco-editor";
 
-self.MonacoEnvironment = {
-  getWorker: async function (_workerId, label) {
+(self as unknown as { MonacoEnvironment: unknown }).MonacoEnvironment = {
+  getWorker: async function (_workerId: string, label: string) {
     switch (label) {
       case "json":
         return new (await import("monaco-editor/esm/vs/language/json/json.worker?worker")).default();
