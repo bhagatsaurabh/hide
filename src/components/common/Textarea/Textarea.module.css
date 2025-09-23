@@ -30,11 +30,13 @@
   height: 100%;
   left: 0;
   text-align: left;
+  display: flex;
+  align-items: center;
   line-height: 2rem;
   color: #9b9b9b;
   pointer-events: none;
   transition: all 0.1s ease-out;
-  top: 75%;
+  top: 70%;
   font-size: 0.75rem;
 }
 
@@ -61,7 +63,7 @@
   background-color: #ed7b7b;
 }
 .input:focus-within::before {
-  top: 45%;
+  top: 70%;
   font-size: 0.75rem;
 }
 .input textarea:focus {

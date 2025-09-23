@@ -105,7 +105,7 @@ const Banner = ({ className }: BannerProps) => {
     <aside className={classNames.join(" ")}>
       <ul>
         <AnimatePresence mode="popLayout">
-          {notifications.reverse().map((ntfn) => {
+          {notifications.slice().reverse().map((ntfn) => {
             return (
               <motion.li
                 key={ntfn.id}

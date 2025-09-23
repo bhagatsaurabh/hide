@@ -74,7 +74,7 @@ export const Create = () => {
     );
     const { success } = res.payload as { success: boolean; wait?: boolean };
     if (success) {
-      navigate("/dashboard/status", { state: { workspaceName: name } });
+      navigate("/dashboard/status", { state: { workspaceName: name, wsUuid: "", isNew: true } });
     }
     setBusy(false);
   };

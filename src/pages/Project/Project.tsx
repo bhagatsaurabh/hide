@@ -23,6 +23,9 @@ import AddMembers from "@/components/AddMembers/AddMembers";
 import Spinner from "@/components/common/Spinner/Spinner";
 import Icon from "@/components/common/Icon/Icon";
 import { getSSHKey } from "@/utils/driver";
+import { notify } from "@/store/notifications";
+import { InternalNotificationPayload } from "@/models/notification";
+import { openEnv } from "@/store/env";
 
 export const Project = () => {
   const workspaceId = useLoaderData<typeof workspaceLoader>();
@@ -67,8 +70,26 @@ export const Project = () => {
     }
   }, []);
 
-  const handleOpen = () => {
-    navigate(`/env/${workspace.uuid}`);
+  const handleOpen = async () => {
+    const sessionId = sessionStorage.getItem("sessionId");
+    if (!sessionId) {
+      dispatch(
+        notify({ title: "No session", message: "Session inactive", status: "warning" } as InternalNotificationPayload)
+      );
+      return;
+    }
+    const res = await dispatch(openEnv({ uuid: workspace.uuid, sessionId }));
+    const { success, wait } = res.payload as { success: boolean; wait?: boolean };
+    if (success) {
+      if (wait) {
+        navigate("/dashboard/status", {
+          state: { workspaceName: workspace.name, wsUuid: workspace.uuid, isNew: false },
+        });
+        return;
+      }
+
+      navigate(`/env/${workspace.uuid}`);
+    }
   };
   const handleUpdate = async () => {
     if (nameRef.current?.input.current?.validate(newName) || descRef.current?.input.current?.validate(newDesc)) {
