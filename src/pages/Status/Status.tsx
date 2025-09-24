@@ -12,6 +12,7 @@ import { ProvisionPayload, ProvisionSuccess } from "@/models/workspace";
 import { processNewWorkspace } from "@/store/workspace";
 import { InternalNotificationPayload } from "@/models/notification";
 import Button from "@/components/common/Button/Button";
+import RadialProgress from "@/components/common/RadialProgress/RadialProgress";
 
 export const Status = () => {
   const navigate = useNavigate();
@@ -96,14 +97,17 @@ export const Status = () => {
     }
   }, [dispatch, handleDismiss, isNew, provStatus, uuid]);
 
-  let displayStatus = isNew ? "0/?:Creating your workspace" : "0/?:Restoring your workspace";
+  let displayStatus = `0/6:${isNew ? "Creating your workspace" : "Restoring your workspace"}`;
   if (provStatus?.action === "status") {
     displayStatus = provStatus.payload.message;
   } else if (provStatus?.action === "success") {
-    displayStatus = "Ready";
+    // displayStatus = "Ready";
   } else if (provStatus?.action === "error") {
     displayStatus = "Error";
   }
+
+  const [meta, msg] = displayStatus.split(":");
+  const [currStep, totalSteps] = meta.split("/").map((val) => parseInt(val));
 
   return (
     <>
@@ -121,7 +125,7 @@ export const Status = () => {
           </Button>
         )}
         <br />
-        <span className={classes.message}>{displayStatus}</span>
+        <RadialProgress currStep={currStep} totalSteps={totalSteps} msg={msg} />
       </div>
     </>
   );
