@@ -4,6 +4,7 @@ import { Null } from "@/utils/types";
 import classes from "./Textarea.module.css";
 import classNames from "classnames";
 import { noop } from "@/utils";
+import Icon from "../Icon/Icon";
 
 interface Attrs {
   disabled?: boolean;
@@ -32,6 +33,7 @@ export interface TextareaProps {
   className?: string;
   style?: CSSProperties;
   children?: ReactNode;
+  size?: number;
 }
 
 export const Textarea = ({
@@ -48,9 +50,17 @@ export const Textarea = ({
   className,
   style = {},
   children,
+  size = 1,
 }: TextareaProps) => {
   const native = useRef<Null<HTMLTextAreaElement>>(null);
   const [err, setErr] = useState<string>("");
+
+  const dStyle = {
+    ...style,
+    "--data-size": `${size}rem`,
+    "--meta-size": `${size * 0.75}rem`,
+    "--err-size": `${size * 0.88}rem`,
+  };
 
   useEffect(() => {
     if (focus) native.current?.focus();
@@ -92,9 +102,10 @@ export const Textarea = ({
           [classes["invalid"]]: !!err,
           "mt-1p5": validation !== "Off",
           [className ?? ""]: true,
+          "fs-0": true,
         })}
         data-placeholder={placeholder}
-        style={style}
+        style={dStyle}
       >
         <textarea
           className={className ?? ""}
@@ -104,18 +115,26 @@ export const Textarea = ({
           placeholder={noTitle ? placeholder : undefined}
           name={placeholder}
           onBlur={onBlur}
-          style={style}
+          style={dStyle}
           {...attrs}
         />
         <AnimatePresence>
           {validation !== "Off" && !!err ? (
             <motion.span
-              initial={{ scaleY: 0 }}
-              animate={{ scaleY: 1 }}
-              exit={{ scaleY: 0 }}
+              initial={{ opacity: 0, bottom: "calc(100% - 0.2rem)" }}
+              animate={{ opacity: 1, bottom: "100%" }}
+              exit={{ opacity: 0, bottom: "calc(100% - 0.2rem)" }}
               className={classNames([classes["errormsg"]])}
             >
-              {err}
+              <Icon
+                size={size * 0.9}
+                className="mr-0p25"
+                name="info"
+                statusClass="info-warning"
+                strokeWidth={2}
+                status
+              />
+              <span>{err}</span>
             </motion.span>
           ) : null}
         </AnimatePresence>

@@ -11,6 +11,9 @@
   color: #ddd;
   display: flex;
   flex-direction: column;
+  padding-top: 0 !important;
+  max-height: 90%;
+  overflow-y: auto;
 }
 .modal.slide {
 }
@@ -31,6 +34,9 @@
 }
 .modal.full {
   height: 100%;
+  box-shadow: none;
+}
+.modal.plain {
   box-shadow: none;
 }
 .modal.ignore-header {

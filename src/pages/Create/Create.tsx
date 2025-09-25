@@ -2,7 +2,7 @@ import { Input, InputRef } from "@/components/common/Input/Input";
 import classes from "./Create.module.css";
 import { useAppDispatch, useAppSelector } from "@/hooks/store";
 import { createNewWorkspace } from "@/store/workspace";
-import { nameRegex } from "@/utils/constants";
+import { codeRegex, nameRegex } from "@/utils/constants";
 import { useCallback, useRef, useState } from "react";
 import { useNavigate } from "react-router";
 import Backdrop from "@/components/common/Backdrop/Backdrop";
@@ -12,12 +12,19 @@ import { auth } from "@/config/firebase";
 import { Textarea, TextareaRef } from "@/components/common/Textarea/Textarea";
 import { selectTemplates } from "@/store/env";
 import { Template } from "@/models/env";
+import Toggle from "@/components/common/Toggle/Toggle";
+import InfoTip from "@/components/common/InfoTip/InfoTip";
+import WorkspaceTypeInfo from "@/components/WorkspaceTypeInfo/WorkspaceTypeInfo";
+import CodeInput, { CodeInputRef } from "@/components/common/CodeInput/CodeInput";
+import classNames from "classnames";
 
 export const Create = () => {
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
+  const [code, setCode] = useState("");
   const [busy, setBusy] = useState(false);
   const nameInput = useRef<InputRef>(null);
+  const codeInput = useRef<CodeInputRef>(null);
   const descInput = useRef<TextareaRef>(null);
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
@@ -39,6 +46,7 @@ export const Create = () => {
     icon: template.path.substring(template.path.lastIndexOf("/") + 1, template.path.indexOf(".svg")),
   }));
   const [image, setImage] = useState<Chip>(imageChips[0]);
+  const [isDedicated, setIsDedicated] = useState(false);
 
   const trapFocus = useCallback((event: KeyboardEvent) => {
     if (event.key === "Tab") {
@@ -61,6 +69,7 @@ export const Create = () => {
 
   const handleCreateWorkspace = async () => {
     if (nameInput.current?.validate(name)) return;
+    if (codeInput.current?.validate(code)) return;
 
     setBusy(true);
     const res = await dispatch(
@@ -86,6 +95,13 @@ export const Create = () => {
     }
     return "";
   };
+  const validateCode = (val: string) => {
+    if (!val) return "Provide a code";
+    if (!codeRegex.test(val)) {
+      return "Enter a valid code";
+    }
+    return "";
+  };
 
   const handleDismiss = () => {
     if (busy) return;
@@ -102,27 +118,55 @@ export const Create = () => {
       <Backdrop show={show} onDismiss={handleDismiss} />
       <div className={classes.create}>
         <div className={classes.heading}>
-          <h2>New Workspace</h2>
-          <Button onClick={handleDismiss} className="p-0p75" size={1.25} icon="close" fit />
+          <h2 className={classes.title}>New Workspace</h2>
+          <Button onClick={handleDismiss} className="p-0p75" size={1} icon="close" fit />
         </div>
-        <Input
-          attrs={{ spellCheck: false, autoComplete: "off" }}
-          placeholder="Name"
-          type="text"
-          value={name}
-          onChange={setName}
-          validator={validateName}
-          ref={nameInput}
-        />
-        <Textarea
-          className="scrollable"
-          attrs={{ spellCheck: false, autoComplete: "off" }}
-          placeholder="Description"
-          type="text"
-          value={description}
-          onChange={setDescription}
-          ref={descInput}
-        />
+        <div className={classes.wrapper}>
+          <div className={classes.inputs}>
+            <Input
+              attrs={{ spellCheck: false, autoComplete: "off" }}
+              placeholder="Name"
+              type="text"
+              value={name}
+              onChange={setName}
+              validator={validateName}
+              ref={nameInput}
+              size={0.9}
+            />
+            <Textarea
+              className="scrollable"
+              attrs={{ spellCheck: false, autoComplete: "off" }}
+              placeholder="Description"
+              type="text"
+              value={description}
+              onChange={setDescription}
+              ref={descInput}
+              size={0.9}
+              validation="Off"
+            />
+          </div>
+          <div className={classes.category}>
+            <div>
+              <h4 className={classes.fieldname}>
+                <span>Dedicated </span>
+                <InfoTip title="Workspace types" color="#f5f5dcdb">
+                  <WorkspaceTypeInfo />
+                </InfoTip>
+              </h4>
+              <Toggle on={isDedicated} onchange={setIsDedicated} className="mb-0p5" />
+            </div>
+            <CodeInput
+              length={16}
+              sublength={4}
+              className={classNames([isDedicated ? classes.show : classes.hide, "mb-1p5"])}
+              onChange={setCode}
+              validator={validateCode}
+              ref={codeInput}
+              size={0.9}
+              placeholder="Access code"
+            />
+          </div>
+        </div>
         <div className={classes.chips}>
           <ChipGroup onChange={(chip) => setImage(chip)} value={image.id} chips={imageChips} />
         </div>

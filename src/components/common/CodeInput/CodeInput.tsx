@@ -1,30 +1,48 @@
-import { RefObject, useImperativeHandle, useRef, useState } from "react";
-import classes from "./PINInput.module.css";
+import { CSSProperties, RefObject, useEffect, useImperativeHandle, useRef, useState } from "react";
+import classes from "./CodeInput.module.css";
 import { noop } from "@/utils";
 import { Null } from "@/utils/types";
 import { motion } from "motion/react";
 import classNames from "classnames";
-import { pinRegex } from "@/utils/constants";
+import { codeRegex, pinRegex } from "@/utils/constants";
 
-export interface PINInputRef {
+export interface CodeInputRef {
   validate: (val: string) => string;
   invalidate: (msg: string) => void;
   focus: () => void;
   clear: (focus: boolean) => void;
 }
-interface PINInuptProps {
+interface CodeInputProps {
   length: number;
+  sublength: number;
   onChange?: (value: string) => void;
   validator?: (val: string) => string;
   validation?: "Lazy" | "Eager" | "Off";
   className?: string;
-  ref?: RefObject<Null<PINInputRef>>;
+  ref?: RefObject<Null<CodeInputRef>>;
+  size?: number;
+  placeholder: string;
 }
 
-const PINInput = ({ length, onChange = noop, validator = () => "", validation = "Lazy", ref }: PINInuptProps) => {
+const CodeInput = ({
+  length,
+  sublength,
+  onChange = noop,
+  validator = () => "",
+  validation = "Lazy",
+  ref,
+  size = 1,
+  className = "",
+  placeholder,
+}: CodeInputProps) => {
   const [chars, setChars] = useState<string[]>(Array(length).fill(""));
   const inputs = useRef<HTMLInputElement[]>([]);
   const [err, setErr] = useState<string>("");
+  const [top, setTop] = useState(0);
+
+  useEffect(() => {
+    inputs.current[top]?.focus();
+  }, [top]);
 
   useImperativeHandle(ref, () => ({
     validate,
@@ -45,11 +63,9 @@ const PINInput = ({ length, onChange = noop, validator = () => "", validation = 
   };
 
   const handleChange = (value: string, index: number) => {
-    if (pinRegex.test(value)) {
+    if (/^[A-HJ-KM-NP-Z2-9a-hj-km-np-z]{1}$/.test(value)) {
       if (validation === "Eager") validate(value);
-      else {
-        setErr("");
-      }
+      else setErr("");
 
       const newChars = [...chars];
       newChars[index] = value;
@@ -57,19 +73,27 @@ const PINInput = ({ length, onChange = noop, validator = () => "", validation = 
       onChange(newChars.join(""));
 
       if (value && index < length - 1) {
-        inputs.current[index + 1].focus();
+        setTop(top + 1);
       }
     }
   };
-  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>, index: number) => {
-    if (e.key === "Backspace" && !chars[index] && index > 0) {
-      inputs.current[index - 1]?.focus();
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>, _idx: number) => {
+    if (e.key === "Backspace" && top > 0) {
+      const updatedChars = [...chars];
+      if (top === length - 1 && chars[top]) {
+        updatedChars[top] = "";
+        setTop(top);
+      } else {
+        updatedChars[top - 1] = "";
+        setTop(top - 1);
+      }
+      setChars(updatedChars);
     }
   };
   const handlePaste = (e: React.ClipboardEvent<HTMLInputElement>) => {
     e.preventDefault();
-    const pasted = e.clipboardData.getData("text").slice(0, length);
-    if (pinRegex.test(pasted)) {
+    const pasted = e.clipboardData.getData("text").slice(0, length).toUpperCase();
+    if (codeRegex.test(pasted)) {
       const pastedChars = pasted.split("");
       const newChars = [...chars];
       pastedChars.forEach((char, idx) => {
@@ -77,15 +101,29 @@ const PINInput = ({ length, onChange = noop, validator = () => "", validation = 
       });
       setChars(newChars.map((char) => char.toUpperCase()));
       onChange(newChars.join(""));
-
-      const nextIdx = Math.min(pastedChars.length, length - 1);
-      inputs.current[nextIdx]?.focus();
+      setTop(length - 1);
     }
+  };
+  const handleFocus = (idx: number) => {
+    if (idx === top) return;
+    inputs.current[top].focus();
   };
 
   return (
-    <>
-      <div className={classes.pin}>
+    <label className={className}>
+      <div
+        className={classNames([classes.code])}
+        tabIndex={0}
+        onFocus={() => inputs.current[top].focus()}
+        data-placeholder={placeholder}
+        style={
+          {
+            "--meta-size": `${size * 0.75}rem`,
+            "--data-size": `${size}rem`,
+            "--err-size": `${size * 0.88}rem`,
+          } as CSSProperties
+        }
+      >
         {chars.map((val, idx) => (
           <input
             key={idx}
@@ -96,7 +134,10 @@ const PINInput = ({ length, onChange = noop, validator = () => "", validation = 
             onPaste={handlePaste}
             maxLength={1}
             inputMode="text"
-            className={classes.input}
+            className={classNames([classes.input, (idx + 1) % sublength === 0 ? classes.edge : ""])}
+            placeholder="-"
+            onFocus={() => handleFocus(idx)}
+            tabIndex={-1}
           />
         ))}
       </div>
@@ -109,8 +150,8 @@ const PINInput = ({ length, onChange = noop, validator = () => "", validation = 
       >
         {err}
       </motion.span>
-    </>
+    </label>
   );
 };
 
-export default PINInput;
+export default CodeInput;

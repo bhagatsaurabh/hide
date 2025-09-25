@@ -1,7 +1,7 @@
 .create {
   position: relative;
   z-index: 101;
-  padding: 2.5rem;
+  padding: 1.75rem;
   background-color: #262626d4;
 }
 .create h2 {
@@ -12,17 +12,59 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
+  margin-bottom: 2rem;
 }
 .create > label {
   width: 100%;
+}
+.heading .title {
+  margin: 0;
+  font-size: 1.25rem;
+}
+.inputs {
+  display: flex;
+  flex-direction: column;
+  flex-shrink: 0;
+}
+.wrapper {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1.5rem;
+}
+.fieldname {
+  font-size: 0.9rem;
+  margin: 0;
+  color: #f5f5dcdb;
+  font-weight: 300;
+  margin-bottom: 0.5rem;
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+.category {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+.show,
+.hide {
+  transition: opacity 0.05s linear;
+}
+.show {
+  opacity: 1;
+  pointer-events: all;
+}
+.hide {
+  opacity: 0;
+  pointer-events: none;
 }
 
 @media (min-width: 768px) {
   .create {
     width: 40rem;
   }
-  .create > label {
+  .inputs > label {
     display: block;
-    width: 20rem;
+    width: 16rem;
   }
 }

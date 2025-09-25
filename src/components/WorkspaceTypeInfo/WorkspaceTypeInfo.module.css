@@ -1,0 +1,12 @@
+.title {
+  color: beige;
+  font-family: "Inter";
+  font-weight: 300;
+  font-size: 1rem;
+  margin-bottom: 1.25rem;
+  margin-top: 2rem;
+}
+.infolist {
+  padding-left: 1rem;
+  margin: 0;
+}

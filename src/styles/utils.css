@@ -57,6 +57,9 @@
 .mb-0p5 {
   margin-bottom: 0.5rem;
 }
+.mb-0 {
+  margin-bottom: 0;
+}
 .mb-0p25 {
   margin-bottom: 0.25rem;
 }
@@ -467,12 +470,18 @@
 .w-16 {
   width: 16rem;
 }
+.mb-1p2 {
+  margin-bottom: 1.2rem;
+}
 
 .c-dark.c-dark {
   color: #000;
 }
 .rotate-90 {
   transform: rotate(90deg);
+}
+.d-inline {
+  display: inline;
 }
 
 @supports selector(::-webkit-scrollbar) {

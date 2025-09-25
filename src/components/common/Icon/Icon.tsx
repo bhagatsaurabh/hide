@@ -9,6 +9,7 @@ interface IconProps {
   className?: string;
   color?: string;
   status?: boolean;
+  statusClass?: string;
   style?: CSSProperties;
   strokeWidth?: number;
   fs?: boolean;
@@ -21,6 +22,7 @@ const Icon = ({
   className,
   color,
   status = false,
+  statusClass = "",
   style = {},
   fs = false,
 }: IconProps) => {
@@ -83,7 +85,7 @@ const Icon = ({
     <>
       {Component && (
         <Component
-          className={[className, status ? classes[name] : ""].join(" ")}
+          className={[className, status ? classes[name] : "", classes[statusClass]].join(" ")}
           width={`${size}rem`}
           height={`${size}rem`}
           style={{ fill: color, stroke: color, strokeWidth, ...style }}
@@ -92,7 +94,7 @@ const Icon = ({
       {!Component && isLoaded && (
         <span
           dangerouslySetInnerHTML={{ __html: svg }}
-          className={[className, status ? classes[name] : ""].join(" ")}
+          className={[className, status ? classes[name] : "", classes[statusClass]].join(" ")}
           style={{ fill: color, stroke: color, strokeWidth, ...style, width: `${size}rem`, height: `${size}rem` }}
         />
       )}
