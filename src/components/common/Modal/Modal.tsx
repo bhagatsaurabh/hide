@@ -53,7 +53,7 @@ const Modal = ({
   anchor,
   plain,
 }: ModalProps) => {
-  const layerLevel = layer ?? 0;
+  const layerLevel = layer ?? 50;
 
   const [show, setShow] = useState(false);
   const dispatch = useAppDispatch();
@@ -63,7 +63,7 @@ const Modal = ({
   const node = useRef<Node>(null);
   const bound = useRef<{ first: HTMLElement | null; last: HTMLElement | null }>(null);
   const modalRef = useRef<HTMLDivElement>(null);
-  const classNames = [classes.modal, classes[`layer${layerLevel}`], "scrollable"];
+  const classNames = [classes.modal, "scrollable"];
   if (className) classNames.push(className);
   if (full) {
     classNames.push(classes.full);
@@ -193,7 +193,7 @@ const Modal = ({
             animate={animate}
             exit={exit}
             transition={{ ease: "easeIn", duration: 0.15 }}
-            style={style}
+            style={{ ...style, "--data-layer": layerLevel } as CSSProperties}
           >
             {children}
           </motion.div>

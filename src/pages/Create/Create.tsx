@@ -1,10 +1,10 @@
 import { Input, InputRef } from "@/components/common/Input/Input";
 import classes from "./Create.module.css";
 import { useAppDispatch, useAppSelector } from "@/hooks/store";
-import { createNewWorkspace } from "@/store/workspace";
+import { createNewWorkspace, requestDedicatedAccess, selectDedicatedWorkspacesCount } from "@/store/workspace";
 import { codeRegex, nameRegex } from "@/utils/constants";
 import { useCallback, useRef, useState } from "react";
-import { useNavigate } from "react-router";
+import { useLocation, useNavigate } from "react-router";
 import Backdrop from "@/components/common/Backdrop/Backdrop";
 import Button from "@/components/common/Button/Button";
 import ChipGroup, { Chip } from "@/components/common/ChipGroup/ChipGroup";
@@ -17,21 +17,29 @@ import InfoTip from "@/components/common/InfoTip/InfoTip";
 import WorkspaceTypeInfo from "@/components/WorkspaceTypeInfo/WorkspaceTypeInfo";
 import CodeInput, { CodeInputRef } from "@/components/common/CodeInput/CodeInput";
 import classNames from "classnames";
+import Modal, { ModalRef } from "@/components/common/Modal/Modal";
 
 export const Create = () => {
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
-  const [code, setCode] = useState("");
+  const location = useLocation();
+  const [code, setCode] = useState(location.state?.code ?? "");
+  const [reason, setReason] = useState("");
   const [busy, setBusy] = useState(false);
+  const [showRequest, setShowRequest] = useState(false);
+  const [reqBusy, setReqBusy] = useState(false);
+  const showRequestRef = useRef<ModalRef>(null);
   const nameInput = useRef<InputRef>(null);
   const codeInput = useRef<CodeInputRef>(null);
   const descInput = useRef<TextareaRef>(null);
+  const reasonInput = useRef<TextareaRef>(null);
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
   const [show, setShow] = useState(true);
   const node = useRef<Node>(null);
   const bound = useRef<{ first: HTMLElement | null; last: HTMLElement | null }>(null);
   const templates = useAppSelector(selectTemplates);
+  const noOfDedicatedWrspcs = useAppSelector(selectDedicatedWorkspacesCount);
   const imageChips = [
     ...templates.map((template) => ({
       ...template,
@@ -46,7 +54,7 @@ export const Create = () => {
     icon: template.path.substring(template.path.lastIndexOf("/") + 1, template.path.indexOf(".svg")),
   }));
   const [image, setImage] = useState<Chip>(imageChips[0]);
-  const [isDedicated, setIsDedicated] = useState(false);
+  const [isDedicated, setIsDedicated] = useState(!!location.state?.code);
 
   const trapFocus = useCallback((event: KeyboardEvent) => {
     if (event.key === "Tab") {
@@ -77,6 +85,8 @@ export const Create = () => {
         name,
         description,
         image: (image as unknown as Template).image,
+        dedicated: isDedicated,
+        accessCode: code,
         uid: auth.currentUser!.uid,
         sessionId: sessionStorage.getItem("sessionId")!,
       })
@@ -112,9 +122,51 @@ export const Create = () => {
       navigate(-1);
     }
   };
+  const handleRequestAccess = async () => {
+    setReqBusy(true);
+    const success = await dispatch(requestDedicatedAccess({ reason })).unwrap();
+    setReqBusy(false);
+
+    if (success) {
+      showRequestRef.current?.close();
+    }
+  };
 
   return (
     <>
+      {showRequest && (
+        <Modal
+          title="request-dedicated-access"
+          onDismiss={() => setShowRequest(false)}
+          ref={showRequestRef}
+          className="p-1p5"
+          type="pop"
+          layer={70}
+          plain
+        >
+          <div className={classes.request}>
+            <div className="d-flex justify-content-space-between align-items-center">
+              <h2>Request access code</h2>
+              <Button icon="close" className="p-0p5" size={0.9} fit onClick={() => showRequestRef.current?.close()} />
+            </div>
+            <h3>Let us know why (helps us to provide the access code quicker)</h3>
+            <Textarea
+              className="scrollable w-100p"
+              attrs={{ spellCheck: false, autoComplete: "off" }}
+              placeholder="Reason (optional)"
+              type="text"
+              value={reason}
+              onChange={setReason}
+              ref={reasonInput}
+              size={0.9}
+              validation="Off"
+            />
+            <Button busy={reqBusy} className="p-0p5 mt-1" size={1} onClick={handleRequestAccess}>
+              Request
+            </Button>
+          </div>
+        </Modal>
+      )}
       <Backdrop show={show} onDismiss={handleDismiss} />
       <div className={classes.create}>
         <div className={classes.heading}>
@@ -153,18 +205,24 @@ export const Create = () => {
                   <WorkspaceTypeInfo />
                 </InfoTip>
               </h4>
-              <Toggle on={isDedicated} onchange={setIsDedicated} className="mb-0p5" />
+              <Toggle on={isDedicated} onchange={setIsDedicated} className="mb-1" />
             </div>
-            <CodeInput
-              length={16}
-              sublength={4}
-              className={classNames([isDedicated ? classes.show : classes.hide, "mb-1p5"])}
-              onChange={setCode}
-              validator={validateCode}
-              ref={codeInput}
-              size={0.9}
-              placeholder="Access code"
-            />
+            <div className={classNames([classes.accesscode, "mb-1p5", isDedicated ? classes.show : classes.hide])}>
+              <CodeInput
+                length={16}
+                sublength={4}
+                onChange={setCode}
+                validator={validateCode}
+                ref={codeInput}
+                size={0.9}
+                placeholder="Access code"
+              />
+              {!noOfDedicatedWrspcs && (
+                <Button className="py-0p25 px-0p5" size={0.85} onClick={() => setShowRequest(true)}>
+                  Request
+                </Button>
+              )}
+            </div>
           </div>
         </div>
         <div className={classes.chips}>

@@ -153,7 +153,7 @@ export const Project = () => {
           type="pop"
           onDismiss={() => setToRemove(null)}
           ref={diagRef}
-          layer={2}
+          layer={52}
           className="p-1p5"
         >
           <div className={classes.removedialog}>
@@ -180,7 +180,7 @@ export const Project = () => {
           type="pop"
           onDismiss={() => setToDelete(false)}
           ref={diagDelRef}
-          layer={2}
+          layer={52}
           className="p-1p5"
         >
           <div className={classes.deletedialog}>
@@ -203,7 +203,7 @@ export const Project = () => {
           type="pop"
           onDismiss={() => setShowAdd(false)}
           ref={addDiagRef}
-          layer={2}
+          layer={52}
           className="p-1p5"
         >
           <AddMembers workspace={workspace} onBack={() => addDiagRef.current?.close()} />

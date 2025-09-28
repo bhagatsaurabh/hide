@@ -1,6 +1,5 @@
 .modal {
   position: fixed;
-  z-index: 50;
   top: 50%;
   left: 0;
   transform: translateY(-50%);
@@ -14,6 +13,7 @@
   padding-top: 0 !important;
   max-height: 90%;
   overflow-y: auto;
+  z-index: var(--data-layer);
 }
 .modal.slide {
 }
@@ -43,16 +43,6 @@
   top: calc(50% + var(--header-height));
   transform: translateY(calc(-50% - var(--header-height) / 2));
   height: calc(100% - var(--header-height));
-}
-
-.modal.layer0 {
-  z-index: 101;
-}
-.modal.layer1 {
-  z-index: 106;
-}
-.modal.layer2 {
-  z-index: 111;
 }
 
 @media (min-width: 768px) {

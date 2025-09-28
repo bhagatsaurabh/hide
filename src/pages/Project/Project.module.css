@@ -1,6 +1,6 @@
 .project {
   position: relative;
-  z-index: 101;
+  z-index: 50;
   padding: 1.5rem;
   background-color: #262626d4;
   color: beige;

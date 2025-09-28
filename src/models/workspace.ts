@@ -21,6 +21,7 @@ export interface WorkspaceDTO {
   memberships: MembershipDTO[];
   image: string;
   status: WorkspaceStatus;
+  dedicated: boolean;
 }
 
 export interface MembershipDTO {
@@ -39,6 +40,8 @@ export interface WorkspaceCreateDTO {
   image: string;
   uid: string;
   sessionId: string;
+  dedicated: boolean;
+  accessCode: string;
 }
 export interface WorkspaceUpdateDTO {
   id: number;

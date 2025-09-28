@@ -11,10 +11,13 @@ import {
   InternalNotificationPayload,
   InternalNotificationType,
   UserNotificationPayload,
+  WorkspaceAccessRequest,
   WorkspaceInvite,
 } from "@/models/notification";
 import Button from "../Button/Button";
-import { respondToInvitation } from "@/store/workspace";
+import { deleteAccessCode, respondToInvitation } from "@/store/workspace";
+import Copy from "../Copy/Copy";
+import { useNavigate } from "react-router";
 
 const iconMap = {
   info,
@@ -31,6 +34,7 @@ interface BannerProps {
 const Banner = ({ className }: BannerProps) => {
   const notifications = useAppSelector(selectActiveNotifications);
   const dispatch = useAppDispatch();
+  const navigate = useNavigate();
 
   const classNames = [classes.banner, className ?? ""];
 
@@ -39,6 +43,14 @@ const Banner = ({ className }: BannerProps) => {
   };
   const handleInvitation = async (ntfn: WorkspaceInvite, accept: boolean) => {
     await dispatch(respondToInvitation({ accept, ntfn }));
+  };
+  const handleCode = async (ntfn: WorkspaceAccessRequest, del?: boolean) => {
+    if (del) {
+      await dispatch(deleteAccessCode(ntfn));
+      return;
+    }
+
+    navigate("/dashboard/new", { state: { code: ntfn.code } });
   };
 
   const getNtfn = (notification: UserNotificationPayload) => {
@@ -98,6 +110,43 @@ const Banner = ({ className }: BannerProps) => {
           </>
         );
       }
+      case "workspace-access-code": {
+        const ntfn = notification as WorkspaceAccessRequest;
+        const Icon = iconMap["info"];
+        return (
+          <>
+            <div className={classes.heading}>
+              <div className={classes.left}>
+                <Icon className={[classes.icon, classes.info].join(" ")} />
+                <span className={classes.title}>Dedicated workspace access-code</span>
+              </div>
+              <Button
+                type="primary"
+                className="p-0p5 ml-auto flex-shrink-0"
+                onClick={() => handleDismiss(ntfn.id)}
+                iconProps={{ strokeWidth: 2 }}
+                icon="close"
+                fit
+              />
+            </div>
+            <span className={classes.msg}>
+              You've received an access code to create a new dedicated workspace ! This access code will stay valid
+              for 5 days only.
+              <br />
+              <span className={classes.code}>{ntfn.code}</span>
+              <Copy value={() => ntfn.code} />
+            </span>
+            <div className={classes.controls}>
+              <Button type="secondary" className="m-0 m-0 p-0p5" onClick={() => handleCode(ntfn, false)} fit>
+                Use
+              </Button>
+              <Button type="tertiary" className="m-0 p-0p5" onClick={() => handleCode(ntfn, true)} fit>
+                Delete
+              </Button>
+            </div>
+          </>
+        );
+      }
     }
   };
 
@@ -105,20 +154,23 @@ const Banner = ({ className }: BannerProps) => {
     <aside className={classNames.join(" ")}>
       <ul>
         <AnimatePresence mode="popLayout">
-          {notifications.slice().reverse().map((ntfn) => {
-            return (
-              <motion.li
-                key={ntfn.id}
-                initial={{ scale: 0.8, opacity: 0 }}
-                animate={{ scale: 1, opacity: 1 }}
-                exit={{ scale: 0.8, opacity: 0 }}
-                transition={{ type: "spring", duration: 0.2 }}
-                layout
-              >
-                {getNtfn(ntfn)}
-              </motion.li>
-            );
-          })}
+          {notifications
+            .slice()
+            .reverse()
+            .map((ntfn) => {
+              return (
+                <motion.li
+                  key={ntfn.id}
+                  initial={{ scale: 0.8, opacity: 0 }}
+                  animate={{ scale: 1, opacity: 1 }}
+                  exit={{ scale: 0.8, opacity: 0 }}
+                  transition={{ type: "spring", duration: 0.2 }}
+                  layout
+                >
+                  {getNtfn(ntfn)}
+                </motion.li>
+              );
+            })}
         </AnimatePresence>
       </ul>
     </aside>

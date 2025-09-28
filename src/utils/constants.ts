@@ -62,4 +62,4 @@ export const errorMap: Record<string, UserError> = {
   },
 };
 
-export const persistentNtfnsTypes: NotificationType[] = ["workspace-invite"];
+export const persistentNtfnsTypes: NotificationType[] = ["workspace-invite", "workspace-access-code"];

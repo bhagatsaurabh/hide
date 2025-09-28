@@ -11,7 +11,7 @@ export type NotificationPayload = {
   };
 }[keyof NotificationPayloadMap];
 
-export type NotificationType = "workspace-invite" | "workspace-membership-removed" | "user";
+export type NotificationType = "workspace-invite" | "workspace-membership-removed" | "workspace-access-code" | "user";
 
 export interface UserNotificationPayload extends InSocketMessagePayload {
   type: NotificationType;
@@ -25,6 +25,12 @@ export interface WorkspaceInvite extends UserNotificationPayload {
   inviterId: string;
   workspaceUUID: string;
   token: string;
+}
+
+export interface WorkspaceAccessRequest extends UserNotificationPayload {
+  success: boolean;
+  code: string;
+  reqId: string;
 }
 
 export interface ExclusionData extends UserNotificationPayload {
