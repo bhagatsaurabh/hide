@@ -82,6 +82,14 @@ const Toast = ({ className }: ToastProps) => {
           </>
         );
       }
+      case "workspace-access-code": {
+        // TODO
+        break;
+      }
+      case "workspace-downgraded": {
+        // TODO
+        break;
+      }
     }
   };
 

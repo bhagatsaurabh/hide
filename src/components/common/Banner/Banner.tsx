@@ -147,6 +147,9 @@ const Banner = ({ className }: BannerProps) => {
           </>
         );
       }
+      case "workspace-downgraded": {
+        // TODO
+      }
     }
   };
 

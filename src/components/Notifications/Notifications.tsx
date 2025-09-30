@@ -165,6 +165,14 @@ export const NotificationBar = ({ size = 1.25, className = "", headerHeight: _ }
           </>
         );
       }
+      case "workspace-access-code": {
+        // TODO
+        break;
+      }
+      case "workspace-downgraded": {
+        // TODO
+        break;
+      }
     }
   };
 
