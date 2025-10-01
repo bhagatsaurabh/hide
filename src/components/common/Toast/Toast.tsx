@@ -11,10 +11,14 @@ import {
   InternalNotificationPayload,
   InternalNotificationType,
   UserNotificationPayload,
+  WorkspaceAccessRequest,
+  WorkspaceDowngraded,
   WorkspaceInvite,
 } from "@/models/notification";
 import Button from "../Button/Button";
-import { respondToInvitation } from "@/store/workspace";
+import { deleteAccessCode, respondToInvitation, selectWorkspaces } from "@/store/workspace";
+import Copy from "../Copy/Copy";
+import { useNavigate } from "react-router";
 
 const iconMap = {
   info,
@@ -31,6 +35,8 @@ interface ToastProps {
 const Toast = ({ className }: ToastProps) => {
   const notifications = useAppSelector(selectActiveNotifications);
   const dispatch = useAppDispatch();
+  const navigate = useNavigate();
+  const wrspcs = useAppSelector(selectWorkspaces);
 
   const classNames = [classes.toast, className ?? ""];
 
@@ -39,6 +45,14 @@ const Toast = ({ className }: ToastProps) => {
   };
   const handleInvitation = async (ntfn: WorkspaceInvite, accept: boolean) => {
     await dispatch(respondToInvitation({ accept, ntfn }));
+  };
+  const handleCode = async (ntfn: WorkspaceAccessRequest, del?: boolean) => {
+    if (del) {
+      await dispatch(deleteAccessCode(ntfn));
+      return;
+    }
+
+    navigate("/dashboard/new", { state: { code: ntfn.code } });
   };
 
   const getNtfn = (notification: UserNotificationPayload) => {
@@ -83,12 +97,68 @@ const Toast = ({ className }: ToastProps) => {
         );
       }
       case "workspace-access-code": {
-        // TODO
-        break;
+        const ntfn = notification as WorkspaceAccessRequest;
+        const Icon = iconMap["info"];
+        return (
+          <>
+            <div className={classes.heading}>
+              <div className={classes.left}>
+                <Icon className={[classes.icon, classes.info].join(" ")} />
+                <span className={classes.title}>Dedicated workspace access-code</span>
+              </div>
+              <Button
+                type="primary"
+                className="p-0p5 ml-auto flex-shrink-0"
+                onClick={() => handleDismiss(ntfn.id)}
+                iconProps={{ strokeWidth: 2 }}
+                icon="close"
+                fit
+              />
+            </div>
+            <span className={classes.msg}>
+              You've received an access code to create a new dedicated workspace ! This access code will stay valid
+              for 5 days only.
+              <br />
+              <span className={classes.code}>{ntfn.code}</span>
+              <Copy value={() => ntfn.code} />
+            </span>
+            <div className={classes.controls}>
+              <Button type="secondary" className="m-0 m-0 p-0p5" onClick={() => handleCode(ntfn, false)} fit>
+                Use
+              </Button>
+              <Button type="tertiary" className="m-0 p-0p5" onClick={() => handleCode(ntfn, true)} fit>
+                Delete
+              </Button>
+            </div>
+          </>
+        );
       }
       case "workspace-downgraded": {
-        // TODO
-        break;
+        const ntfn = notification as WorkspaceDowngraded;
+        const wrspc = wrspcs.workspaces.find((wrspc) => wrspc.uuid === ntfn.uuid);
+        const Icon = iconMap["info"];
+        return (
+          <>
+            <div className={classes.heading}>
+              <div className={classes.left}>
+                <Icon className={[classes.icon, classes.info].join(" ")} />
+                <span className={classes.title}>Workspace downgraded</span>
+              </div>
+              <Button
+                type="primary"
+                className="p-0p5 ml-auto flex-shrink-0"
+                onClick={() => handleDismiss(ntfn.id)}
+                iconProps={{ strokeWidth: 2 }}
+                icon="close"
+                fit
+              />
+            </div>
+            <span className={classes.msg}>
+              Your workspace <span className={classes.mark}>{`${wrspc?.name ?? "Unknown"}`}</span> has been downgraded
+              to spot
+            </span>
+          </>
+        );
       }
     }
   };

@@ -17,9 +17,11 @@ import {
   InternalNotificationPayload,
   InternalNotificationType,
   UserNotificationPayload,
+  WorkspaceAccessRequest,
+  WorkspaceDowngraded,
   WorkspaceInvite,
 } from "@/models/notification";
-import { respondToInvitation, selectConnected } from "@/store/workspace";
+import { deleteAccessCode, respondToInvitation, selectConnected, selectWorkspaces } from "@/store/workspace";
 import { useMediaQuery } from "@/hooks/media-query";
 import Backdrop from "../common/Backdrop/Backdrop";
 import { AnimatePresence, motion } from "motion/react";
@@ -28,6 +30,8 @@ import warning from "@/assets/icons/warning.svg?react";
 import success from "@/assets/icons/success.svg?react";
 import error from "@/assets/icons/error.svg?react";
 import classNames from "classnames";
+import Copy from "../common/Copy/Copy";
+import { useNavigate } from "react-router";
 
 const iconMap = {
   info,
@@ -52,6 +56,8 @@ export const NotificationBar = ({ size = 1.25, className = "", headerHeight: _ }
   const ntfnsRef = useRef<ModalRef>(null);
   const connected = useAppSelector(selectConnected);
   const isHandheld = useMediaQuery("(max-width: 1024px)");
+  const wrspcs = useAppSelector(selectWorkspaces);
+  const navigate = useNavigate();
 
   useEffect(() => {
     if (authStatus === AuthStatus.SIGNED_IN) {
@@ -115,6 +121,15 @@ export const NotificationBar = ({ size = 1.25, className = "", headerHeight: _ }
     await dispatch(respondToInvitation({ accept, ntfn }));
   };
 
+  const handleCode = async (ntfn: WorkspaceAccessRequest, del?: boolean) => {
+    if (del) {
+      await dispatch(deleteAccessCode(ntfn));
+      return;
+    }
+
+    navigate("/dashboard/new", { state: { code: ntfn.code } });
+  };
+
   const getNtfn = (notification: UserNotificationPayload) => {
     switch (notification.type) {
       case "user": {
@@ -166,12 +181,60 @@ export const NotificationBar = ({ size = 1.25, className = "", headerHeight: _ }
         );
       }
       case "workspace-access-code": {
-        // TODO
-        break;
+        const ntfn = notification as WorkspaceAccessRequest;
+        const Icon = iconMap["info"];
+        return (
+          <>
+            <div className={classes.heading}>
+              <div className={classes.left}>
+                <Icon className={[classes.icon, classes.info].join(" ")} />
+                <span className={classes.title}>Dedicated workspace access-code</span>
+              </div>
+            </div>
+            <span className={classes.msg}>
+              You've received an access code to create a new dedicated workspace ! This access code will stay valid
+              for 5 days only.
+              <br />
+              <span className={classes.code}>{ntfn.code}</span>
+              <Copy value={() => ntfn.code} />
+            </span>
+            <div className={classes.controls}>
+              <Button type="secondary" className="m-0 m-0 p-0p5" onClick={() => handleCode(ntfn, false)} fit>
+                Use
+              </Button>
+              <Button type="tertiary" className="m-0 p-0p5" onClick={() => handleCode(ntfn, true)} fit>
+                Delete
+              </Button>
+            </div>
+          </>
+        );
       }
       case "workspace-downgraded": {
-        // TODO
-        break;
+        const ntfn = notification as WorkspaceDowngraded;
+        const wrspc = wrspcs.workspaces.find((wrspc) => wrspc.uuid === ntfn.uuid);
+        const Icon = iconMap["info"];
+        return (
+          <>
+            <div className={classes.heading}>
+              <div className={classes.left}>
+                <Icon className={[classes.icon, classes.info].join(" ")} />
+                <span className={classes.title}>Workspace downgraded</span>
+              </div>
+              <Button
+                type="primary"
+                className="p-0p5 ml-auto flex-shrink-0"
+                onClick={() => handleDelete(ntfn.id)}
+                iconProps={{ strokeWidth: 2 }}
+                icon="bin"
+                fit
+              />
+            </div>
+            <span className={classes.msg}>
+              Your workspace <span className={classes.mark}>{`${wrspc?.name ?? "Unknown"}`}</span> has been downgraded
+              to spot
+            </span>
+          </>
+        );
       }
     }
   };

@@ -12,10 +12,11 @@ import {
   InternalNotificationType,
   UserNotificationPayload,
   WorkspaceAccessRequest,
+  WorkspaceDowngraded,
   WorkspaceInvite,
 } from "@/models/notification";
 import Button from "../Button/Button";
-import { deleteAccessCode, respondToInvitation } from "@/store/workspace";
+import { deleteAccessCode, respondToInvitation, selectWorkspaces } from "@/store/workspace";
 import Copy from "../Copy/Copy";
 import { useNavigate } from "react-router";
 
@@ -35,6 +36,7 @@ const Banner = ({ className }: BannerProps) => {
   const notifications = useAppSelector(selectActiveNotifications);
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
+  const wrspcs = useAppSelector(selectWorkspaces);
 
   const classNames = [classes.banner, className ?? ""];
 
@@ -148,7 +150,31 @@ const Banner = ({ className }: BannerProps) => {
         );
       }
       case "workspace-downgraded": {
-        // TODO
+        const ntfn = notification as WorkspaceDowngraded;
+        const wrspc = wrspcs.workspaces.find((wrspc) => wrspc.uuid === ntfn.uuid);
+        const Icon = iconMap["info"];
+        return (
+          <>
+            <div className={classes.heading}>
+              <div className={classes.left}>
+                <Icon className={[classes.icon, classes.info].join(" ")} />
+                <span className={classes.title}>Workspace downgraded</span>
+              </div>
+              <Button
+                type="primary"
+                className="p-0p5 ml-auto flex-shrink-0"
+                onClick={() => handleDismiss(ntfn.id)}
+                iconProps={{ strokeWidth: 2 }}
+                icon="close"
+                fit
+              />
+            </div>
+            <span className={classes.msg}>
+              Your workspace <span className={classes.mark}>{`${wrspc?.name ?? "Unknown"}`}</span> has been downgraded
+              to spot
+            </span>
+          </>
+        );
       }
     }
   };
