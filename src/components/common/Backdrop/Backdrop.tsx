@@ -1,6 +1,6 @@
 import { AnimatePresence, motion } from "motion/react";
 import classes from "./Backdrop.module.css";
-import { ReactNode } from "react";
+import { CSSProperties, ReactNode } from "react";
 
 interface BackdropProps {
   show: boolean;
@@ -11,20 +11,12 @@ interface BackdropProps {
   onDismiss: () => void;
 }
 
-const Backdrop = ({
-  show,
-  clear,
-  layer,
-  onDismiss,
-  ignoreHeader = false,
-  children,
-}: Partial<BackdropProps>) => {
+const Backdrop = ({ show, clear, layer, onDismiss, ignoreHeader = false, children }: Partial<BackdropProps>) => {
   const classNames = [classes.backdrop];
-  const layerLevel = layer ?? 0;
+  const layerLevel = layer ?? 50;
 
   if (clear) classNames.push(classes.clear);
   if (ignoreHeader) classNames.push(classes["ignore-header"]);
-  classNames.push(classes[`layer${layerLevel}`]);
 
   return (
     <AnimatePresence>
@@ -37,6 +29,7 @@ const Backdrop = ({
           transition={{ ease: "easeIn", duration: 0.15 }}
           className={classNames.join(" ")}
           onPointerUp={onDismiss}
+          style={{ "--data-layer": layerLevel } as CSSProperties}
         >
           {children}
         </motion.div>

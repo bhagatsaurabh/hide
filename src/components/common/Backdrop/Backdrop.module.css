@@ -8,6 +8,7 @@
   opacity: 1;
   background-color: #8383834d;
   backdrop-filter: blur(5px);
+  z-index: var(--data-layer);
 }
 .backdrop.ignore-header {
   top: var(--header-height);
@@ -16,14 +17,4 @@
 .backdrop.clear {
   backdrop-filter: unset;
   background-color: unset;
-}
-
-.backdrop.layer0 {
-  z-index: 100;
-}
-.backdrop.layer1 {
-  z-index: 105;
-}
-.backdrop.layer2 {
-  z-index: 110;
 }

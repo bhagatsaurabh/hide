@@ -18,10 +18,9 @@ import layoutMobile from "@/assets/layouts/mobile.json";
 import { Panel, PanelSchema } from "@/components/common/Panel/Panel";
 import { createHtmlPortalNode, InPortal } from "react-reverse-portal";
 import { ViewContext } from "@/context/view/view.context";
-import { closeEnv, openEnv, setUuid } from "@/store/env";
-import Spinner from "@/components/common/Spinner/Spinner";
+import { closeEnv, setUuid } from "@/store/env";
 import { notify } from "@/store/notifications";
-import { MembershipDTO, ProvisionPayload } from "@/models/workspace";
+import { MembershipDTO } from "@/models/workspace";
 import { socket } from "@/config/socket";
 import { FNodeOf } from "@/models/filesystem";
 import { InSocketMessage } from "@/models/common";
@@ -52,9 +51,6 @@ export const Environment = () => {
   const [dimension, setDimension] = useState({ width: window.innerWidth, height: window.innerHeight });
   const containerRef = useRef<HTMLDivElement>(null);
   const dispatch = useAppDispatch();
-  const [busy, setBusy] = useState(true);
-  const [waitMsg, setWaitMsg] = useState("Connecting to workspace...");
-  const [provStatus, setProvStatus] = useState<ProvisionPayload | null>(null);
   const navigate = useNavigate();
   const userColors = useRef(
     new Map<string, { default: string; transparent: string }>([[auth.currentUser!.uid, getRandomAccentColor()]])
@@ -84,50 +80,16 @@ export const Environment = () => {
   }, []);
 
   useEffect(() => {
-    if (provStatus?.action === "error") {
-      dispatch(
-        notify({
-          title: "Could not connect to workspace",
-          status: "error",
-          message: "Something went wrong while connecting to your workspace, please try again later",
-        } as InternalNotificationPayload)
-      );
-      navigate(-1);
-      socket?.off("provision");
-    } else if (provStatus?.action === "success" || provStatus?.action === "ready") {
-      dispatch(setUuid(workspace.uuid));
-      socket?.off("provision");
-      setBusy(false);
-    } else {
-      if (!provStatus) return;
-      setWaitMsg(provStatus.payload.message);
-    }
-  }, [dispatch, navigate, provStatus, workspace.uuid]);
-
-  const init = async (sessionId: string) => {
-    socket?.on("provision", (msg) => setProvStatus(msg));
-    const res = await dispatch(openEnv({ uuid: workspace.uuid, sessionId }));
-    const { success, wait } = res.payload as { success: boolean; wait?: boolean };
-    if (success) {
-      if (wait) return;
-
-      socket?.off("provision");
-      dispatch(setUuid(workspace.uuid));
-      setBusy(false);
-    } else {
-      navigate(-1);
-    }
-  };
-  useEffect(() => {
     const sessionId = sessionStorage.getItem("sessionId");
     if (!sessionId) {
       dispatch(
         notify({ title: "No session", message: "Session inactive", status: "warning" } as InternalNotificationPayload)
       );
-      navigate(-1);
+      navigate("/dashboard");
       return;
     }
-    init(sessionId);
+
+    dispatch(setUuid(workspace.uuid));
 
     if (containerRef.current) {
       const rect = containerRef.current.getBoundingClientRect();
@@ -167,7 +129,7 @@ export const Environment = () => {
 
     socket.on("env", handleAwarenessMessage);
     return () => void socket?.off("env", handleAwarenessMessage);
-  }, []);
+  }, [workspace.memberships]);
   useEffect(() => {
     const unsubs: Unsubscribe[] = [];
     unsubs.push(bus.on("help.about", () => setShowAbout(true)));
@@ -196,11 +158,7 @@ export const Environment = () => {
     explorerRef.current?.closeFile(fnode);
   };
 
-  return busy ? (
-    <div className={classes.wait}>
-      <Spinner size={2}>{waitMsg}</Spinner>
-    </div>
-  ) : (
+  return (
     <>
       {showAbout && (
         <Modal type="pop" title="about" onDismiss={() => setShowAbout(false)} ref={aboutRef} className="p-1p5">

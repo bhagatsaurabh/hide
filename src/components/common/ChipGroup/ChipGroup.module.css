@@ -13,7 +13,7 @@
 }
 .chip {
   cursor: pointer;
-  position: relative;
+  /* position: relative; */
 }
 .input {
   position: absolute;

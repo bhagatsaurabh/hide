@@ -31,3 +31,11 @@ export const ignoreInvitation = async (data: InvitationIgnoreDTO) => {
 export const deleteWorkspace = async (uuid: string) => {
   return await api.delete(`/workspace/${uuid}/delete`);
 };
+
+export const requestAccess = async (reason: string) => {
+  return await api.post(`/workspace/access/request`, { reason });
+};
+
+export const deleteAccess = async (reqId: string, ntfnId: string) => {
+  return await api.delete(`/workspace/access/delete`, { params: { reqId, ntfnId } });
+};

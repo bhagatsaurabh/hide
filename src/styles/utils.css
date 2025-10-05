@@ -57,6 +57,9 @@
 .mb-0p5 {
   margin-bottom: 0.5rem;
 }
+.mb-0 {
+  margin-bottom: 0;
+}
 .mb-0p25 {
   margin-bottom: 0.25rem;
 }
@@ -251,6 +254,9 @@
 .justify-content-end {
   justify-content: flex-end;
 }
+.justify-content-space-between {
+  justify-content: space-between;
+}
 .fw-100 {
   font-weight: 100;
 }
@@ -332,6 +338,9 @@
 }
 .h-6 {
   height: 6rem;
+}
+.w-100p {
+  width: 100%;
 }
 
 .br-5t {
@@ -467,12 +476,18 @@
 .w-16 {
   width: 16rem;
 }
+.mb-1p2 {
+  margin-bottom: 1.2rem;
+}
 
 .c-dark.c-dark {
   color: #000;
 }
 .rotate-90 {
   transform: rotate(90deg);
+}
+.d-inline {
+  display: inline;
 }
 
 @supports selector(::-webkit-scrollbar) {

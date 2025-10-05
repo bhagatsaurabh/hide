@@ -1,0 +1,56 @@
+.code {
+  display: flex;
+  /* gap: 0.5rem; */
+  padding-bottom: 4px;
+  border-bottom: 3.5px solid grey;
+  position: relative;
+  transition: border-bottom 0.1s linear;
+}
+.code::after {
+  content: attr(data-placeholder);
+  display: block;
+  position: absolute;
+  font-size: var(--meta-size);
+  left: 0;
+  text-align: left;
+  color: #9b9b9b;
+  pointer-events: none;
+  transition: all 0.1s ease-out;
+  transform: translateY(100%);
+  bottom: -4px;
+}
+.code:focus-within {
+  border-bottom: 3.5px solid #80ccbf;
+}
+.input {
+  width: var(--data-size);
+  text-align: center;
+  font-size: var(--data-size);
+  border: 1px solid #ccc;
+  outline: none;
+  border: none;
+  background-color: transparent;
+  color: rgb(251, 251, 234);
+  font-weight: 300;
+  font-family: "Inter";
+  padding: 0;
+  margin-left: -0.1rem;
+  margin-right: -0.1rem;
+}
+.input.edge {
+  margin-right: 0.5rem;
+}
+.input.edge:last-child {
+  margin-right: -0.1rem;
+}
+.errormsg {
+  width: 100%;
+  text-align: center;
+  margin-top: 1rem;
+  text-overflow: ellipsis;
+  overflow: hidden;
+  white-space: nowrap;
+  font-weight: 600;
+  color: #ed7b7b;
+  font-size: var(--err-size);
+}

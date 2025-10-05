@@ -1,6 +1,6 @@
 .input {
   display: inline-block;
-  margin: 1.5rem 0;
+  margin-bottom: 1.5rem;
   position: relative;
 }
 .input.no-title {
@@ -12,10 +12,10 @@
 .input textarea {
   height: 100%;
   width: 100%;
-  font-size: 1rem;
+  font-size: var(--data-size);
   border: none;
-  padding: 0.5rem 0;
-  transition: border 0.1s linear;
+  padding: 0.5rem 0.25rem;
+  transition: border 0.1s linear, background-color 0.1s linear;
   background-color: transparent;
   color: #ececec;
   font-family: Inter;
@@ -23,31 +23,38 @@
 }
 .input::before {
   content: attr(data-placeholder);
-  display: flex;
-  align-items: flex-end;
   position: absolute;
-  width: 100%;
-  height: 100%;
   left: 0;
   text-align: left;
-  line-height: 2rem;
   color: #9b9b9b;
   pointer-events: none;
   transition: all 0.1s ease-out;
-  top: 75%;
-  font-size: 0.75rem;
+  font-size: var(--meta-size);
+  transform: translateY(100%);
+  bottom: 0px;
 }
 
 .input.blank::before {
-  top: 0;
-  font-size: 1rem;
+  transform: translateY(0%);
+  bottom: 3px;
+  font-size: var(--data-size);
 }
+.input:focus-within::before {
+  transform: translateY(100%);
+  bottom: 0px;
+  font-size: var(--meta-size);
+}
+
+.input:focus-within textarea {
+  background-color: #6a6a6a73;
+}
+
 .input::after {
   content: "";
   display: block;
   position: absolute;
   width: 100%;
-  height: 4px;
+  height: 3px;
   bottom: 0;
   left: 0;
   transition: height 0.1s linear, background-color 0.1s linear;
@@ -55,14 +62,10 @@
 }
 .input:focus-within::after {
   background-color: #80ccbf;
-  height: 1px;
+  height: 2px;
 }
 .input.invalid:focus-within::after {
   background-color: #ed7b7b;
-}
-.input:focus-within::before {
-  top: 45%;
-  font-size: 0.75rem;
 }
 .input textarea:focus {
   outline: none;
@@ -76,9 +79,10 @@
   text-overflow: ellipsis;
   overflow: hidden;
   white-space: nowrap;
-  font-weight: 600;
+  font-weight: 500;
   color: #ed7b7b;
-  transform-origin: bottom;
-  transition: transform 0.05s linear;
-  font-size: 1rem;
+  transition: opacity 0.1s linear, bottom 0.1s linear;
+  font-size: var(--err-size);
+  display: flex;
+  align-items: center;
 }

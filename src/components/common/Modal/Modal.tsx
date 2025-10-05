@@ -32,6 +32,7 @@ interface ModalProps {
   style?: CSSProperties;
   type?: "slide" | "pop" | "menu";
   anchor?: RefObject<Null<HTMLElement>>;
+  plain?: boolean;
 }
 export interface ModalRef {
   close: () => void;
@@ -50,8 +51,9 @@ const Modal = ({
   style,
   type = "slide",
   anchor,
+  plain,
 }: ModalProps) => {
-  const layerLevel = layer ?? 0;
+  const layerLevel = layer ?? 50;
 
   const [show, setShow] = useState(false);
   const dispatch = useAppDispatch();
@@ -61,11 +63,14 @@ const Modal = ({
   const node = useRef<Node>(null);
   const bound = useRef<{ first: HTMLElement | null; last: HTMLElement | null }>(null);
   const modalRef = useRef<HTMLDivElement>(null);
-  const classNames = [classes.modal, classes[`layer${layerLevel}`]];
+  const classNames = [classes.modal, "scrollable"];
   if (className) classNames.push(className);
   if (full) {
     classNames.push(classes.full);
     if (ignoreHeader) classNames.push(classes["ignore-header"]);
+  }
+  if (plain) {
+    classNames.push(classes.plain);
   }
   classNames.push(classes[type]);
 
@@ -188,7 +193,7 @@ const Modal = ({
             animate={animate}
             exit={exit}
             transition={{ ease: "easeIn", duration: 0.15 }}
-            style={style}
+            style={{ ...style, "--data-layer": layerLevel } as CSSProperties}
           >
             {children}
           </motion.div>

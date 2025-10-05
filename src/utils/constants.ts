@@ -2,6 +2,8 @@ import { NotificationType } from "@/models/notification";
 
 export const usernameRegex = /^[^!@#$%^&*()+={}[\]`~:;"?/<>\s]{3,}$/;
 export const nameRegex = /^.[^!@#$%^&*()+={}[\]`~:;"?/<>]{3,}$/;
+export const pinRegex = /^[a-zA-Z0-9]?$/;
+export const codeRegex = /^[A-HJ-KM-NP-Z2-9]{16}$/;
 export const descRegex = /^.[^!@#$%^&*()+={}[\]`~:;"?/<>]{3,}$/;
 export const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
 export const emailPinRegex = /^[a-zA-Z0-9]{5}$/;
@@ -60,4 +62,4 @@ export const errorMap: Record<string, UserError> = {
   },
 };
 
-export const persistentNtfnsTypes: NotificationType[] = ["workspace-invite"];
+export const persistentNtfnsTypes: NotificationType[] = ["workspace-invite", "workspace-access-code"];

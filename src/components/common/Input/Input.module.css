@@ -12,7 +12,7 @@
 .input input {
   height: 100%;
   width: 100%;
-  font-size: 1rem;
+  font-size: var(--data-size);
   border: none;
   padding: 0.5rem 0;
   transition: border 0.1s linear;
@@ -22,30 +22,38 @@
 }
 .input::before {
   content: attr(data-placeholder);
-  display: block;
   position: absolute;
-  width: 100%;
-  height: 100%;
   left: 0;
   text-align: left;
-  line-height: 2.4rem;
   color: #9b9b9b;
   pointer-events: none;
   transition: all 0.1s ease-out;
-  top: 75%;
-  font-size: 0.75rem;
+  font-size: var(--meta-size);
+  transform: translateY(100%);
+  bottom: 0px;
+}
+.input:focus-within::before {
+  transform: translateY(100%);
+  bottom: 0px;
+  font-size: var(--meta-size);
 }
 
 .input.blank::before {
-  top: 0;
-  font-size: 1rem;
+  transform: translateY(0%);
+  bottom: 3px;
+  font-size: var(--data-size);
+}
+.input.blank:focus-within::before {
+  transform: translateY(100%);
+  bottom: 0px;
+  font-size: var(--meta-size);
 }
 .input::after {
   content: "";
   display: block;
   position: absolute;
   width: 100%;
-  height: 4px;
+  height: 3px;
   bottom: 0;
   left: 0;
   transition: height 0.1s linear, background-color 0.1s linear;
@@ -53,14 +61,10 @@
 }
 .input:focus-within::after {
   background-color: #80ccbf;
-  height: 4px;
+  height: 3px;
 }
 .input.invalid:focus-within::after {
   background-color: #ed7b7b;
-}
-.input:focus-within::before {
-  top: 75%;
-  font-size: 0.75rem;
 }
 .input input:focus {
   outline: none;
@@ -74,9 +78,10 @@
   text-overflow: ellipsis;
   overflow: hidden;
   white-space: nowrap;
-  font-weight: 600;
+  font-weight: 500;
   color: #ed7b7b;
-  transform-origin: bottom;
-  transition: transform 0.05s linear;
-  font-size: 1rem;
+  transition: opacity 0.1s linear, bottom 0.1s linear;
+  font-size: var(--err-size);
+  display: flex;
+  align-items: center;
 }

@@ -8,9 +8,11 @@ import { useAppDispatch } from "@/hooks/store";
 import { notify } from "@/store/notifications";
 import { noop } from "@/utils";
 import { socket } from "@/config/socket";
-import { ProvisionPayload } from "@/models/workspace";
+import { ProvisionPayload, ProvisionSuccess } from "@/models/workspace";
 import { processNewWorkspace } from "@/store/workspace";
 import { InternalNotificationPayload } from "@/models/notification";
+import Button from "@/components/common/Button/Button";
+import RadialProgress from "@/components/common/RadialProgress/RadialProgress";
 
 export const Status = () => {
   const navigate = useNavigate();
@@ -19,34 +21,18 @@ export const Status = () => {
   const bound = useRef<{ first: HTMLElement | null; last: HTMLElement | null }>(null);
   const location = useLocation();
   const workspaceName = usePrevious<string>(location.state?.workspaceName);
+  const isNew = usePrevious<string>(location.state?.isNew);
   const [provStatus, setProvStatus] = useState<ProvisionPayload | null>(null);
   const dispatch = useAppDispatch();
+  const [busy, setBusy] = useState(true);
+  const [uuid, setUuid] = useState(location.state?.wsUuid ?? "");
 
   useEffect(() => {
     if (!workspaceName) navigate("/dashboard", { replace: true });
 
     socket.on("provision", (msg) => setProvStatus(msg));
-
     return () => void socket.off("provision");
-  }, []);
-
-  useEffect(() => {
-    if (provStatus?.action === "error") {
-      dispatch(
-        notify({
-          title: "Could not provision workspace",
-          status: "error",
-          message: "Something went wrong while provisioning your workspace, please try again later",
-        } as InternalNotificationPayload)
-      );
-      handleDismiss(-1);
-    } else if (provStatus?.action === "success") {
-      dispatch(
-        processNewWorkspace({ workspace: provStatus.payload.workspace, privateKey: provStatus.payload.privateKey })
-      );
-      handleDismiss("/dashboard");
-    }
-  }, [dispatch, provStatus]);
+  }, [navigate, workspaceName]);
 
   const trapFocus = useCallback((event: KeyboardEvent) => {
     if (event.key === "Tab") {
@@ -66,22 +52,62 @@ export const Status = () => {
       }
     }
   }, []);
+  const handleDismiss = useCallback(
+    (to: unknown) => {
+      if (show) {
+        window.removeEventListener("keydown", trapFocus);
+        setShow(false);
+        navigate(to as string);
+      }
+    },
+    [navigate, show, trapFocus]
+  );
 
-  const handleDismiss = (to: unknown) => {
-    if (show) {
-      window.removeEventListener("keydown", trapFocus);
-      setShow(false);
-      navigate(to as unknown as string);
+  useEffect(() => {
+    if (provStatus?.action === "error") {
+      if (isNew) {
+        dispatch(
+          notify({
+            title: "Could not provision workspace",
+            status: "error",
+            message: "Something went wrong while provisioning your workspace, please try again later",
+          } as InternalNotificationPayload)
+        );
+      } else {
+        dispatch(
+          notify({
+            title: "Could not connect to workspace",
+            status: "error",
+            message: "Something went wrong while connecting to your workspace, please try again later",
+          } as InternalNotificationPayload)
+        );
+      }
+      handleDismiss(-1);
+    } else if (provStatus?.action === "success") {
+      dispatch(
+        processNewWorkspace({
+          workspace: (provStatus.payload as ProvisionSuccess).workspace,
+          privateKey: (provStatus.payload as ProvisionSuccess).privateKey,
+        })
+      );
+      setUuid((provStatus.payload as ProvisionSuccess).workspace.uuid);
+      setBusy(false);
+    } else if (provStatus?.action === "ready") {
+      handleDismiss(`/env/${uuid}`);
     }
-  };
-  let displayStatus = "Creating";
+  }, [dispatch, handleDismiss, isNew, provStatus, uuid]);
+
+  let displayStatus = `0/6:${isNew ? "Creating your workspace" : "Restoring your workspace"}`;
   if (provStatus?.action === "status") {
     displayStatus = provStatus.payload.message;
   } else if (provStatus?.action === "success") {
-    displayStatus = "Ready";
+    // displayStatus = "Ready";
   } else if (provStatus?.action === "error") {
     displayStatus = "Error";
   }
+
+  const [meta, msg] = displayStatus.split(":");
+  const [currStep, totalSteps] = meta.split("/").map((val) => parseInt(val));
 
   return (
     <>
@@ -91,9 +117,15 @@ export const Status = () => {
           <h2>{workspaceName}</h2>
         </div>
         <br />
-        <Spinner className="m-auto" size={1.3} />
+        {busy ? (
+          <Spinner className="m-auto" size={1.3} />
+        ) : (
+          <Button className="px-0p5 py-0p25" icon="launch" onClick={() => handleDismiss(`/env/${uuid}`)} fit>
+            Launch
+          </Button>
+        )}
         <br />
-        <span className={classes.message}>{displayStatus}</span>
+        <RadialProgress currStep={currStep} totalSteps={totalSteps} msg={msg} />
       </div>
     </>
   );

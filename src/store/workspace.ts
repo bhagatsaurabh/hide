@@ -4,16 +4,19 @@ import { WorkspaceCreateDTO, WorkspaceDTO, WorkspaceUpdateDTO } from "@/models/w
 import {
   acceptInvitation,
   createWorkspace,
+  deleteAccess,
   deleteWorkspace,
   getAllWorkspaces,
   ignoreInvitation,
+  requestAccess,
   updateWorkspace,
 } from "@/services/workspace";
 import { RootState } from ".";
 import { auth } from "@/config/firebase";
 import { storeSSHKey } from "@/utils/driver";
 import { notify, removeNotification } from "./notifications";
-import { InternalNotificationPayload, WorkspaceInvite } from "@/models/notification";
+import { InternalNotificationPayload, WorkspaceAccessRequest, WorkspaceInvite } from "@/models/notification";
+import { isAxiosError } from "axios";
 
 type WorkspaceState = {
   workspaces: WorkspaceDTO[];
@@ -136,6 +139,37 @@ export const deleteExistingWorkspace = createAsyncThunk<boolean, string>(
     return false;
   }
 );
+export const requestDedicatedAccess = createAsyncThunk<boolean, { reason?: string }>(
+  "workspace/access",
+  async ({ reason = "" }, { dispatch }) => {
+    try {
+      await requestAccess(reason);
+      dispatch(
+        notify({
+          title: "Access request",
+          message: "Request submitted successfully ! You'll get a notification with an access code soon",
+          status: "success",
+        } as InternalNotificationPayload)
+      );
+      return true;
+    } catch (error) {
+      if (isAxiosError(error)) {
+        // TODO
+        console.log(error.toJSON());
+      } else {
+        console.log(error);
+      }
+      dispatch(
+        notify({
+          title: "Failed to request access code",
+          message: "Something went wrong when requesting the access code, please try again later.",
+          status: "error",
+        } as InternalNotificationPayload)
+      );
+    }
+    return false;
+  }
+);
 export const respondToInvitation = createAsyncThunk<void, { accept: boolean; ntfn: WorkspaceInvite }>(
   "workspace/respond-invite",
   async ({ accept, ntfn }, { dispatch }) => {
@@ -161,6 +195,17 @@ export const respondToInvitation = createAsyncThunk<void, { accept: boolean; ntf
     }
   }
 );
+export const deleteAccessCode = createAsyncThunk<void, WorkspaceAccessRequest>(
+  "workspace/delete-access",
+  async (ntfn, { dispatch }) => {
+    try {
+      await deleteAccess(ntfn.reqId, ntfn.id);
+      dispatch(removeNotification(ntfn.id));
+    } catch (error) {
+      console.log(error);
+    }
+  }
+);
 
 export const { setWorkspaces, addWorkspace, setConnected, setRecent } = wsSlice.actions;
 
@@ -173,5 +218,7 @@ export const selectWorkspace = (state: RootState, uuid: string) => {
 export const selectWorkspaceById = (state: RootState, id: number) => {
   return state.workspace.workspaces.find((workspace) => workspace.id === id);
 };
+export const selectDedicatedWorkspacesCount = (state: RootState) =>
+  state.workspace.workspaces.filter((wrspc) => wrspc.dedicated).length;
 
 export default wsSlice.reducer;
