@@ -4,7 +4,7 @@ import { noop } from "@/utils";
 import { Null } from "@/utils/types";
 import { motion } from "motion/react";
 import classNames from "classnames";
-import { codeRegex, pinRegex } from "@/utils/constants";
+import { codeRegex } from "@/utils/constants";
 
 export interface CodeInputRef {
   validate: (val: string) => string;
