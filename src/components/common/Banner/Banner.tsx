@@ -18,7 +18,7 @@ import {
 import Button from "../Button/Button";
 import { deleteAccessCode, respondToInvitation, selectWorkspaces } from "@/store/workspace";
 import Copy from "../Copy/Copy";
-import { useNavigate } from "react-router";
+import router from "@/router";
 
 const iconMap = {
   info,
@@ -35,7 +35,6 @@ interface BannerProps {
 const Banner = ({ className }: BannerProps) => {
   const notifications = useAppSelector(selectActiveNotifications);
   const dispatch = useAppDispatch();
-  const navigate = useNavigate();
   const wrspcs = useAppSelector(selectWorkspaces);
 
   const classNames = [classes.banner, className ?? ""];
@@ -52,7 +51,7 @@ const Banner = ({ className }: BannerProps) => {
       return;
     }
 
-    navigate("/dashboard/new", { state: { code: ntfn.code } });
+    router.navigate("/dashboard/new", { state: { code: ntfn.code } });
   };
 
   const getNtfn = (notification: UserNotificationPayload) => {
