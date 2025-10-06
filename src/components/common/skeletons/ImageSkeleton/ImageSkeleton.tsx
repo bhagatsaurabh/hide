@@ -1,5 +1,5 @@
+import { DefaultImageSVG } from "@/assets";
 import classes from "./ImageSkeleton.module.css";
-import DefaultImageSVG from "../../../../assets/icons/image.svg?react";
 import React from "react";
 
 interface ImageSkeletonProps {

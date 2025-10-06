@@ -132,9 +132,10 @@ const AddMembers = ({ workspace, onBack }: AddMembersProps) => {
                 <div className={classes.identity}>
                   <Image
                     className="w-3 h-3 sm:w-3 sm:h-3 md:w-3 md:h-3 of-contain br-5t"
-                    path={hit.doc.picture || "../../../assets/icons/guest.svg"}
+                    path={hit.doc.picture || "guest"}
                     alt={hit.doc.name}
                     asset={!hit.doc.picture}
+                    icon={!hit.doc.picture}
                   />
                   <div className={classes.details}>
                     <span className={classes.name}>{hit.doc.name}</span>

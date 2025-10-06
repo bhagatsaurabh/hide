@@ -64,7 +64,6 @@ const Icon = ({
         setError(true);
       }
     };
-
     loadSvg();
   }, [name, fs]);
 

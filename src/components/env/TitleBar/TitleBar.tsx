@@ -22,9 +22,10 @@ const TitleBar = () => {
             key={onlineUser.profile.userId}
           >
             <Image
-              path={onlineUser.profile.picture || "../../../assets/icons/guest.svg"}
+              path={onlineUser.profile.picture || "guest.svg"}
               alt="member avatar"
               asset={!onlineUser.profile.picture}
+              icon={!onlineUser.profile.picture}
               className="w-1p15 h-1p15 of-contain"
             />
           </div>

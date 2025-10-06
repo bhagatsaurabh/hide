@@ -212,7 +212,13 @@ const Profile = ({ profile, save, action }: ProfileProps) => {
             <div className={classes.avatarselect}>
               <div className={classes.preview}>
                 <h3>Preview</h3>
-                <Image path={avatar || "../../../guest.png"} alt="Avatar" className="w-6 h-6 mx-auto mb-1" />
+                <Image
+                  path={avatar || "guest.svg"}
+                  alt="Avatar"
+                  className="w-6 h-6 mx-auto mb-1"
+                  asset={!avatar}
+                  icon={!avatar}
+                />
               </div>
               <div className={classes.crop}>
                 <Cropper
@@ -260,9 +266,10 @@ const Profile = ({ profile, save, action }: ProfileProps) => {
               onClick={() => avatarInputRef.current?.click()}
             >
               <Image
-                path={profile?.picture || "../../../assets/icons/guest.svg"}
+                path={profile?.picture || "guest.svg"}
                 alt="Avatar"
                 asset={!profile?.picture}
+                icon={!profile?.picture}
                 className="w-5 h-5"
                 style={{ color: "#eeeeee", objectFit: "cover" }}
               />

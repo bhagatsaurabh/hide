@@ -7,10 +7,11 @@ const Features = () => {
       <div className={classes.feature}>
         <div className={classes.iconhighlight}>
           <Image
-            path="../../../assets/icons/cloud.svg"
+            path="cloud.svg"
             alt="Cloud icon"
             className="w-2 h-2 sm:w-3 sm:h-3 md:w-4 md:h-4 of-contain"
             asset
+            icon
           />
         </div>
         <h3 className={classes.heading}>Anytime, anywhere</h3>
@@ -19,10 +20,11 @@ const Features = () => {
       <div className={classes.feature}>
         <div className={classes.iconhighlight}>
           <Image
-            path="../../../assets/icons/lock.svg"
+            path="lock.svg"
             alt="Lock icon"
             className="w-2 h-2 sm:w-3 sm:h-3 md:w-4 md:h-4 of-contain"
             asset
+            icon
           />
         </div>
         <h3 className={classes.heading}>Secure access</h3>
@@ -31,24 +33,27 @@ const Features = () => {
       <div className={classes.feature}>
         <div className={classes.iconhighlight}>
           <Image
-            path="../../../assets/icons/refresh.svg"
+            path="refresh.svg"
             alt="Wrench icon"
             className="w-2 h-2 sm:w-3 sm:h-3 md:w-4 md:h-4 of-contain"
             asset
+            icon
           />
         </div>
         <h3 className={classes.heading}>Continue where you left off</h3>
         <p>
-          With no need for regular snapshots, your environment stays light, fast and uninterruptible with quick resume.
+          With no need for regular snapshots, your environment stays light, fast and uninterruptible with quick
+          resume.
         </p>
       </div>
       <div className={classes.feature}>
         <div className={classes.iconhighlight}>
           <Image
-            path="../../../assets/icons/wrench.svg"
+            path="wrench.svg"
             alt="Wrench icon"
             className="w-2 h-2 sm:w-3 sm:h-3 md:w-4 md:h-4 of-contain"
             asset
+            icon
           />
         </div>
         <h3 className={classes.heading}>Customizable</h3>
@@ -57,10 +62,11 @@ const Features = () => {
       <div className={classes.feature}>
         <div className={classes.iconhighlight}>
           <Image
-            path="../../../assets/icons/group.svg"
+            path="group.svg"
             alt="Wrench icon"
             className="w-2 h-2 sm:w-3 sm:h-3 md:w-4 md:h-4 of-contain"
             asset
+            icon
           />
         </div>
         <h3 className={classes.heading}>Live collaboration</h3>
