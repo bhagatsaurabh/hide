@@ -122,7 +122,7 @@ const NavMenu = () => {
             <Link
               to="https://github.com/bhagatsaurabh/hide-server"
               icon="github"
-              iconProps={{ size: 2 }}
+              iconProps={{ size: 2, asset: true }}
               className="p-absolute bottom-0"
             />
           </div>

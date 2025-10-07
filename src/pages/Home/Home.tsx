@@ -93,7 +93,11 @@ export const Home = () => {
       </main>
       <Footer>
         <Logo />
-        <Link to="https://github.com/bhagatsaurabh/hide-server" icon="github" iconProps={{ size: 1.25 }} />
+        <Link
+          to="https://github.com/bhagatsaurabh/hide-server"
+          icon="github"
+          iconProps={{ size: 1.25, asset: true }}
+        />
       </Footer>
     </>
   );
