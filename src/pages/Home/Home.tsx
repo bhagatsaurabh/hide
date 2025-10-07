@@ -56,7 +56,7 @@ export const Home = () => {
           </p>
           <Button
             icon="mission"
-            iconProps={{ "data-position": "right" }}
+            iconProps={{ "data-position": "right", asset: true }}
             className="mt-2"
             size={1.5}
             onClick={handleAction}
@@ -93,7 +93,11 @@ export const Home = () => {
       </main>
       <Footer>
         <Logo />
-        <Link to="https://github.com/bhagatsaurabh/hide-server" icon="github" iconProps={{ size: 1.25 }} />
+        <Link
+          to="https://github.com/bhagatsaurabh/hide-server"
+          icon="github"
+          iconProps={{ size: 1.25, asset: true }}
+        />
       </Footer>
     </>
   );

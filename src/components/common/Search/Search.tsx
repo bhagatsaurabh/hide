@@ -21,7 +21,7 @@ const Search = ({ onSearch, placeholder = "Search" }: SearchProps) => {
   return (
     <div className={classes.search}>
       <form onSubmit={handleSearch} noValidate={true}>
-        <Icon name="search" size={1.2} />
+        <Icon name="search" size={1.2} asset />
         <input
           onInput={(e) => handleInput(e as ChangeEvent<HTMLInputElement>)}
           type="text"

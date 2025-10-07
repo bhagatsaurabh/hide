@@ -1,4 +1,4 @@
-import Icon from "../Icon/Icon";
+import Icon, { IconProps } from "../Icon/Icon";
 import classes from "./ChipGroup.module.css";
 
 export interface Chip {
@@ -6,6 +6,7 @@ export interface Chip {
   id: number;
   name: string;
   icon: string;
+  iconProps?: Partial<IconProps>;
 }
 
 interface ChipGroupProps {
@@ -33,7 +34,7 @@ const ChipGroup = ({ chips, onChange, value = 0 }: ChipGroupProps) => {
             onChange={() => handleChange(chip.id)}
           />
           <div className={classes.wrapper}>
-            <Icon name={chip.icon} size={1} />
+            <Icon name={chip.icon} size={1} {...(chip.iconProps ?? {})} />
             <span>{chip.name}</span>
           </div>
         </label>

@@ -53,10 +53,10 @@ const ActivityBar = () => {
             });
           }}
         >
-          <Icon name="burger" size={1.75} />
+          <Icon name="burger" size={1.75} asset />
         </button>
         <button>
-          <Icon name="files" size={1.7} />
+          <Icon name="files" size={1.7} asset />
         </button>
       </div>
       <div className={classes.lower}></div>

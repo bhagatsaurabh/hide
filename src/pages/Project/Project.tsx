@@ -241,14 +241,14 @@ export const Project = () => {
         <div className={classes.status}>
           <span>Status:&nbsp;</span>
           <span className={classes.stattext}>{isReady ? "Ready" : "Not Ready"}&nbsp;</span>
-          {isReady ? <Icon name="success" status size={0.9} /> : <Spinner size={1} />}
+          {isReady ? <Icon name="success" status size={0.9} asset /> : <Spinner size={1} />}
         </div>
         <div className={classes.actions}>
           <Button
             onClick={() => setToDelete(true)}
             className="px-0p75"
             icon="bin"
-            iconProps={{ color: "#f79393" }}
+            iconProps={{ color: "#f79393", asset: true }}
             size={1.8}
           />
           {(newName !== workspace.name || newDesc !== workspace.description) && (
@@ -265,7 +265,7 @@ export const Project = () => {
             disabled={!isReady}
             className="px-1"
             icon="chevron-right"
-            iconProps={{ "data-position": "right" }}
+            iconProps={{ "data-position": "right", asset: true }}
             onClick={handleOpen}
           >
             Open

@@ -270,7 +270,7 @@ const Explorer = ({ ref }: ExplorerProps) => {
                 onMouseLeave={hideTooltip}
                 className="p-0p1"
               >
-                <Icon name="new-file" />
+                <Icon name="new-file" asset />
               </button>
               <button
                 onClick={() => bus.emit("folder.new", { path: "" })}
@@ -278,7 +278,7 @@ const Explorer = ({ ref }: ExplorerProps) => {
                 onMouseLeave={hideTooltip}
                 className="p-0p1"
               >
-                <Icon name="new-folder" />
+                <Icon name="new-folder" asset />
               </button>
               <button
                 onClick={handleRefresh}
@@ -286,7 +286,7 @@ const Explorer = ({ ref }: ExplorerProps) => {
                 onMouseLeave={hideTooltip}
                 className="p-0p1"
               >
-                <Icon name="refresh" />
+                <Icon name="refresh" asset />
               </button>
               <button
                 onClick={() => bus.emit("internal.explorer.collapseall")}
@@ -294,7 +294,7 @@ const Explorer = ({ ref }: ExplorerProps) => {
                 onMouseLeave={hideTooltip}
                 className="p-0p1"
               >
-                <Icon name="collapse-all" />
+                <Icon name="collapse-all" asset />
               </button>
             </div>
           </div>

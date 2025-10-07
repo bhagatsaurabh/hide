@@ -208,7 +208,7 @@ const FileList = ({ root, open, close, draft, save, isDraft, ref }: FileListProp
               className="ml-0p5 flex-shrink-0"
               name={getFileIcon(fnode.isDraft ? draftInput : fnode.name)}
               size={0.8}
-              fs
+              prefix="editor"
             />
           ) : (
             <Icon
@@ -218,6 +218,7 @@ const FileList = ({ root, open, close, draft, save, isDraft, ref }: FileListProp
               size={0.8}
               style={{ transform: `rotateZ(${/* expandedDirs.current.has(fnode.path) */ fnode.isOpen ? 90 : 0}deg)` }}
               name="chevron-right"
+              asset
             />
           )}
           {fnode.isDraft && (

@@ -28,9 +28,10 @@ export const Auth = () => {
           <Image
             style={{ color: "#ffffff" }}
             className="w-7 h-4 of-contain"
-            path="../../../assets/icons/logo-compact.svg"
+            path="logo-compact.svg"
             alt="H-IDE logo"
             asset
+            icon
           />
         </section>
         {status === AuthStatus.PENDING ? (

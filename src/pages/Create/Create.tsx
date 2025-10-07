@@ -147,7 +147,14 @@ export const Create = () => {
           <div className={classes.request}>
             <div className="d-flex justify-content-space-between align-items-center">
               <h2>Request access code</h2>
-              <Button icon="close" className="p-0p5" size={0.9} fit onClick={() => showRequestRef.current?.close()} />
+              <Button
+                icon="close"
+                iconProps={{ asset: true }}
+                className="p-0p5"
+                size={0.9}
+                fit
+                onClick={() => showRequestRef.current?.close()}
+              />
             </div>
             <h3>Let us know why (helps us to provide the access code quicker)</h3>
             <Textarea
@@ -171,7 +178,7 @@ export const Create = () => {
       <div className={classes.create}>
         <div className={classes.heading}>
           <h2 className={classes.title}>New Workspace</h2>
-          <Button onClick={handleDismiss} className="p-0p75" size={1} icon="close" fit />
+          <Button onClick={handleDismiss} className="p-0p75" size={1} icon="close" iconProps={{ asset: true }} fit />
         </div>
         <div className={classes.wrapper}>
           <div className={classes.inputs}>

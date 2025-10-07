@@ -19,9 +19,10 @@ const MemberList = ({ members, onRemove, role }: MemberListProps) => {
             <div className={classes.identity}>
               <Image
                 className="w-2 h-2 sm:w-2 sm:h-2 md:w-2 md:h-2 of-contain br-5t"
-                path={member.picture || "../../../assets/icons/guest.svg"}
+                path={member.picture || "guest.svg"}
                 alt={member.name}
                 asset={!member.picture}
+                icon={!member.picture}
               />
               <div className={classes.details}>
                 <span className={classes.name}>{member.name}</span>
@@ -33,7 +34,7 @@ const MemberList = ({ members, onRemove, role }: MemberListProps) => {
             {member.role !== "owner" && role === "owner" ? (
               <Button
                 icon="close"
-                iconProps={{ "data-position": "right" }}
+                iconProps={{ "data-position": "right", asset: true }}
                 className="py-0p5 px-0p75"
                 onClick={() => onRemove(member)}
                 size={1}

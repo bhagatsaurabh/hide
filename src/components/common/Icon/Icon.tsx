@@ -1,18 +1,19 @@
 import { CSSProperties, useEffect, useState } from "react";
-import PointSkeleton from "../skeletons/PointSkeleton/PointSkeleton";
-import DefaultSVG from "../../../assets/icons/default.svg?react";
 import classes from "./Icon.module.css";
+import PointSkeleton from "../skeletons/PointSkeleton/PointSkeleton";
+import { DefaultSVG, getIcon } from "@/assets";
 
-interface IconProps {
-  size?: number;
+export interface IconProps {
   name: string;
-  className?: string;
+  prefix?: string;
+  asset?: boolean;
+  size?: number;
   color?: string;
   status?: boolean;
   statusClass?: string;
-  style?: CSSProperties;
   strokeWidth?: number;
-  fs?: boolean;
+  className?: string;
+  style?: CSSProperties;
 }
 
 const Icon = ({
@@ -24,49 +25,29 @@ const Icon = ({
   status = false,
   statusClass = "",
   style = {},
-  fs = false,
+  prefix = "",
+  asset,
 }: IconProps) => {
-  const [Component, setComponent] = useState<React.FC<React.SVGProps<SVGSVGElement>> | null>(null);
+  const Svg = asset ? getIcon(`${prefix ? prefix + "/" : ""}${name}`) : null;
+  const [svgSrc, setSvgSrc] = useState("");
+  const [isLoaded, setIsLoaded] = useState(asset ? true : false);
   const [error, setError] = useState(false);
-  const [isLoaded, setIsLoaded] = useState(false);
-  const [svg, setSvg] = useState("");
 
   useEffect(() => {
-    if (fs) return;
-    let isMounted = true;
-    const promise = import(`../../../assets/icons/${name}.svg?react`);
-    promise
-      .then((module) => {
-        if (isMounted) {
-          setComponent(() => module.default);
-          setError(false);
-        }
-      })
-      .catch((err) => {
-        console.log(err);
-        setComponent(null);
-        setError(true);
-      });
+    if (asset) return;
 
-    return () => {
-      isMounted = false;
-    };
-  }, [name, fs]);
-  useEffect(() => {
-    if (!fs) return;
     const loadSvg = async () => {
       try {
-        const data = await (await fetch(`/icons/editor/${name}.svg`)).text();
+        const data = await (await fetch(`/icons/${prefix ? prefix + "/" : ""}${name}.svg`)).text();
         setIsLoaded(true);
-        setSvg(data);
+        setSvgSrc(data);
       } catch (error) {
         console.log(error);
         setError(true);
       }
     };
-
     loadSvg();
-  }, [name, fs]);
+  }, [asset, name, prefix]);
 
   if (error) {
     return (
@@ -78,22 +59,22 @@ const Icon = ({
       />
     );
   }
-  if ((!Component && !fs) || (fs && !isLoaded)) {
+  if (!asset && !isLoaded) {
     return <PointSkeleton className={className} style={style} size={size} />;
   }
   return (
     <>
-      {Component && (
-        <Component
+      {Svg && (
+        <Svg
           className={[className, status ? classes[name] : "", classes[statusClass]].join(" ")}
           width={`${size}rem`}
           height={`${size}rem`}
           style={{ fill: color, stroke: color, strokeWidth, ...style }}
         />
       )}
-      {!Component && isLoaded && (
+      {!asset && isLoaded && (
         <span
-          dangerouslySetInnerHTML={{ __html: svg }}
+          dangerouslySetInnerHTML={{ __html: svgSrc }}
           className={[className, status ? classes[name] : "", classes[statusClass]].join(" ")}
           style={{ fill: color, stroke: color, strokeWidth, ...style, width: `${size}rem`, height: `${size}rem` }}
         />

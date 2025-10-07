@@ -11,7 +11,7 @@ const EnvAbout = ({ close }: EnvAboutProps) => {
     <div className={classes.about}>
       <div className={classes.abheader}>
         <Logo size={1.5} />
-        <Button className="float-right p-0p5" icon="close" fit onClick={close} />
+        <Button className="float-right p-0p5" icon="close" iconProps={{ asset: true }} fit onClick={close} />
       </div>
       <div className={classes.abcontent}>
         <div className={classes.abinfo}>

@@ -26,7 +26,7 @@ const AnonymousProvider = () => {
         busy={busy}
         disabled={busy}
         icon="chevron-right"
-        iconProps={{ "data-position": "right" }}
+        iconProps={{ "data-position": "right", asset: true }}
         size={1.25}
         onClick={handleContinue}
       >

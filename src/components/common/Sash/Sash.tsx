@@ -57,7 +57,7 @@ const Sash = ({ direction, onDrag, onDragStart, active, style = {} }: SashProps)
     >
       {isMobile && (
         <div className={classes.thumb}>
-          <Icon size={2} name={direction === "column" ? "vertical-resize" : "horizontal-resize"} />
+          <Icon size={2} name={direction === "column" ? "vertical-resize" : "horizontal-resize"} asset />
         </div>
       )}
     </div>

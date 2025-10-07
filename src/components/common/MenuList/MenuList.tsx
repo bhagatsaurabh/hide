@@ -137,7 +137,7 @@ const MenuList = ({
               }}
             >
               <span>{item.label}</span>
-              {item.type === "submenu" && <Icon name="chevron-right" color="#454545" size={0.7} />}
+              {item.type === "submenu" && <Icon name="chevron-right" color="#454545" size={0.7} asset />}
             </div>
 
             {isOpen &&

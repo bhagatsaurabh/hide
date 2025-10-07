@@ -207,6 +207,7 @@ export const Panel = ({ className = "", schema, dimension, position, style = {} 
               name="chevron-right"
               size={1}
               className={classNames({ "rotate-90": !collapsibles.current.get(node.id)?.collapsed })}
+              asset
             />
             <h3 className={classes.title}>{node.title}</h3>
           </div>
