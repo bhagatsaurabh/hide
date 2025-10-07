@@ -1,10 +1,10 @@
 import { ReactNode } from "react";
-import Icon from "../Icon/Icon";
+import Icon, { IconProps } from "../Icon/Icon";
 import classes from "./Link.module.css";
 
 interface LinkProps {
   icon?: string;
-  iconProps?: { size?: number };
+  iconProps?: Partial<IconProps>;
   to: string;
   children?: ReactNode;
   className?: string;
@@ -17,7 +17,7 @@ const Link = ({ icon, iconProps = {}, to, children, className }: LinkProps) => {
 
   return (
     <a className={classNames.join(" ")} href={to} target="_blank">
-      {icon && <Icon name={icon} size={iconProps.size || 1} />}
+      {icon && <Icon name={icon} size={iconProps.size || 1} {...iconProps} />}
       {children}
     </a>
   );

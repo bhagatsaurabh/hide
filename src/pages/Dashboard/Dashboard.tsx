@@ -63,7 +63,7 @@ export const Dashboard = () => {
           <>
             <Button className="px-0p5 py-0p25 mx-0p25" type="secondary" onClick={handleCreate} size={1.1}>
               <div style={{ display: "flex", alignItems: "center", justifyContent: "center" }}>
-                <Icon name="plus" size={1} className="mr-0p25" />
+                <Icon name="plus" size={1} className="mr-0p25" asset />
                 <span>New</span>
               </div>
             </Button>
@@ -100,7 +100,13 @@ export const Dashboard = () => {
                 <WorkspaceList workspaces={workspaces}>
                   <div className={classes.noworkspace}>
                     <h2>No workspaces</h2>
-                    <Button onClick={handleCreate} icon="plus" size={1.15} type="secondary">
+                    <Button
+                      onClick={handleCreate}
+                      icon="plus"
+                      iconProps={{ asset: true }}
+                      size={1.15}
+                      type="secondary"
+                    >
                       Create your first workspace
                     </Button>
                   </div>

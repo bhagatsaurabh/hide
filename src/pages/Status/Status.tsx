@@ -120,7 +120,13 @@ export const Status = () => {
         {busy ? (
           <Spinner className="m-auto" size={1.3} />
         ) : (
-          <Button className="px-0p5 py-0p25" icon="launch" onClick={() => handleDismiss(`/env/${uuid}`)} fit>
+          <Button
+            className="px-0p5 py-0p25"
+            icon="launch"
+            iconProps={{ asset: true }}
+            onClick={() => handleDismiss(`/env/${uuid}`)}
+            fit
+          >
             Launch
           </Button>
         )}

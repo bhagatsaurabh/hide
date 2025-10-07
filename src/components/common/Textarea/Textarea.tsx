@@ -133,6 +133,7 @@ export const Textarea = ({
                 statusClass="info-warning"
                 strokeWidth={2}
                 status
+                asset
               />
               <span>{err}</span>
             </motion.span>

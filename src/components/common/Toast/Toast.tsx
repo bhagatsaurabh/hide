@@ -1,9 +1,5 @@
 import { ReactNode } from "react";
 import classes from "./Toast.module.css";
-import info from "@/assets/icons/info.svg?react";
-import warning from "@/assets/icons/warning.svg?react";
-import success from "@/assets/icons/success.svg?react";
-import error from "@/assets/icons/error.svg?react";
 import { useAppDispatch, useAppSelector } from "@/hooks/store";
 import { dismissNotification, selectActiveNotifications } from "@/store/notifications";
 import { AnimatePresence, motion } from "motion/react";
@@ -19,14 +15,7 @@ import Button from "../Button/Button";
 import { deleteAccessCode, respondToInvitation, selectWorkspaces } from "@/store/workspace";
 import Copy from "../Copy/Copy";
 import router from "@/router";
-
-const iconMap = {
-  info,
-  warning,
-  success,
-  error,
-  "info-warning": info,
-};
+import { getStatusIcon } from "@/assets";
 
 interface ToastProps {
   className?: string;
@@ -57,14 +46,14 @@ const Toast = ({ className }: ToastProps) => {
   const getNtfn = (notification: UserNotificationPayload) => {
     switch (notification.type) {
       case "user": {
-        const Icon = iconMap[notification.status as InternalNotificationType];
+        const StatusIcon = getStatusIcon(notification.status as InternalNotificationType);
         const ntfn = notification as InternalNotificationPayload;
         return (
           <>
             <div className={classes.heading}>
-              <Icon className={[classes.icon, classes[ntfn.status as InternalNotificationType]].join(" ")} />
+              <StatusIcon className={[classes.icon, classes[ntfn.status as InternalNotificationType]].join(" ")} />
               <h3>{ntfn.title as string}</h3>
-              <Button icon="close" onClick={() => handleDismiss(ntfn.id)} fit />
+              <Button icon="close" iconProps={{ asset: true }} onClick={() => handleDismiss(ntfn.id)} fit />
             </div>
             <span className={classes.msg}>{ntfn.message as ReactNode}</span>
           </>
@@ -72,13 +61,13 @@ const Toast = ({ className }: ToastProps) => {
       }
       case "workspace-invite": {
         const ntfn = notification as WorkspaceInvite;
-        const Icon = iconMap["info"];
+        const StatusIcon = getStatusIcon("info");
         return (
           <>
             <div className={classes.heading}>
-              <Icon className={[classes.icon, classes.info].join(" ")} />
+              <StatusIcon className={[classes.icon, classes.info].join(" ")} />
               <h3>Workspace invitation</h3>
-              <Button icon="close" onClick={() => handleDismiss(ntfn.id)} fit />
+              <Button icon="close" iconProps={{ asset: true }} onClick={() => handleDismiss(ntfn.id)} fit />
             </div>
             <span className={classes.msg}>
               You've been invited by <span className={classes.mark}>{ntfn.inviterName as string}</span> to collaborate
@@ -97,19 +86,19 @@ const Toast = ({ className }: ToastProps) => {
       }
       case "workspace-access-code": {
         const ntfn = notification as WorkspaceAccessRequest;
-        const Icon = iconMap["info"];
+        const StatusIcon = getStatusIcon("info");
         return (
           <>
             <div className={classes.heading}>
               <div className={classes.left}>
-                <Icon className={[classes.icon, classes.info].join(" ")} />
+                <StatusIcon className={[classes.icon, classes.info].join(" ")} />
                 <span className={classes.title}>Dedicated workspace access-code</span>
               </div>
               <Button
                 type="primary"
                 className="p-0p5 ml-auto flex-shrink-0"
                 onClick={() => handleDismiss(ntfn.id)}
-                iconProps={{ strokeWidth: 2 }}
+                iconProps={{ strokeWidth: 2, asset: true }}
                 icon="close"
                 fit
               />
@@ -135,19 +124,19 @@ const Toast = ({ className }: ToastProps) => {
       case "workspace-downgraded": {
         const ntfn = notification as WorkspaceDowngraded;
         const wrspc = wrspcs.workspaces.find((wrspc) => wrspc.uuid === ntfn.uuid);
-        const Icon = iconMap["info"];
+        const StatusIcon = getStatusIcon("info");
         return (
           <>
             <div className={classes.heading}>
               <div className={classes.left}>
-                <Icon className={[classes.icon, classes.info].join(" ")} />
+                <StatusIcon className={[classes.icon, classes.info].join(" ")} />
                 <span className={classes.title}>Workspace downgraded</span>
               </div>
               <Button
                 type="primary"
                 className="p-0p5 ml-auto flex-shrink-0"
                 onClick={() => handleDismiss(ntfn.id)}
-                iconProps={{ strokeWidth: 2 }}
+                iconProps={{ strokeWidth: 2, asset: true }}
                 icon="close"
                 fit
               />

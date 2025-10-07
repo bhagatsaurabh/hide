@@ -329,7 +329,7 @@ const TabGroup = ({ ref }: TabGroupProps) => {
             onMouseLeave={hideTooltip}
             onClick={() => setActive(tabMeta)}
           >
-            <Icon name={getFileIcon(tabMeta.node.name)} fs />
+            <Icon name={getFileIcon(tabMeta.node.name)} prefix="editor" />
             <span className={classNames({ [classes.name]: true, [classes.displaced]: tabMeta.isDisplaced })}>
               {tabMeta.node.name}
             </span>
@@ -340,7 +340,7 @@ const TabGroup = ({ ref }: TabGroupProps) => {
               onMouseLeave={hideTooltip}
               onClick={() => handleTabRemove(tabMeta)}
             >
-              <Icon name="close" strokeWidth={0.4} size={0.6} />
+              <Icon name="close" strokeWidth={0.4} size={0.6} asset />
             </button>
           </div>
         ))}

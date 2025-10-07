@@ -83,7 +83,7 @@ const TerminalGroup = () => {
               onMouseLeave={hideTooltip}
               className="p-0p1"
             >
-              <Icon name="plus" />
+              <Icon name="plus" asset />
             </button>
           </div>
         </div>
@@ -112,7 +112,7 @@ const TerminalGroup = () => {
                 key={termId}
               >
                 <div className={classes.itemsect}>
-                  <Icon name="terminal" className="mr-0p25" />
+                  <Icon name="terminal" className="mr-0p25" asset />
                   <span>shell</span>
                 </div>
                 <div className={[classes.itemsect, classes.actions].join(" ")}>
@@ -122,7 +122,7 @@ const TerminalGroup = () => {
                     onMouseLeave={hideTooltip}
                     className="p-0p1"
                   >
-                    <Icon name="bin" />
+                    <Icon name="bin" asset />
                   </button>
                 </div>
               </li>

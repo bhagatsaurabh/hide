@@ -56,7 +56,7 @@ export const Home = () => {
           </p>
           <Button
             icon="mission"
-            iconProps={{ "data-position": "right" }}
+            iconProps={{ "data-position": "right", asset: true }}
             className="mt-2"
             size={1.5}
             onClick={handleAction}

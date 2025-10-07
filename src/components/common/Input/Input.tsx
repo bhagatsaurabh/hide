@@ -134,6 +134,7 @@ export const Input = ({
                 statusClass="info-warning"
                 strokeWidth={2}
                 status
+                asset
               />
               <span>{err}</span>
             </motion.span>

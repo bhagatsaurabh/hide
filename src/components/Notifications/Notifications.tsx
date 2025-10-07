@@ -25,21 +25,10 @@ import { deleteAccessCode, respondToInvitation, selectConnected, selectWorkspace
 import { useMediaQuery } from "@/hooks/media-query";
 import Backdrop from "../common/Backdrop/Backdrop";
 import { AnimatePresence, motion } from "motion/react";
-import info from "@/assets/icons/info.svg?react";
-import warning from "@/assets/icons/warning.svg?react";
-import success from "@/assets/icons/success.svg?react";
-import error from "@/assets/icons/error.svg?react";
 import classNames from "classnames";
 import Copy from "../common/Copy/Copy";
 import { useNavigate } from "react-router";
-
-const iconMap = {
-  info,
-  warning,
-  success,
-  error,
-  "info-warning": info,
-};
+import { getStatusIcon } from "@/assets";
 
 interface NotificationBarProps {
   size?: number;
@@ -133,18 +122,18 @@ export const NotificationBar = ({ size = 1.25, className = "", headerHeight: _ }
   const getNtfn = (notification: UserNotificationPayload) => {
     switch (notification.type) {
       case "user": {
-        const Icon = iconMap[notification.status as InternalNotificationType];
+        const StatusIcon = getStatusIcon(notification.status as InternalNotificationType);
         const ntfn = notification as InternalNotificationPayload;
         return (
           <>
             <div className={classes.heading}>
               <div className={classes.left}>
-                <Icon className={[classes.icon, classes[ntfn.status as InternalNotificationType]].join(" ")} />
+                <StatusIcon className={[classes.icon, classes[ntfn.status as InternalNotificationType]].join(" ")} />
                 <span className={classes.title}>{ntfn.title as string}</span>
               </div>
               <Button
                 className="p-0p5"
-                iconProps={{ strokeWidth: 2 }}
+                iconProps={{ strokeWidth: 2, asset: true }}
                 icon="bin"
                 onClick={() => handleDelete(ntfn.id)}
                 fit
@@ -156,12 +145,12 @@ export const NotificationBar = ({ size = 1.25, className = "", headerHeight: _ }
       }
       case "workspace-invite": {
         const ntfn = notification as WorkspaceInvite;
-        const Icon = iconMap["info"];
+        const StatusIcon = getStatusIcon("info");
         return (
           <>
             <div className={classes.heading}>
               <div className={classes.left}>
-                <Icon className={[classes.icon, classes.info].join(" ")} />
+                <StatusIcon className={[classes.icon, classes.info].join(" ")} />
                 <span className={classes.title}>Workspace invitation</span>
               </div>
             </div>
@@ -182,12 +171,12 @@ export const NotificationBar = ({ size = 1.25, className = "", headerHeight: _ }
       }
       case "workspace-access-code": {
         const ntfn = notification as WorkspaceAccessRequest;
-        const Icon = iconMap["info"];
+        const StatusIcon = getStatusIcon("info");
         return (
           <>
             <div className={classes.heading}>
               <div className={classes.left}>
-                <Icon className={[classes.icon, classes.info].join(" ")} />
+                <StatusIcon className={[classes.icon, classes.info].join(" ")} />
                 <span className={classes.title}>Dedicated workspace access-code</span>
               </div>
             </div>
@@ -212,19 +201,19 @@ export const NotificationBar = ({ size = 1.25, className = "", headerHeight: _ }
       case "workspace-downgraded": {
         const ntfn = notification as WorkspaceDowngraded;
         const wrspc = wrspcs.workspaces.find((wrspc) => wrspc.uuid === ntfn.uuid);
-        const Icon = iconMap["info"];
+        const StatusIcon = getStatusIcon("info");
         return (
           <>
             <div className={classes.heading}>
               <div className={classes.left}>
-                <Icon className={[classes.icon, classes.info].join(" ")} />
+                <StatusIcon className={[classes.icon, classes.info].join(" ")} />
                 <span className={classes.title}>Workspace downgraded</span>
               </div>
               <Button
                 type="primary"
                 className="p-0p5 ml-auto flex-shrink-0"
                 onClick={() => handleDelete(ntfn.id)}
-                iconProps={{ strokeWidth: 2 }}
+                iconProps={{ strokeWidth: 2, asset: true }}
                 icon="bin"
                 fit
               />
@@ -286,7 +275,7 @@ export const NotificationBar = ({ size = 1.25, className = "", headerHeight: _ }
         <Button
           icon="notifications"
           size={size}
-          iconProps={{ strokeWidth: 2 }}
+          iconProps={{ strokeWidth: 2, asset: true }}
           onClick={handleClick}
           className={classNames({
             "position-relative": true,

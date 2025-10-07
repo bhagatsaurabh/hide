@@ -53,9 +53,16 @@ const NavMenu = () => {
               </Button>
             </RouterLink>
             <RouterLink to="/profile">
-              <Button className="p-0p5" size={1.25} icon="guest" fit />
+              <Button className="p-0p5" size={1.25} icon="guest" iconProps={{ asset: true }} fit />
             </RouterLink>
-            <Button className="p-0p5" size={1.25} icon="sign-out" onClick={handleSignOut} fit />
+            <Button
+              className="p-0p5"
+              size={1.25}
+              icon="sign-out"
+              iconProps={{ asset: true }}
+              onClick={handleSignOut}
+              fit
+            />
           </>
         )}
         {signInEnabled && (
@@ -76,7 +83,7 @@ const NavMenu = () => {
           transition={{ ease: "easeInOut", duration: 0.15 }}
           className={classes.icon}
         >
-          <Icon name="menu" size={1.25} />
+          <Icon name="menu" size={1.25} asset />
         </motion.div>
         <motion.div
           initial={false}
@@ -87,7 +94,7 @@ const NavMenu = () => {
           transition={{ ease: "easeInOut", duration: 0.15 }}
           className={[classes.icon, classes.closeicon].join(" ")}
         >
-          <Icon name="close" size={1.25} />
+          <Icon name="close" size={1.25} asset />
         </motion.div>
       </button>
       {isOpen && (

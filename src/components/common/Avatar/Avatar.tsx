@@ -37,6 +37,7 @@ export const Avatar = () => {
         <Button
           ref={modalAnchor}
           icon="guest"
+          iconProps={{ asset: true }}
           size={1.5}
           onClick={handleClick}
           className="p-0p25"
@@ -57,13 +58,13 @@ export const Avatar = () => {
             <ul className={classes.menu}>
               <li>
                 <button role="link" onClick={() => handleMenuOption("profile")}>
-                  <Icon name="profile" size={1.1} />
+                  <Icon name="profile" size={1.1} asset />
                   <span>Profile</span>
                 </button>
               </li>
               <li>
                 <button onClick={() => handleMenuOption("signout")}>
-                  <Icon name="sign-out" size={1.1} />
+                  <Icon name="sign-out" size={1.1} asset />
                   <span>Sign out</span>
                 </button>
               </li>

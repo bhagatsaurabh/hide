@@ -1,6 +1,6 @@
 import { CSSProperties, MouseEvent, ReactNode, RefObject } from "react";
 import classes from "./Button.module.css";
-import Icon from "../Icon/Icon";
+import Icon, { IconProps } from "../Icon/Icon";
 import Spinner from "../Spinner/Spinner";
 import { isText, noop } from "@/utils";
 import { Null } from "@/utils/types";
@@ -10,7 +10,7 @@ interface ButtonProps {
   disabled: boolean;
   onClick: (e: MouseEvent) => unknown;
   icon: string;
-  iconProps: { "data-position"?: "left" | "right"; [key: string]: unknown; color?: string };
+  iconProps: Partial<IconProps> & { "data-position"?: "left" | "right" };
   size: number;
   className: string;
   children: ReactNode;

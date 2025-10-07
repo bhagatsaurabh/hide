@@ -84,8 +84,15 @@ const EditableField = ({
         </span>
       </Component>
       <div className={classes.action}>
-        <Icon name="modified" style={{ visibility: value !== orgValue ? "visible" : "hidden" }} />
-        <Button size={1.5} onClick={handleEdit} className="p-0p25 c-inherit" icon="edit" fit />
+        <Icon name="modified" style={{ visibility: value !== orgValue ? "visible" : "hidden" }} asset />
+        <Button
+          size={1.5}
+          onClick={handleEdit}
+          className="p-0p25 c-inherit"
+          icon="edit"
+          iconProps={{ asset: true }}
+          fit
+        />
       </div>
     </div>
   );
