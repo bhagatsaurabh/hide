@@ -65,7 +65,7 @@ const Providers = () => {
             className="px-1 py-0p5"
             busy={pendingProvider === AuthType.GOOGLE}
             icon="google"
-            iconProps={{ size: 1.35, "data-position": "left", asset: true }}
+            iconProps={{ size: 1.35, "data-position": "left" }}
             size={1.25}
             type="secondary"
             onClick={() => handleClick(AuthType.GOOGLE)}
@@ -76,7 +76,7 @@ const Providers = () => {
             className="px-1 py-0p5"
             busy={pendingProvider === AuthType.MICROSOFT}
             icon="microsoft"
-            iconProps={{ size: 1.35, "data-position": "left", asset: true }}
+            iconProps={{ size: 1.35, "data-position": "left" }}
             size={1.25}
             type="secondary"
             onClick={() => handleClick(AuthType.MICROSOFT)}
