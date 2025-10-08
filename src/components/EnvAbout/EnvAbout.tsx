@@ -40,7 +40,7 @@ const EnvAbout = ({ close }: EnvAboutProps) => {
         <Button
           type="secondary"
           size={1}
-          onClick={() => window.open("https://github.com/bhagatsaurabh/hide/issues", "_blank")}
+          onClick={() => window.open(import.meta.env.VITE_HIDE_LINK_ISSUES, "_blank")}
         >
           Report Bug
         </Button>
