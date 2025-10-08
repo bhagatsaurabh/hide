@@ -28,7 +28,7 @@ export const Auth = () => {
           <Image
             style={{ color: "#ffffff" }}
             className="w-7 h-4 of-contain"
-            path="logo-compact.svg"
+            path="logo-compact"
             alt="H-IDE logo"
             asset
             icon

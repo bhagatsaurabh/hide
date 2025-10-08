@@ -7,7 +7,7 @@ const Features = () => {
       <div className={classes.feature}>
         <div className={classes.iconhighlight}>
           <Image
-            path="cloud.svg"
+            path="cloud"
             alt="Cloud icon"
             className="w-2 h-2 sm:w-3 sm:h-3 md:w-4 md:h-4 of-contain"
             asset
@@ -19,13 +19,7 @@ const Features = () => {
       </div>
       <div className={classes.feature}>
         <div className={classes.iconhighlight}>
-          <Image
-            path="lock.svg"
-            alt="Lock icon"
-            className="w-2 h-2 sm:w-3 sm:h-3 md:w-4 md:h-4 of-contain"
-            asset
-            icon
-          />
+          <Image path="lock" alt="Lock icon" className="w-2 h-2 sm:w-3 sm:h-3 md:w-4 md:h-4 of-contain" asset icon />
         </div>
         <h3 className={classes.heading}>Secure access</h3>
         <p>Each environment is fully isolated, SSH-accessible, and open only to the members that you add.</p>
@@ -33,8 +27,8 @@ const Features = () => {
       <div className={classes.feature}>
         <div className={classes.iconhighlight}>
           <Image
-            path="refresh.svg"
-            alt="Wrench icon"
+            path="refresh"
+            alt="Refresh icon"
             className="w-2 h-2 sm:w-3 sm:h-3 md:w-4 md:h-4 of-contain"
             asset
             icon
@@ -49,7 +43,7 @@ const Features = () => {
       <div className={classes.feature}>
         <div className={classes.iconhighlight}>
           <Image
-            path="wrench.svg"
+            path="wrench"
             alt="Wrench icon"
             className="w-2 h-2 sm:w-3 sm:h-3 md:w-4 md:h-4 of-contain"
             asset
@@ -62,8 +56,8 @@ const Features = () => {
       <div className={classes.feature}>
         <div className={classes.iconhighlight}>
           <Image
-            path="group.svg"
-            alt="Wrench icon"
+            path="group"
+            alt="Group icon"
             className="w-2 h-2 sm:w-3 sm:h-3 md:w-4 md:h-4 of-contain"
             asset
             icon

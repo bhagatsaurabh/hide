@@ -72,10 +72,9 @@ export const Home = () => {
             props={templates
               .map((template) => ({
                 ...template,
-                path: `../../../assets/icons/${template.image.substring(template.image.lastIndexOf("-") + 1)}.svg`,
+                path: `/icons/${template.image.substring(template.image.lastIndexOf("-") + 1)}.svg`,
                 alt: template.name,
                 className: "w-5 h-4 sm:w-6 sm:h-4p8 md:w-7 md:h-5p6 of-contain",
-                asset: true,
               }))
               .slice(1)}
             height={9}

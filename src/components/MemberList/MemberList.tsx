@@ -19,7 +19,7 @@ const MemberList = ({ members, onRemove, role }: MemberListProps) => {
             <div className={classes.identity}>
               <Image
                 className="w-2 h-2 sm:w-2 sm:h-2 md:w-2 md:h-2 of-contain br-5t"
-                path={member.picture || "guest.svg"}
+                path={member.picture || "guest"}
                 alt={member.name}
                 asset={!member.picture}
                 icon={!member.picture}
