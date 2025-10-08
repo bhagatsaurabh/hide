@@ -213,7 +213,7 @@ const Profile = ({ profile, save, action }: ProfileProps) => {
               <div className={classes.preview}>
                 <h3>Preview</h3>
                 <Image
-                  path={avatar || "guest.svg"}
+                  path={avatar || "guest"}
                   alt="Avatar"
                   className="w-6 h-6 mx-auto mb-1"
                   asset={!avatar}
@@ -267,7 +267,7 @@ const Profile = ({ profile, save, action }: ProfileProps) => {
               onClick={() => avatarInputRef.current?.click()}
             >
               <Image
-                path={profile?.picture || "guest.svg"}
+                path={profile?.picture || "guest"}
                 alt="Avatar"
                 asset={!profile?.picture}
                 icon={!profile?.picture}

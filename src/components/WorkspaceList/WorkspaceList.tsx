@@ -50,7 +50,7 @@ const WorkspaceList = ({ workspaces, children }: WorkspaceListProps) => {
                 {workspace.memberships.map((membership) => (
                   <Image
                     key={membership.userId}
-                    path={membership.picture || "guest.svg"}
+                    path={membership.picture || "guest"}
                     alt="member avatar"
                     asset={!membership.picture}
                     icon={!membership.picture}

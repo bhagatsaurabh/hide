@@ -9,7 +9,7 @@ const Templates = () => {
   const tmplts = [
     ...templates.map((template) => ({
       ...template,
-      path: `${template.image.substring(template.image.lastIndexOf("-") + 1)}`,
+      path: `/icons/${template.image.substring(template.image.lastIndexOf("-") + 1)}.svg`,
       alt: template.name,
     })),
   ] as unknown as {
@@ -29,7 +29,7 @@ const Templates = () => {
       <div className={classes.list}>
         {tmplts.map((template, idx) => (
           <a key={idx} className={classes.template} href={template["data-href"]}>
-            <Image {...template} className="w-3 h-3 sm:w-4 sm:h-4 md:w-5 md:h-5 of-contain" asset icon />
+            <Image {...template} className="w-3 h-3 sm:w-4 sm:h-4 md:w-5 md:h-5 of-contain" />
             <span>{template.alt}</span>
           </a>
         ))}

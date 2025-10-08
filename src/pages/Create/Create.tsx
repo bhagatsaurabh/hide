@@ -44,14 +44,13 @@ export const Create = () => {
     ...templates.map((template) => ({
       ...template,
       alt: template.name,
-      path: `../../../assets/icons/${template.image.substring(template.image.lastIndexOf("-") + 1)}.svg`,
       image: import.meta.env.VITE_HIDE_IMAGE_DEV ? `${template.image}-dev` : template.image,
     })),
   ].map((template, idx) => ({
     ...template,
     id: idx,
     name: template.alt,
-    icon: template.path.substring(template.path.lastIndexOf("/") + 1, template.path.indexOf(".svg")),
+    icon: `/icons/${template.image.substring(template.image.lastIndexOf("-") + 1)}.svg`,
   }));
   const [image, setImage] = useState<Chip>(imageChips[0]);
   const [isDedicated, setIsDedicated] = useState(!!location.state?.code);
