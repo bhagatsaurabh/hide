@@ -120,9 +120,9 @@ const NavMenu = () => {
               </Button>
             )}
             <Link
-              to="https://github.com/bhagatsaurabh/hide-server"
+              to={import.meta.env.VITE_HIDE_LINK_SOURCE}
               icon="github"
-              iconProps={{ size: 2, asset: true }}
+              iconProps={{ size: 2 }}
               className="p-absolute bottom-0"
             />
           </div>

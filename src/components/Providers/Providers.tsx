@@ -54,7 +54,7 @@ const Providers = () => {
             className="px-1 py-0p5"
             busy={pendingProvider === AuthType.GITHUB}
             icon="github"
-            iconProps={{ size: 1.35, "data-position": "left", asset: true }}
+            iconProps={{ size: 1.35, "data-position": "left" }}
             size={1.25}
             type="secondary"
             onClick={() => handleClick(AuthType.GITHUB)}

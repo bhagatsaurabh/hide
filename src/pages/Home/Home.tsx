@@ -92,11 +92,7 @@ export const Home = () => {
       </main>
       <Footer>
         <Logo />
-        <Link
-          to="https://github.com/bhagatsaurabh/hide-server"
-          icon="github"
-          iconProps={{ size: 1.25, asset: true }}
-        />
+        <Link to={import.meta.env.VITE_HIDE_LINK_SOURCE} icon="github" iconProps={{ size: 1.25 }} />
       </Footer>
     </>
   );

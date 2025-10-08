@@ -36,8 +36,7 @@ const Features = () => {
         </div>
         <h3 className={classes.heading}>Continue where you left off</h3>
         <p>
-          With no need for regular snapshots, your environment stays light, fast and uninterruptible with quick
-          resume.
+          With no need for regular snapshots, your environment stays light, fast and uninterruptible.
         </p>
       </div>
       <div className={classes.feature}>
