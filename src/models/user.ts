@@ -13,7 +13,7 @@ export type UserSearchHighlight = {
 };
 
 export type UserSearchHits = {
-  doc: User;
+  doc: Partial<User>;
   highlights: UserSearchHighlight[];
 };
 

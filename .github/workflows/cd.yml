@@ -22,6 +22,7 @@ jobs:
           npm run build
         env:
           VITE_HIDE_FIREBASE_PUBLIC_KEY: ${{ secrets.VITE_HIDE_FIREBASE_PUBLIC_KEY }}
+          VITE_HIDE_TYPESENSE_SEARCH_API_KEY: ${{ secrets.VITE_HIDE_TYPESENSE_SEARCH_API_KEY }}
 
       - name: Upload artifacts
         uses: actions/upload-artifact@v4

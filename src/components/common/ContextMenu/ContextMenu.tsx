@@ -61,7 +61,7 @@ const ContextMenu = () => {
     clearTimeout(leaveHandle.current);
   };
   const handleMouseLeaveMenu = (depth: number) => {
-    leaveHandle.current = setTimeout(() => {
+    leaveHandle.current = window.setTimeout(() => {
       setOpenPath((path) => path.slice(0, depth));
       setActiveIndexPath((path) => path.slice(0, depth));
     }, 350);
