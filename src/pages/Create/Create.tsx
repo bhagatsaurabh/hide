@@ -40,7 +40,7 @@ export const Create = () => {
   const bound = useRef<{ first: HTMLElement | null; last: HTMLElement | null }>(null);
   const templates = useAppSelector(selectTemplates);
   const noOfDedicatedWrspcs = useAppSelector(selectDedicatedWorkspacesCount);
-  const imageChips = [
+  const imageChips: Chip[] = [
     ...templates.map((template) => ({
       ...template,
       alt: template.name,
@@ -50,7 +50,7 @@ export const Create = () => {
     ...template,
     id: idx,
     name: template.alt,
-    icon: `/icons/${template.image.substring(template.image.lastIndexOf("-") + 1)}.svg`,
+    icon: `${template.image.substring(template.image.lastIndexOf("-") + 1)}`,
   }));
   const [image, setImage] = useState<Chip>(imageChips[0]);
   const [isDedicated, setIsDedicated] = useState(!!location.state?.code);
