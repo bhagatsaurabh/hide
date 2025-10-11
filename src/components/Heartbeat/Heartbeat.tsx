@@ -13,7 +13,7 @@ export const Heartbeat = () => {
     let handle = -1;
     if (connected) {
       const msg: OutSocketMessage = { service: "presence", action: "session.ping", payload: { uuid } };
-      handle = setInterval(() => socket.emit("msg", msg), 6000);
+      handle = window.setInterval(() => socket.emit("msg", msg), 6000);
     }
 
     return () => clearInterval(handle);

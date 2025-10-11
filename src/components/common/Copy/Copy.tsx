@@ -14,7 +14,7 @@ const Copy = ({ value }: CopyProps) => {
   useEffect(() => {
     let handle: number;
     if (done) {
-      handle = setTimeout(() => {
+      handle = window.setTimeout(() => {
         setDone(false);
       }, 3000);
     }

@@ -87,7 +87,7 @@ const MenuList = ({
     clearTimeout(subMenuHandle.current);
     setActiveIndexPath([...path, idx]);
     if (item.type === "submenu") {
-      subMenuHandle.current = setTimeout(() => {
+      subMenuHandle.current = window.setTimeout(() => {
         setOpenPath([...path, idx]);
       }, 350);
     } else {

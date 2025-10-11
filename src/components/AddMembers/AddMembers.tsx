@@ -34,10 +34,10 @@ const AddMembers = ({ workspace, onBack }: AddMembersProps) => {
     setHits(null);
     setBusy(true);
     try {
-      const res = await search(query, page);
-      setPage(res.data.page);
+      const res = await search(auth.currentUser!.uid, query, page);
+      setPage(res.page);
       setBusy(false);
-      setHits(res.data.data);
+      setHits(res.data);
     } catch (error) {
       console.log(error);
       dispatch(
@@ -93,14 +93,14 @@ const AddMembers = ({ workspace, onBack }: AddMembersProps) => {
   };
 
   const getAction = (hit: UserSearchHits) => {
-    if (existing.has(hit.doc.uid)) {
+    if (existing.has(hit.doc.uid!)) {
       return (
         <div className={classes.extra}>
           <span>Member</span>
         </div>
       );
     }
-    if (added.has(hit.doc.uid)) {
+    if (added.has(hit.doc.uid!)) {
       return (
         <div className={classes.extra}>
           <span>Added</span>
@@ -108,7 +108,7 @@ const AddMembers = ({ workspace, onBack }: AddMembersProps) => {
       );
     }
     return (
-      <Button className="py-0p25 px-0p75" onClick={() => handleAdd(hit.doc)} size={1} type="primary">
+      <Button className="py-0p25 px-0p75" onClick={() => handleAdd(hit.doc as User)} size={1} type="primary">
         Add
       </Button>
     );
@@ -133,7 +133,7 @@ const AddMembers = ({ workspace, onBack }: AddMembersProps) => {
                   <Image
                     className="w-3 h-3 sm:w-3 sm:h-3 md:w-3 md:h-3 of-contain br-5t"
                     path={hit.doc.picture || "guest"}
-                    alt={hit.doc.name}
+                    alt={hit.doc.name!}
                     asset={!hit.doc.picture}
                     icon={!hit.doc.picture}
                   />

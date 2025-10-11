@@ -82,7 +82,7 @@ export class WebsocketProvider {
     this.wsLastMessageReceived = 0;
     this._resyncInterval = 0;
     if (resyncInterval > 0) {
-      this._resyncInterval = setInterval(() => {
+      this._resyncInterval = window.setInterval(() => {
         if (this.socket.connected) {
           const encoder = encoding.createEncoder();
           encoding.writeVarUint(encoder, messageSync);
@@ -96,7 +96,7 @@ export class WebsocketProvider {
     this.doc.on("update", this.updateHandler);
     this.awarenessUpdateHandler = this._awarenessUpdateHandler.bind(this);
     this.awareness.on("update", this.awarenessUpdateHandler);
-    this._checkInterval = setInterval(() => {
+    this._checkInterval = window.setInterval(() => {
       if (this.socket.connected && messageReconnectTimeout < time.getUnixTime() - this.wsLastMessageReceived) {
         this.close();
       }
