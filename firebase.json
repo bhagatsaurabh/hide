@@ -40,7 +40,7 @@
     "rewrites": [
       {
         "source": "/__/auth/**",
-        "destination": "/__/auth/index.html"
+        "destination": "/__/auth/handler"
       },
       {
         "source": "**",
