@@ -269,10 +269,11 @@ export const signInMicrosoft = createAsyncThunk<UserError | void | undefined>(
   async (_, { dispatch }) => {
     try {
       const userCred = await signInWithPopup(auth, microsoftAuthProvider);
+      const credential = OAuthProvider.credentialFromResult(userCred);
       try {
         const res = await fetch("https://graph.microsoft.com/v1.0/me/photo/$value", {
           method: "GET",
-          headers: { Authorization: "" },
+          headers: { Authorization: `Bearer ${credential?.accessToken}` },
         });
         const data = await res.blob();
         await dispatch(uploadAvatar({ convert: true, data, uid: userCred.user.uid })).unwrap();

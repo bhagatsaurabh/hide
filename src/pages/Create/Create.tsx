@@ -44,7 +44,10 @@ export const Create = () => {
     ...templates.map((template) => ({
       ...template,
       alt: template.name,
-      image: import.meta.env.VITE_HIDE_IMAGE_DEV ? `${template.image}-dev` : template.image,
+      image:
+        typeof import.meta.env.VITE_HIDE_IMAGE_DEV !== "undefined" && JSON.parse(import.meta.env.VITE_HIDE_IMAGE_DEV)
+          ? `${template.image}-dev`
+          : template.image,
     })),
   ].map((template, idx) => ({
     ...template,
