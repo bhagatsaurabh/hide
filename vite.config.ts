@@ -20,6 +20,7 @@ export default defineConfig({
       workbox: {
         globPatterns: ["**/*.{js,css,html,ico,png}"],
         globIgnores: ["**/index-*.js", "**/*.worker*.js"],
+        navigateFallbackDenylist: [/^\/__\/auth\//],
       },
       includeAssets: ["assets/favicon.ico", "assets/images/logo192.png"],
       manifest: {
