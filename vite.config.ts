@@ -55,15 +55,6 @@ export default defineConfig({
       },
     },
   ],
-  server: {
-    proxy: {
-      "/__/": {
-        target: "https://hide.saurabhagat.me",
-        changeOrigin: true,
-        secure: true,
-      },
-    },
-  },
   resolve: {
     alias: {
       "@": path.resolve(__dirname, "./src"),
