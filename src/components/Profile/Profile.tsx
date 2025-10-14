@@ -242,7 +242,6 @@ const Profile = ({ profile, save, action }: ProfileProps) => {
                 onClick={handleAvatarUpload}
                 size={1.1}
                 icon="upload"
-                iconProps={{ asset: true }}
                 className="mt-1p5 px-1 py-0p5"
               >
                 Upload
@@ -283,7 +282,6 @@ const Profile = ({ profile, save, action }: ProfileProps) => {
               }}
               className="p-absolute p-0p25"
               icon="edit"
-              iconProps={{ asset: true }}
               size={1.25}
               fit
             />
@@ -324,7 +322,7 @@ const Profile = ({ profile, save, action }: ProfileProps) => {
             busy={busy}
             disabled={busy}
             icon="chevron-right"
-            iconProps={{ "data-position": "right", asset: true }}
+            iconProps={{ "data-position": "right" }}
             size={1.25}
             onClick={(e) => {
               e.preventDefault();

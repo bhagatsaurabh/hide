@@ -16,7 +16,7 @@ import { storeUser } from "@/utils/driver";
 import { collection, getDocs, query, where } from "firebase/firestore";
 import { notify } from "./notifications";
 import { checkNetwork, convertToPng } from "@/utils";
-import { register, update } from "@/services/user";
+import { deleteUser, register, update } from "@/services/user";
 import { InternalNotificationPayload } from "@/models/notification";
 import { verifyEmail } from "@/services/auth";
 import { VerifyEmailDTO } from "@/models/auth";
@@ -25,6 +25,7 @@ import { errorMap, UserError } from "@/utils/constants";
 import { FirebaseError } from "firebase/app";
 import { User } from "@/models/user";
 import { getDownloadURL, ref, uploadBytes } from "firebase/storage";
+import { userConverter } from "@/config/firestore";
 
 const githubAuthProvider = new GithubAuthProvider();
 githubAuthProvider.addScope("read:user");
@@ -103,7 +104,9 @@ export const createProfile = createAsyncThunk<boolean, Pick<User, "name" | "user
   }
 );
 export const fetchProfile = createAsyncThunk("auth/fetch-profile", async (_, { dispatch }) => {
-  const qSnap = await getDocs(query(collection(db, "users"), where("uid", "==", auth.currentUser!.uid)));
+  const qSnap = await getDocs(
+    query(collection(db, "users").withConverter(userConverter()), where("uid", "==", auth.currentUser!.uid))
+  );
   const profileSnap = qSnap.docs[0];
   if (!profileSnap || !profileSnap.exists()) return null;
 
@@ -347,6 +350,23 @@ export const signOut = createAsyncThunk("auth/sign-out", async (_, { dispatch })
     );
   } finally {
     dispatch(setStatus(AuthStatus.SIGNED_OUT));
+  }
+});
+
+export const deleteAccount = createAsyncThunk<boolean>("auth/delete-account", async (_, { dispatch }) => {
+  try {
+    await deleteUser();
+    return true;
+  } catch (error) {
+    dispatch(
+      notify({
+        title: "Couldn't delete your account",
+        status: "error",
+        message: "Something went wrong, please try again",
+      } as InternalNotificationPayload)
+    );
+    console.log(error);
+    return false;
   }
 });
 

@@ -1,3 +1,19 @@
 .profile {
   width: 100%;
 }
+.deletebtn.deletebtn {
+  color: #dc6161;
+}
+.delconfirm {
+  min-width: unset;
+}
+.delconfirm h2,
+.delconfirm p {
+  font-weight: 300;
+}
+
+@media (min-width: 768px) {
+  .delconfirm {
+    min-width: 30rem;
+  }
+}

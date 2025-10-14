@@ -58,7 +58,6 @@ const Banner = ({ className }: BannerProps) => {
               <Button
                 className="p-0p5 ml-auto flex-shrink-0"
                 icon="close"
-                iconProps={{ asset: true }}
                 onClick={() => handleDismiss(ntfn.id)}
                 fit
               />
@@ -81,7 +80,7 @@ const Banner = ({ className }: BannerProps) => {
                 type="primary"
                 className="p-0p5 ml-auto flex-shrink-0"
                 onClick={() => handleDismiss(ntfn.id)}
-                iconProps={{ strokeWidth: 2, asset: true }}
+                iconProps={{ strokeWidth: 2 }}
                 icon="close"
                 fit
               />
@@ -115,7 +114,7 @@ const Banner = ({ className }: BannerProps) => {
                 type="primary"
                 className="p-0p5 ml-auto flex-shrink-0"
                 onClick={() => handleDismiss(ntfn.id)}
-                iconProps={{ strokeWidth: 2, asset: true }}
+                iconProps={{ strokeWidth: 2 }}
                 icon="close"
                 fit
               />
@@ -153,7 +152,7 @@ const Banner = ({ className }: BannerProps) => {
                 type="primary"
                 className="p-0p5 ml-auto flex-shrink-0"
                 onClick={() => handleDismiss(ntfn.id)}
-                iconProps={{ strokeWidth: 2, asset: true }}
+                iconProps={{ strokeWidth: 2 }}
                 icon="close"
                 fit
               />

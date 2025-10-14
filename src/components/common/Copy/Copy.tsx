@@ -36,17 +36,7 @@ const Copy = ({ value }: CopyProps) => {
     }
   };
 
-  return (
-    <Button
-      busy={busy}
-      icon={!done ? "copy" : "tick"}
-      iconProps={{ asset: true }}
-      fit
-      className="p-0p25"
-      size={0.8}
-      onClick={handleCopy}
-    />
-  );
+  return <Button busy={busy} icon={!done ? "copy" : "tick"} fit className="p-0p25" size={0.8} onClick={handleCopy} />;
 };
 
 export default Copy;

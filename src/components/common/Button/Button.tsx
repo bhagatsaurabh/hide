@@ -6,7 +6,7 @@ import { isText, noop } from "@/utils";
 import { Null } from "@/utils/types";
 
 interface ButtonProps {
-  busy: boolean;
+  busy?: boolean;
   disabled: boolean;
   onClick: (e: MouseEvent) => unknown;
   icon: string;
@@ -24,11 +24,11 @@ interface ButtonProps {
 }
 
 const Button = ({
-  busy,
+  busy = false,
   disabled,
   onClick,
   icon,
-  iconProps = { "data-position": "left" },
+  iconProps = {},
   size = 1,
   className,
   children,
@@ -45,36 +45,38 @@ const Button = ({
   if (fit) classNames.push(classes.fit);
   if (className) classNames.push(className);
   if (highlight) classNames.push(classes["highlight"]);
-  const content = [];
   const iconClasses = ["va-text-bottom"];
+  const _iconProps = { asset: true, "data-position": "left", ...iconProps };
 
+  let contentText;
   if (children) {
-    content.push(
-      isText(children) ? <span style={!fit ? { lineHeight: `${size * 1.25}rem` } : {}}>{children}</span> : children
-    );
-  }
-  if (icon) {
-    content.push(
-      !busy ? (
-        <Icon
-          className={iconClasses.join(" ")}
-          style={
-            children
-              ? { [iconProps["data-position"] === "left" ? "marginRight" : "marginLeft"]: `${size * 0.6}rem` }
-              : {}
-          }
-          size={size * 0.8}
-          name={icon}
-          {...iconProps}
-        />
+    contentText =
+      !icon && busy ? (
+        <Spinner key="spinner" className={iconClasses.join(" ")} size={size} />
+      ) : isText(children) ? (
+        <span style={!fit ? { lineHeight: `${size * 1.25}rem` } : {}}>{children}</span>
       ) : (
-        <Spinner className={iconClasses.join(" ")} size={size} />
-      )
+        children
+      );
+  }
+  let contentIcon;
+  if (icon) {
+    contentIcon = !busy ? (
+      <Icon
+        key="icon"
+        className={iconClasses.join(" ")}
+        style={
+          children
+            ? { [_iconProps["data-position"] === "left" ? "marginRight" : "marginLeft"]: `${size * 0.6}rem` }
+            : {}
+        }
+        size={size * 0.8}
+        name={icon}
+        {..._iconProps}
+      />
+    ) : (
+      <Spinner key="spinner" className={iconClasses.join(" ")} size={size} />
     );
-
-    if (iconProps["data-position"] === "left") {
-      [content[0], content[1]] = [content[1], content[0]];
-    }
   }
 
   return (
@@ -93,7 +95,17 @@ const Button = ({
       onMouseEnter={onMouseEnter}
       onMouseLeave={onMouseLeave}
     >
-      {...content}
+      {_iconProps["data-position"] === "left" ? (
+        <>
+          {contentIcon}
+          {contentText}
+        </>
+      ) : (
+        <>
+          {contentText}
+          {contentIcon}
+        </>
+      )}
     </button>
   );
 };

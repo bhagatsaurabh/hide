@@ -100,13 +100,7 @@ export const Dashboard = () => {
                 <WorkspaceList workspaces={workspaces}>
                   <div className={classes.noworkspace}>
                     <h2>No workspaces</h2>
-                    <Button
-                      onClick={handleCreate}
-                      icon="plus"
-                      iconProps={{ asset: true }}
-                      size={1.15}
-                      type="secondary"
-                    >
+                    <Button onClick={handleCreate} icon="plus" size={1.15} type="secondary">
                       Create your first workspace
                     </Button>
                   </div>

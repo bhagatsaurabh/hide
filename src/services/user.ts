@@ -38,3 +38,7 @@ export const search = async (uid: string, q: string, page: number) => {
 export const getDetails = async (uid: string) => {
   return await api.get<User>(`/user/${uid}`);
 };
+
+export const deleteUser = async () => {
+  return await api.delete("/user/delete");
+};
