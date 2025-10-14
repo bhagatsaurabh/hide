@@ -248,7 +248,7 @@ export const Project = () => {
             onClick={() => setToDelete(true)}
             className="px-0p75"
             icon="bin"
-            iconProps={{ color: "#f79393", asset: true }}
+            iconProps={{ color: "#f79393" }}
             size={1.8}
           />
           {(newName !== workspace.name || newDesc !== workspace.description) && (
@@ -265,7 +265,7 @@ export const Project = () => {
             disabled={!isReady}
             className="px-1"
             icon="chevron-right"
-            iconProps={{ "data-position": "right", asset: true }}
+            iconProps={{ "data-position": "right" }}
             onClick={handleOpen}
           >
             Open

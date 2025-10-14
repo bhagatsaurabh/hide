@@ -53,16 +53,9 @@ const NavMenu = () => {
               </Button>
             </RouterLink>
             <RouterLink to="/profile">
-              <Button className="p-0p5" size={1.25} icon="guest" iconProps={{ asset: true }} fit />
+              <Button className="p-0p5" size={1.25} icon="guest" fit />
             </RouterLink>
-            <Button
-              className="p-0p5"
-              size={1.25}
-              icon="sign-out"
-              iconProps={{ asset: true }}
-              onClick={handleSignOut}
-              fit
-            />
+            <Button className="p-0p5" size={1.25} icon="sign-out" onClick={handleSignOut} fit />
           </>
         )}
         {signInEnabled && (

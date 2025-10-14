@@ -53,7 +53,7 @@ const Toast = ({ className }: ToastProps) => {
             <div className={classes.heading}>
               <StatusIcon className={[classes.icon, classes[ntfn.status as InternalNotificationType]].join(" ")} />
               <h3>{ntfn.title as string}</h3>
-              <Button icon="close" iconProps={{ asset: true }} onClick={() => handleDismiss(ntfn.id)} fit />
+              <Button icon="close" onClick={() => handleDismiss(ntfn.id)} fit />
             </div>
             <span className={classes.msg}>{ntfn.message as ReactNode}</span>
           </>
@@ -67,7 +67,7 @@ const Toast = ({ className }: ToastProps) => {
             <div className={classes.heading}>
               <StatusIcon className={[classes.icon, classes.info].join(" ")} />
               <h3>Workspace invitation</h3>
-              <Button icon="close" iconProps={{ asset: true }} onClick={() => handleDismiss(ntfn.id)} fit />
+              <Button icon="close" onClick={() => handleDismiss(ntfn.id)} fit />
             </div>
             <span className={classes.msg}>
               You've been invited by <span className={classes.mark}>{ntfn.inviterName as string}</span> to collaborate
@@ -98,7 +98,7 @@ const Toast = ({ className }: ToastProps) => {
                 type="primary"
                 className="p-0p5 ml-auto flex-shrink-0"
                 onClick={() => handleDismiss(ntfn.id)}
-                iconProps={{ strokeWidth: 2, asset: true }}
+                iconProps={{ strokeWidth: 2 }}
                 icon="close"
                 fit
               />
@@ -136,7 +136,7 @@ const Toast = ({ className }: ToastProps) => {
                 type="primary"
                 className="p-0p5 ml-auto flex-shrink-0"
                 onClick={() => handleDismiss(ntfn.id)}
-                iconProps={{ strokeWidth: 2, asset: true }}
+                iconProps={{ strokeWidth: 2 }}
                 icon="close"
                 fit
               />

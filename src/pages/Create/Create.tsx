@@ -40,20 +40,22 @@ export const Create = () => {
   const bound = useRef<{ first: HTMLElement | null; last: HTMLElement | null }>(null);
   const templates = useAppSelector(selectTemplates);
   const noOfDedicatedWrspcs = useAppSelector(selectDedicatedWorkspacesCount);
+  const isDev =
+    typeof import.meta.env.VITE_HIDE_IMAGE_DEV !== "undefined" && JSON.parse(import.meta.env.VITE_HIDE_IMAGE_DEV);
   const imageChips: Chip[] = [
     ...templates.map((template) => ({
       ...template,
       alt: template.name,
-      image:
-        typeof import.meta.env.VITE_HIDE_IMAGE_DEV !== "undefined" && JSON.parse(import.meta.env.VITE_HIDE_IMAGE_DEV)
-          ? `${template.image}-dev`
-          : template.image,
+      image: isDev ? `${template.image}-dev` : template.image,
     })),
   ].map((template, idx) => ({
     ...template,
     id: idx,
     name: template.alt,
-    icon: `${template.image.substring(template.image.lastIndexOf("-") + 1)}`,
+    icon: isDev
+      ? `${template.image.split("-")[2]}`
+      : `${template.image.substring(template.image.lastIndexOf("-") + 1)}`,
+    iconProps: { asset: false },
   }));
   const [image, setImage] = useState<Chip>(imageChips[0]);
   const [isDedicated, setIsDedicated] = useState(!!location.state?.code);
@@ -149,14 +151,7 @@ export const Create = () => {
           <div className={classes.request}>
             <div className="d-flex justify-content-space-between align-items-center">
               <h2>Request access code</h2>
-              <Button
-                icon="close"
-                iconProps={{ asset: true }}
-                className="p-0p5"
-                size={0.9}
-                fit
-                onClick={() => showRequestRef.current?.close()}
-              />
+              <Button icon="close" className="p-0p5" size={0.9} fit onClick={() => showRequestRef.current?.close()} />
             </div>
             <h3>Let us know why (helps us to provide the access code quicker)</h3>
             <Textarea
@@ -180,7 +175,7 @@ export const Create = () => {
       <div className={classes.create}>
         <div className={classes.heading}>
           <h2 className={classes.title}>New Workspace</h2>
-          <Button onClick={handleDismiss} className="p-0p75" size={1} icon="close" iconProps={{ asset: true }} fit />
+          <Button onClick={handleDismiss} className="p-0p75" size={1} icon="close" fit />
         </div>
         <div className={classes.wrapper}>
           <div className={classes.inputs}>

@@ -29,4 +29,5 @@ export type User = {
   email: string;
   picture: string;
   issuer: string;
+  expireAt?: string;
 };

@@ -75,8 +75,19 @@ const Icon = ({
       {!asset && isLoaded && (
         <span
           dangerouslySetInnerHTML={{ __html: svgSrc }}
-          className={[className, status ? classes[name] : "", classes[statusClass]].join(" ")}
-          style={{ fill: color, stroke: color, strokeWidth, ...style, width: `${size}rem`, height: `${size}rem` }}
+          className={["fs-0", classes.wrapper, className, status ? classes[name] : "", classes[statusClass]].join(
+            " "
+          )}
+          style={
+            {
+              fill: color,
+              stroke: color,
+              strokeWidth,
+              ...style,
+              "--width": `${size}rem`,
+              "--height": `${size}rem`,
+            } as CSSProperties
+          }
         />
       )}
     </>

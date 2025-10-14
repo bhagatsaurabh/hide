@@ -37,7 +37,6 @@ export const Avatar = () => {
         <Button
           ref={modalAnchor}
           icon="guest"
-          iconProps={{ asset: true }}
           size={1.5}
           onClick={handleClick}
           className="p-0p25"

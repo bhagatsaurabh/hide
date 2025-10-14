@@ -161,7 +161,7 @@ const AddMembers = ({ workspace, onBack }: AddMembersProps) => {
       </div>
       <div className={classes.controls}>
         {added.size > 0 && (
-          <Button icon="email" iconProps={{ asset: true }} busy={invBusy} onClick={handleInvite}>
+          <Button icon="email" busy={invBusy} onClick={handleInvite}>
             Invite
           </Button>
         )}

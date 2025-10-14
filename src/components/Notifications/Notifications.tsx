@@ -133,7 +133,7 @@ export const NotificationBar = ({ size = 1.25, className = "", headerHeight: _ }
               </div>
               <Button
                 className="p-0p5"
-                iconProps={{ strokeWidth: 2, asset: true }}
+                iconProps={{ strokeWidth: 2 }}
                 icon="bin"
                 onClick={() => handleDelete(ntfn.id)}
                 fit
@@ -213,7 +213,7 @@ export const NotificationBar = ({ size = 1.25, className = "", headerHeight: _ }
                 type="primary"
                 className="p-0p5 ml-auto flex-shrink-0"
                 onClick={() => handleDelete(ntfn.id)}
-                iconProps={{ strokeWidth: 2, asset: true }}
+                iconProps={{ strokeWidth: 2 }}
                 icon="bin"
                 fit
               />
@@ -275,7 +275,7 @@ export const NotificationBar = ({ size = 1.25, className = "", headerHeight: _ }
         <Button
           icon="notifications"
           size={size}
-          iconProps={{ strokeWidth: 2, asset: true }}
+          iconProps={{ strokeWidth: 2 }}
           onClick={handleClick}
           className={classNames({
             "position-relative": true,
@@ -317,7 +317,7 @@ export const NotificationBar = ({ size = 1.25, className = "", headerHeight: _ }
             full
             ignoreHeader
           >
-            <div className={classes.list}>{getList()}</div>
+            <div className={classNames([classes.list, "mt-1"])}>{getList()}</div>
           </Modal>
         )}
       </>

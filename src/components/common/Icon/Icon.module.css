@@ -13,3 +13,7 @@
 .error {
   color: #dc6161;
 }
+.wrapper svg {
+  width: var(--width);
+  height: var(--height);
+}

@@ -34,7 +34,7 @@ const MemberList = ({ members, onRemove, role }: MemberListProps) => {
             {member.role !== "owner" && role === "owner" ? (
               <Button
                 icon="close"
-                iconProps={{ "data-position": "right", asset: true }}
+                iconProps={{ "data-position": "right" }}
                 className="py-0p5 px-0p75"
                 onClick={() => onRemove(member)}
                 size={1}
