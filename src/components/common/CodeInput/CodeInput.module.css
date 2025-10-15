@@ -1,3 +1,8 @@
+.codeinput {
+  position: relative;
+  display: inline-block;
+  margin: 1.5rem 0;
+}
 .code {
   display: flex;
   /* gap: 0.5rem; */
@@ -44,13 +49,18 @@
   margin-right: -0.1rem;
 }
 .errormsg {
+  position: absolute;
   width: 100%;
-  text-align: center;
-  margin-top: 1rem;
+  bottom: calc(100% + 0.15rem);
+  left: 0;
+  text-align: left;
   text-overflow: ellipsis;
   overflow: hidden;
   white-space: nowrap;
-  font-weight: 600;
+  font-weight: 500;
   color: #ed7b7b;
+  transition: opacity 0.1s linear, bottom 0.1s linear;
   font-size: var(--err-size);
+  display: flex;
+  align-items: center;
 }

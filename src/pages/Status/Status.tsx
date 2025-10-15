@@ -2,7 +2,6 @@ import classes from "./Status.module.css";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useLocation, useNavigate } from "react-router";
 import Backdrop from "@/components/common/Backdrop/Backdrop";
-import Spinner from "@/components/common/Spinner/Spinner";
 import { usePrevious } from "@/hooks/prev";
 import { useAppDispatch } from "@/hooks/store";
 import { notify } from "@/store/notifications";
@@ -13,6 +12,7 @@ import { processNewWorkspace } from "@/store/workspace";
 import { InternalNotificationPayload } from "@/models/notification";
 import Button from "@/components/common/Button/Button";
 import RadialProgress from "@/components/common/RadialProgress/RadialProgress";
+import { AnimatePresence, motion } from "motion/react";
 
 export const Status = () => {
   const navigate = useNavigate();
@@ -84,6 +84,7 @@ export const Status = () => {
       }
       handleDismiss(-1);
     } else if (provStatus?.action === "success") {
+      if (uuid) return;
       dispatch(
         processNewWorkspace({
           workspace: (provStatus.payload as ProvisionSuccess).workspace,
@@ -111,21 +112,48 @@ export const Status = () => {
 
   return (
     <>
-      <Backdrop show={show} onDismiss={noop} />
+      <Backdrop show={show} onDismiss={busy ? noop : () => navigate("/dashboard")} />
       <div className={classes.status}>
+        {!busy && (
+          <Button
+            icon="close"
+            fit
+            className="p-0p5 p-absolute tr-1"
+            size={1}
+            onClick={() => navigate("/dashboard")}
+          />
+        )}
         <div className={classes.heading}>
           <h2>{workspaceName}</h2>
         </div>
         <br />
-        {busy ? (
-          <Spinner className="m-auto" size={1.3} />
-        ) : (
-          <Button className="px-0p5 py-0p25" icon="launch" onClick={() => handleDismiss(`/env/${uuid}`)} fit>
-            Launch
-          </Button>
-        )}
+        <AnimatePresence mode="wait">
+          {busy ? (
+            <motion.div
+              key="progress"
+              initial={{ opacity: 0, scale: 0.9 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.9 }}
+              transition={{ duration: 0.3 }}
+            >
+              <RadialProgress currStep={currStep} totalSteps={totalSteps} msg={msg} />
+            </motion.div>
+          ) : (
+            <motion.div
+              key="button"
+              initial={{ opacity: 0, scale: 0.9 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.9 }}
+              transition={{ duration: 0.3 }}
+              className="mx-auto w-min-content"
+            >
+              <Button size={1.2} className="px-1 py-0p5" icon="launch" onClick={() => handleDismiss(`/env/${uuid}`)}>
+                Launch
+              </Button>
+            </motion.div>
+          )}
+        </AnimatePresence>
         <br />
-        <RadialProgress currStep={currStep} totalSteps={totalSteps} msg={msg} />
       </div>
     </>
   );

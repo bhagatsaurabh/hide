@@ -177,6 +177,10 @@
 .maxh-75 {
   max-height: 75%;
 }
+.tr-1 {
+  top: 1rem;
+  right: 1rem;
+}
 .a-reset {
   color: inherit;
   text-decoration: inherit;

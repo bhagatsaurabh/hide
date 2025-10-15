@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import classes from "./RadialProgress.module.css";
 import { rng } from "@/utils";
+import Spinner from "../Spinner/Spinner";
 
 interface RadialProgressProps {
   currStep: number;
@@ -73,10 +74,11 @@ export default function RadialProgress({ currStep, totalSteps, msg, radius = 40 
         </svg>
         <div className={classes["radial-steps"]}>
           <span>
-            {currStep + 1} / {totalSteps}
+            {Math.min(currStep + 1, totalSteps)} / {totalSteps}
           </span>
         </div>
       </div>
+      <Spinner className="m-auto" size={1.3} />
       <div className={classes["radial-text"]}>
         <div className={classes["radial-msg"]}>{msg}</div>
       </div>
