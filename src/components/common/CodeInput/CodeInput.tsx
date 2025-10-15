@@ -5,6 +5,7 @@ import { Null } from "@/utils/types";
 import { motion } from "motion/react";
 import classNames from "classnames";
 import { codeRegex } from "@/utils/constants";
+import Icon from "../Icon/Icon";
 
 export interface CodeInputRef {
   validate: (val: string) => string;
@@ -110,19 +111,21 @@ const CodeInput = ({
   };
 
   return (
-    <label className={className}>
+    <label
+      className={classNames([className, classes.codeinput])}
+      style={
+        {
+          "--meta-size": `${size * 0.75}rem`,
+          "--data-size": `${size}rem`,
+          "--err-size": `${size * 0.88}rem`,
+        } as CSSProperties
+      }
+    >
       <div
         className={classNames([classes.code])}
         tabIndex={0}
         onFocus={() => inputs.current[top].focus()}
         data-placeholder={placeholder}
-        style={
-          {
-            "--meta-size": `${size * 0.75}rem`,
-            "--data-size": `${size}rem`,
-            "--err-size": `${size * 0.88}rem`,
-          } as CSSProperties
-        }
       >
         {chars.map((val, idx) => (
           <input
@@ -142,14 +145,25 @@ const CodeInput = ({
         ))}
       </div>
 
-      <motion.span
-        initial={{ opacity: 0 }}
-        animate={{ opacity: validation !== "Off" ? 1 : 0 }}
-        transition={{ duration: 0.15 }}
-        className={classNames([classes["errormsg"]])}
-      >
-        {err}
-      </motion.span>
+      {!!err && (
+        <motion.span
+          initial={{ opacity: 0 }}
+          animate={{ opacity: validation !== "Off" ? 1 : 0 }}
+          transition={{ duration: 0.15 }}
+          className={classNames([classes["errormsg"]])}
+        >
+          <Icon
+            size={size * 0.9}
+            className="mr-0p25"
+            name="info"
+            statusClass="info-warning"
+            strokeWidth={2}
+            status
+            asset
+          />
+          {err}
+        </motion.span>
+      )}
     </label>
   );
 };

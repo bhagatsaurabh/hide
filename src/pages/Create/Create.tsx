@@ -46,7 +46,7 @@ export const Create = () => {
     ...templates.map((template) => ({
       ...template,
       alt: template.name,
-      image: isDev ? `${template.image}-dev` : template.image,
+      image: isDev ? `${template.image}:dev` : template.image,
     })),
   ].map((template, idx) => ({
     ...template,
@@ -81,7 +81,7 @@ export const Create = () => {
 
   const handleCreateWorkspace = async () => {
     if (nameInput.current?.validate(name)) return;
-    if (codeInput.current?.validate(code)) return;
+    if (isDedicated && codeInput.current?.validate(code)) return;
 
     setBusy(true);
     const res = await dispatch(
@@ -211,7 +211,7 @@ export const Create = () => {
               </h4>
               <Toggle on={isDedicated} onchange={setIsDedicated} className="mb-1" />
             </div>
-            <div className={classNames([classes.accesscode, "mb-1p5", isDedicated ? classes.show : classes.hide])}>
+            <div className={classNames([classes.accesscode, isDedicated ? classes.show : classes.hide])}>
               <CodeInput
                 length={16}
                 sublength={4}
