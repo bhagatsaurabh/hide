@@ -180,21 +180,33 @@ export const NotificationBar = ({ size = 1.25, className = "", headerHeight: _ }
                 <span className={classes.title}>Dedicated workspace access-code</span>
               </div>
             </div>
-            <span className={classes.msg}>
-              You've received an access code to create a new dedicated workspace ! This access code will stay valid
-              for 5 days only.
-              <br />
-              <span className={classes.code}>{ntfn.code}</span>
-              <Copy value={() => ntfn.code} />
-            </span>
-            <div className={classes.controls}>
-              <Button type="secondary" className="m-0 m-0 p-0p5" onClick={() => handleCode(ntfn, false)} fit>
-                Use
-              </Button>
-              <Button type="tertiary" className="m-0 p-0p5" onClick={() => handleCode(ntfn, true)} fit>
-                Delete
-              </Button>
-            </div>
+            {ntfn.success ? (
+              <>
+                <span className={classes.msg}>
+                  You've received an access code to create a new dedicated workspace ! This access code will stay
+                  valid for 5 days only.
+                  <br />
+                  <span className={classes.code}>{ntfn.code}</span>
+                  <Copy value={() => ntfn.code} />
+                </span>
+                <div className={classes.controls}>
+                  <Button type="secondary" className="m-0 m-0 p-0p5" onClick={() => handleCode(ntfn, false)} fit>
+                    Use
+                  </Button>
+                  <Button type="tertiary" className="m-0 p-0p5" onClick={() => handleCode(ntfn, true)} fit>
+                    Delete
+                  </Button>
+                </div>
+              </>
+            ) : (
+              <span className={classes.msg}>
+                Your request for an access code was rejected, please contact{" "}
+                <a href={`mailto:${import.meta.env.VITE_HIDE_SUPPORT_MAIL}`}>
+                  {`<${import.meta.env.VITE_HIDE_SUPPORT_MAIL}>`}
+                </a>{" "}
+                for any further communication.
+              </span>
+            )}
           </>
         );
       }
