@@ -30,7 +30,10 @@ export const Status = () => {
   useEffect(() => {
     if (!workspaceName) navigate("/dashboard", { replace: true });
 
-    socket.on("provision", (msg) => setProvStatus(msg));
+    socket.on("provision", (msg) => {
+      console.log(msg);
+      setProvStatus(msg);
+    });
     return () => void socket.off("provision");
   }, [navigate, workspaceName]);
 
