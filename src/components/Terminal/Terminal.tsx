@@ -47,6 +47,11 @@ const Terminal = ({ id: guid, show, ref, onClose }: TerminalProps) => {
   useImperativeHandle(ref, () => ({
     handleSSHMessage,
   }));
+  useEffect(() => {
+    if (show) {
+      fitAddon.current?.fit();
+    }
+  }, [show]);
 
   const handleSSHMessage = (msg: InSocketMessage<"ssh">) => {
     switch (msg.action) {

@@ -13,6 +13,7 @@ import { InternalNotificationPayload } from "@/models/notification";
 import Button from "@/components/common/Button/Button";
 import RadialProgress from "@/components/common/RadialProgress/RadialProgress";
 import { AnimatePresence, motion } from "motion/react";
+import { openEnv } from "@/store/env";
 
 export const Status = () => {
   const navigate = useNavigate();
@@ -26,6 +27,7 @@ export const Status = () => {
   const dispatch = useAppDispatch();
   const [busy, setBusy] = useState(true);
   const [uuid, setUuid] = useState(location.state?.wsUuid ?? "");
+  const [launchBusy, setLaunchBusy] = useState(false);
 
   useEffect(() => {
     if (!workspaceName) navigate("/dashboard", { replace: true });
@@ -56,15 +58,42 @@ export const Status = () => {
     }
   }, []);
   const handleDismiss = useCallback(
-    (to: unknown) => {
+    (to?: unknown) => {
       if (show) {
         window.removeEventListener("keydown", trapFocus);
         setShow(false);
-        navigate(to as string);
+        if (to) navigate(to as string, { replace: true });
       }
     },
     [navigate, show, trapFocus]
   );
+  const handleLaunch = async () => {
+    setLaunchBusy(true);
+    const sessionId = sessionStorage.getItem("sessionId");
+    if (!sessionId) {
+      dispatch(
+        notify({ title: "No session", message: "Session inactive", status: "warning" } as InternalNotificationPayload)
+      );
+      handleDismiss("/dashboard");
+      setLaunchBusy(false);
+      return;
+    }
+    const res = await dispatch(openEnv({ uuid, sessionId }));
+    const { success, wait } = res.payload as { success: boolean; wait?: boolean };
+    if (success) {
+      if (wait) {
+        handleDismiss();
+        navigate("/dashboard/status", {
+          state: { workspaceName, wsUuid: uuid, isNew: false },
+          replace: true,
+        });
+        setLaunchBusy(false);
+        return;
+      }
+      setLaunchBusy(false);
+      handleDismiss(`/env/${uuid}`);
+    }
+  };
 
   useEffect(() => {
     if (provStatus?.action === "error") {
@@ -85,7 +114,7 @@ export const Status = () => {
           } as InternalNotificationPayload)
         );
       }
-      handleDismiss(-1);
+      handleDismiss("/dashboard");
     } else if (provStatus?.action === "success") {
       if (uuid) return;
       dispatch(
@@ -115,7 +144,7 @@ export const Status = () => {
 
   return (
     <>
-      <Backdrop show={show} onDismiss={busy ? noop : () => navigate("/dashboard")} />
+      <Backdrop show={show} onDismiss={busy ? noop : () => navigate("/dashboard", { replace: true })} />
       <div className={classes.status}>
         {!busy && (
           <Button
@@ -123,7 +152,7 @@ export const Status = () => {
             fit
             className="p-0p5 p-absolute tr-1"
             size={1}
-            onClick={() => navigate("/dashboard")}
+            onClick={() => navigate("/dashboard", { replace: true })}
           />
         )}
         <div className={classes.heading}>
@@ -150,7 +179,14 @@ export const Status = () => {
               transition={{ duration: 0.3 }}
               className="mx-auto w-min-content"
             >
-              <Button size={1.2} className="px-1 py-0p5" icon="launch" onClick={() => handleDismiss(`/env/${uuid}`)}>
+              <Button
+                busy={launchBusy}
+                disabled={launchBusy}
+                size={1.2}
+                className="px-1 py-0p5"
+                icon="launch"
+                onClick={handleLaunch}
+              >
                 Launch
               </Button>
             </motion.div>
