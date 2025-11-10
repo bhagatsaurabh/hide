@@ -18,11 +18,13 @@ const WorkspaceTypeInfo = () => {
         <li>Will shutdown anytime to reclaim resources</li>
       </ul>
       <p className="mt-2 mb-0">
-        Contact me{" "}
+        Request for getting an access code and try out the platform on a dedicated workspace for up to 2 days.
+        <br />
+        Having issues ? Contact{" "}
         <a href={`mailto:${import.meta.env.VITE_HIDE_SUPPORT_MAIL}`}>
           {`<${import.meta.env.VITE_HIDE_SUPPORT_MAIL}>`}
         </a>{" "}
-        for getting an access code and try out the platform on a dedicated workspace for up to 2 days.
+        for any queries.
       </p>
     </div>
   );

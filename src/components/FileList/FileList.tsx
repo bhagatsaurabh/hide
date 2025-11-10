@@ -9,6 +9,7 @@ import { FNode, FNodeOf } from "@/models/filesystem";
 import bus from "@/config/bus";
 import { Unsubscribe } from "nanoevents";
 import { uint32 } from "lib0/random.js";
+import { fsIgnoreList } from "@/utils/constants";
 
 type FlatNode = {
   fnode: FNode;
@@ -188,58 +189,62 @@ const FileList = ({ root, open, close, draft, save, isDraft, ref }: FileListProp
 
   return (
     <div className={classes.fslist}>
-      {flatNodes.map(({ fnode, depth, blocked }) => (
-        <div
-          key={fnode.id}
-          className={classNames({
-            [classes.fsitem]: true,
-            [classes.selected]: fnode.id === selected.current?.id,
-            [classes.disabled]: busy.has(fnode.id) || blocked || fnode.isBlocked,
-          })}
-          style={{ paddingLeft: `${depth * 0.5}rem` }}
-          onClick={() => handleClick(fnode)}
-          onMouseEnter={(e: MouseEvent) => showTooltip(fnode.path.substring(10), e.clientX, e.clientY)}
-          onMouseLeave={hideTooltip}
-        >
-          {busy.has(fnode.id) || fnode.isBlocked ? (
-            <Spinner size={0.8} className="ml-0p5 flex-shrink-0" />
-          ) : fnode.type === "file" ? (
-            <Icon
-              className="ml-0p5 flex-shrink-0"
-              name={getFileIcon(fnode.isDraft ? draftInput : fnode.name)}
-              size={0.8}
-              prefix="editor"
-            />
-          ) : (
-            <Icon
-              className="ml-0p5 flex-shrink-0"
-              color="#505050"
-              strokeWidth={1.5}
-              size={0.8}
-              style={{ transform: `rotateZ(${/* expandedDirs.current.has(fnode.path) */ fnode.isOpen ? 90 : 0}deg)` }}
-              name="chevron-right"
-              asset
-            />
-          )}
-          {fnode.isDraft && (
-            <input
-              ref={draftInputEl}
-              className={classes.draftinput}
-              type="text"
-              spellCheck={false}
-              placeholder={`${fnode.type === "file" ? "File" : "Directory"} name`}
-              value={draftInput}
-              onInput={(e) => setDraftInput((e.target as HTMLInputElement).value)}
-              onBlur={() => handleDraftBlur(fnode)}
-            />
-          )}
-          {fnode.isDraft ? (
-            <span className={[classes.name, classes.draft].join(" ")}>&nbsp;</span>
-          ) : (
-            <span className={classes.name}>{fnode.name}</span>
-          )}
-        </div>
-      ))}
+      {flatNodes
+        .filter(({ fnode }) => !fsIgnoreList.includes(fnode.name))
+        .map(({ fnode, depth, blocked }) => (
+          <div
+            key={fnode.id}
+            className={classNames({
+              [classes.fsitem]: true,
+              [classes.selected]: fnode.id === selected.current?.id,
+              [classes.disabled]: busy.has(fnode.id) || blocked || fnode.isBlocked,
+            })}
+            style={{ paddingLeft: `${depth * 0.5}rem` }}
+            onClick={() => handleClick(fnode)}
+            onMouseEnter={(e: MouseEvent) => showTooltip(fnode.path.substring(10), e.clientX, e.clientY)}
+            onMouseLeave={hideTooltip}
+          >
+            {busy.has(fnode.id) || fnode.isBlocked ? (
+              <Spinner size={0.8} className="ml-0p5 flex-shrink-0" />
+            ) : fnode.type === "file" ? (
+              <Icon
+                className="ml-0p5 flex-shrink-0"
+                name={getFileIcon(fnode.isDraft ? draftInput : fnode.name)}
+                size={0.8}
+                prefix="editor"
+              />
+            ) : (
+              <Icon
+                className="ml-0p5 flex-shrink-0"
+                color="#505050"
+                strokeWidth={1.5}
+                size={0.8}
+                style={{
+                  transform: `rotateZ(${/* expandedDirs.current.has(fnode.path) */ fnode.isOpen ? 90 : 0}deg)`,
+                }}
+                name="chevron-right"
+                asset
+              />
+            )}
+            {fnode.isDraft && (
+              <input
+                ref={draftInputEl}
+                className={classes.draftinput}
+                type="text"
+                spellCheck={false}
+                placeholder={`${fnode.type === "file" ? "File" : "Directory"} name`}
+                value={draftInput}
+                onInput={(e) => setDraftInput((e.target as HTMLInputElement).value)}
+                onBlur={() => handleDraftBlur(fnode)}
+              />
+            )}
+            {fnode.isDraft ? (
+              <span className={[classes.name, classes.draft].join(" ")}>&nbsp;</span>
+            ) : (
+              <span className={classes.name}>{fnode.name}</span>
+            )}
+          </div>
+        ))}
     </div>
   );
 };

@@ -63,3 +63,5 @@ export const errorMap: Record<string, UserError> = {
 };
 
 export const persistentNtfnsTypes: NotificationType[] = ["workspace-invite", "workspace-access-code"];
+
+export const fsIgnoreList = ["lost+found"];
