@@ -1,4 +1,6 @@
 .link {
   display: flex;
   color: #c2c2c2;
+  align-items: center;
+  justify-content: center;
 }

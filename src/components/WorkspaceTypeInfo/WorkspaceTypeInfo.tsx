@@ -20,6 +20,8 @@ const WorkspaceTypeInfo = () => {
       <p className="mt-2 mb-0">
         Request for getting an access code and try out the platform on a dedicated workspace for up to 2 days.
         <br />
+      </p>
+      <p className="mt-1 mb-0 fs-0p8">
         Having issues ? Contact{" "}
         <a href={`mailto:${import.meta.env.VITE_HIDE_SUPPORT_MAIL}`}>
           {`<${import.meta.env.VITE_HIDE_SUPPORT_MAIL}>`}

@@ -6,7 +6,19 @@
   display: flex;
   justify-content: center;
   align-items: center;
+  flex-direction: column;
   position: absolute;
   top: 0;
   left: 0;
+  font-family: "Inter";
+}
+
+.crashboard h2 {
+  font-weight: 200;
+}
+
+.crashboard .actions {
+  display: flex;
+  justify-content: center;
+  gap: 1rem;
 }
