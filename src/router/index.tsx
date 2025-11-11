@@ -41,7 +41,7 @@ const router = createBrowserRouter([
       {
         path: "profile",
         element: <CreateProfile />,
-        // errorElement: <CrashBoard />,
+        errorElement: <CrashBoard />,
         loader: authGuard,
       },
     ],

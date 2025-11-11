@@ -8,13 +8,16 @@ import "@/config/workers.ts";
 import "@/styles/utils.css";
 import TooltipProvider from "./context/tooltip/TooltipProvider.tsx";
 import { enableMapSet } from "immer";
+import GlobalErrorBoundary from "./error/global.tsx";
 
 enableMapSet();
 
 createRoot(document.getElementById("root")!).render(
-  <Provider store={store}>
-    <TooltipProvider>
-      <App />
-    </TooltipProvider>
-  </Provider>
+  <GlobalErrorBoundary>
+    <Provider store={store}>
+      <TooltipProvider>
+        <App />
+      </TooltipProvider>
+    </Provider>
+  </GlobalErrorBoundary>
 );
