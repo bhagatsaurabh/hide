@@ -60,6 +60,11 @@ export const NotificationBar = ({ size = 1.25, className = "", headerHeight: _ }
     const handleNewNotification = async (notification: UserNotificationPayload) => {
       dispatch(notify(notification));
     };
+    const handleNotificationDirective = async (notification: UserNotificationPayload) => {
+      if (notification.type === "notification-delete") {
+        dispatch(removeNotification(notification.id));
+      }
+    };
 
     if (connected) {
       socket?.on("notification", (msg) => {
@@ -70,6 +75,10 @@ export const NotificationBar = ({ size = 1.25, className = "", headerHeight: _ }
           }
           case "new": {
             handleNewNotification(msg.payload);
+            break;
+          }
+          case "directive": {
+            handleNotificationDirective(msg.payload);
             break;
           }
           default:

@@ -3,6 +3,7 @@ import { InSocketMessagePayload } from "./common";
 export type NotificationPayloadMap = {
   new: UserNotificationPayload;
   pending: UserNotificationPayload[];
+  directive: UserNotificationPayload;
 };
 export type NotificationPayload = {
   [K in keyof NotificationPayloadMap]: {
@@ -16,6 +17,7 @@ export type NotificationType =
   | "workspace-membership-removed"
   | "workspace-access-code"
   | "workspace-downgraded"
+  | "notification-delete"
   | "user";
 
 export interface UserNotificationPayload extends InSocketMessagePayload {
