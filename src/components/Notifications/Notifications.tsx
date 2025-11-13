@@ -62,12 +62,14 @@ export const NotificationBar = ({ size = 1.25, className = "", headerHeight: _ }
     };
     const handleNotificationDirective = async (notification: UserNotificationPayload) => {
       if (notification.type === "notification-delete") {
+        console.log("Removing notification on directive", notification);
         dispatch(removeNotification(notification.id));
       }
     };
 
     if (connected) {
       socket?.on("notification", (msg) => {
+        console.log("Received notification: ", msg);
         switch (msg.action) {
           case "pending": {
             handlePendingNotifications(msg.payload);
