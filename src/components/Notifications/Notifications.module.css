@@ -5,7 +5,7 @@
   border-radius: 0.75rem;
   width: 1rem;
   height: 1rem;
-  margin-right: 0.75rem;
+  margin-right: 0.5rem;
 }
 .icon.info {
   color: #7070c5;
@@ -113,6 +113,16 @@
   color: white;
   font-weight: 300;
   margin: 0;
+}
+.heading .left {
+  display: flex;
+}
+.heading .left svg {
+  margin-top: 0.23rem;
+}
+.code {
+  font-style: italic;
+  color: #e0e0c8;
 }
 
 @media (min-width: 1024px) {

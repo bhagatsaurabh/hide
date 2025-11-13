@@ -86,7 +86,7 @@
 .va-text-bottom {
   vertical-align: text-bottom;
 }
-.fs-0 {
+.fs-0.fs-0 {
   font-size: 0 !important;
 }
 .fs-2.fs-2 {
@@ -146,6 +146,12 @@
 .flex-center {
   justify-content: center;
   align-items: center;
+}
+.mt-0p23.mt-0p23 {
+  margin-top: 0.23rem;
+}
+.align-self-flex-start {
+  align-self: flex-start;
 }
 .flex-column {
   flex-direction: column;
@@ -459,8 +465,11 @@
 .p-0p1 {
   padding: 0.1rem;
 }
-.ml-0p5 {
+.ml-0p5.ml-0p5 {
   margin-left: 0.5rem;
+}
+.d-inline-block.d-inline-block {
+  display: inline-block;
 }
 .ml-auto {
   margin-left: auto;
