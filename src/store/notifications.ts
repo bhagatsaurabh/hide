@@ -14,8 +14,8 @@ import {
   storePersistentNotification,
 } from "@/utils/driver";
 import { auth } from "@/config/firebase";
-import { persistentNtfnsTypes } from "@/utils/constants";
 import { getDetails } from "@/services/user";
+import { isNotificationPersistent } from "@/utils";
 
 type NotificationsState = {
   pending: UserNotificationPayload[];
@@ -156,7 +156,7 @@ export const notify = createAsyncThunk<void, InternalNotificationPayload | UserN
 const process = createAsyncThunk<UserNotificationPayload, UserNotificationPayload>(
   "notifications/process",
   async (notification) => {
-    if (persistentNtfnsTypes.includes(notification.type)) {
+    if (isNotificationPersistent(notification)) {
       notification.isPersistent = true;
     }
     if (notification.type === "workspace-invite") {
