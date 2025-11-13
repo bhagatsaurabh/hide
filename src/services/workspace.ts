@@ -33,9 +33,9 @@ export const deleteWorkspace = async (uuid: string) => {
 };
 
 export const requestAccess = async (reason: string) => {
-  return await api.post(`/workspace/access/request`, { reason });
+  return await api.post(`/workspace/access-request`, { reason });
 };
 
 export const deleteAccess = async (reqId: string, ntfnId: string) => {
-  return await api.delete(`/workspace/access/delete`, { params: { reqId, ntfnId } });
+  return await api.delete(`/workspace/access-delete`, { params: { reqId, ntfnId } });
 };

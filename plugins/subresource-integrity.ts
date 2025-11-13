@@ -1,7 +1,6 @@
 import { PluginOption } from "vite";
 import { createHash } from "crypto";
 import { load } from "cheerio";
-import { OutputAsset, OutputChunk } from "rollup";
 import path from "path";
 import { readFile, writeFile } from "fs/promises";
 
@@ -14,10 +13,13 @@ function SRI(): PluginOption {
     async writeBundle(_, bundle) {
       const integrityMap = new Map<string, string>();
 
-      for (const [fileName, asset] of Object.entries(bundle)) {
+      for (const [fileName, _asset] of Object.entries(bundle)) {
         if (fileName.endsWith(".js") || fileName.endsWith(".css")) {
-          const source = (asset as OutputChunk).code || (asset as OutputAsset).source;
-          const hash = createHash("sha512").update(source).digest("base64");
+          /* const source = (asset as OutputChunk).code || (asset as OutputAsset).source;
+          const hash = createHash("sha512").update(source).digest("base64"); */
+          const finalPath = path.resolve("dist", fileName);
+          const finalSource = await readFile(finalPath);
+          const hash = createHash("sha512").update(finalSource).digest("base64");
           integrityMap.set(fileName, `sha512-${hash}`);
         }
       }
@@ -26,8 +28,10 @@ function SRI(): PluginOption {
       const html = await readFile(indexPath, "utf8");
 
       const $ = load(html);
+      // $('script[src], link[href]').each(...)
       $("script[src],link[rel=stylesheet][href]").each((_, el) => {
         const attr = el.attribs.src ? "src" : "href";
+        // const fileName = el.attribs[attr].replace(/^\.?\//, "");
         const fileName = el.attribs[attr].replace(/^\//, "");
         const integrity = integrityMap.get(fileName);
         if (integrity) {
