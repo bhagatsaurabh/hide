@@ -3,6 +3,8 @@ import { Location } from "react-router";
 import iconMapping from "@/assets/icon-map.json";
 import { FNode } from "@/models/filesystem";
 import { Area } from "react-easy-crop";
+import { NotificationType, UserNotificationPayload, WorkspaceAccessRequest } from "@/models/notification";
+import { persistentNtfnTypes } from "./constants";
 
 type IconMap = {
   fileNames: Record<string, string>;
@@ -266,4 +268,13 @@ export const getCroppedImg = async (
       res(blob);
     }, "image/png");
   });
+};
+
+export const persistentNtfnTypesChecks: Partial<
+  Record<NotificationType, (ntfn: UserNotificationPayload) => boolean>
+> = {
+  "workspace-access-code": (ntfn: UserNotificationPayload) => (ntfn as WorkspaceAccessRequest).success,
+};
+export const isNotificationPersistent = (ntfn: UserNotificationPayload) => {
+  return persistentNtfnTypes.includes(ntfn.type) && (persistentNtfnTypesChecks[ntfn.type]?.(ntfn) ?? true);
 };
