@@ -8,3 +8,7 @@ export const getPendingNotifications = async () => {
 export const readNotification = async (data: NotificationReadDTO) => {
   return await api.post<NotificationReadDTO>("/notification/read", data);
 };
+
+export const readAllNotifications = async (ids: string[]) => {
+  return await api.post<string[]>("/notification/readall", ids);
+};

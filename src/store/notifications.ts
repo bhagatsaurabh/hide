@@ -1,6 +1,6 @@
 import { createAsyncThunk, createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { RootState } from ".";
-import { getPendingNotifications } from "@/services/notifications";
+import { getPendingNotifications, readAllNotifications, readNotification } from "@/services/notifications";
 import { uuidv4 as uuid } from "lib0/random.js";
 import {
   ExclusionData,
@@ -178,6 +178,35 @@ const process = createAsyncThunk<UserNotificationPayload, UserNotificationPayloa
       ntfn.type = "user";
     }
     return notification;
+  }
+);
+export const deleteAllNotifications = createAsyncThunk<void>(
+  "notifications/read-all",
+  async (_, { dispatch, getState }) => {
+    const { pending, active } = (getState() as RootState).notifications;
+    try {
+      const ntfnIds = new Set<string>();
+      pending.filter((ntfn) => !ntfn.isPersistent && ntfn.type !== "user").forEach((ntfn) => ntfnIds.add(ntfn.id));
+      active.filter((ntfn) => !ntfn.isPersistent && ntfn.type !== "user").forEach((ntfn) => ntfnIds.add(ntfn.id));
+
+      await readAllNotifications([...ntfnIds]);
+    } catch (error) {
+      console.log(error);
+    }
+
+    dispatch(removeAllNotifications());
+  }
+);
+export const deleteNotification = createAsyncThunk<void, string>(
+  "notifications/read",
+  async (ntfnId, { dispatch }) => {
+    try {
+      await readNotification({ id: ntfnId });
+    } catch (error) {
+      console.log(error);
+    }
+
+    dispatch(removeNotification(ntfnId));
   }
 );
 

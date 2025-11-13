@@ -2,10 +2,11 @@ import { useEffect, useRef, useState } from "react";
 import { useAppDispatch, useAppSelector } from "@/hooks/store";
 import { AuthStatus, selectStatus } from "@/store/auth";
 import {
+  deleteAllNotifications,
+  deleteNotification,
   fetchNotifications,
   loadNotifications,
   notify,
-  removeAllNotifications,
   removeNotification,
   selectNotifications,
 } from "@/store/notifications";
@@ -110,11 +111,11 @@ export const NotificationBar = ({ size = 1.25, className = "", headerHeight: _ }
     }
   };
 
-  const handleDelete = (id: string) => {
-    dispatch(removeNotification(id));
+  const handleDelete = async (id: string) => {
+    await dispatch(deleteNotification(id));
   };
-  const handleNtfnsClear = () => {
-    dispatch(removeAllNotifications());
+  const handleNtfnsClear = async () => {
+    await dispatch(deleteAllNotifications());
   };
 
   const handleInvitation = async (ntfn: WorkspaceInvite, accept: boolean) => {
@@ -142,13 +143,15 @@ export const NotificationBar = ({ size = 1.25, className = "", headerHeight: _ }
                 <StatusIcon className={[classes.icon, classes[ntfn.status as InternalNotificationType]].join(" ")} />
                 <span className={classes.title}>{ntfn.title as string}</span>
               </div>
-              <Button
-                className="p-0p5"
-                iconProps={{ strokeWidth: 2 }}
-                icon="bin"
-                onClick={() => handleDelete(ntfn.id)}
-                fit
-              />
+              {!ntfn.isPersistent && (
+                <Button
+                  className="p-0p5 align-self-flex-start mt-0p23"
+                  iconProps={{ strokeWidth: 2 }}
+                  icon="bin"
+                  onClick={() => handleDelete(ntfn.id)}
+                  fit
+                />
+              )}
             </div>
             <span className={classes.msg}>{ntfn.message}</span>
           </>
@@ -164,6 +167,15 @@ export const NotificationBar = ({ size = 1.25, className = "", headerHeight: _ }
                 <StatusIcon className={[classes.icon, classes.info].join(" ")} />
                 <span className={classes.title}>Workspace invitation</span>
               </div>
+              {!ntfn.isPersistent && (
+                <Button
+                  className="p-0p5 align-self-flex-start mt-0p23"
+                  iconProps={{ strokeWidth: 2 }}
+                  icon="bin"
+                  onClick={() => handleDelete(ntfn.id)}
+                  fit
+                />
+              )}
             </div>
             <span className={classes.msg}>
               You've been invited by <span className={classes.mark}>{ntfn.inviterName as string}</span> to collaborate
@@ -190,6 +202,15 @@ export const NotificationBar = ({ size = 1.25, className = "", headerHeight: _ }
                 <StatusIcon className={[classes.icon, classes.info].join(" ")} />
                 <span className={classes.title}>Dedicated workspace access-code</span>
               </div>
+              {!ntfn.isPersistent && (
+                <Button
+                  className="p-0p5 align-self-flex-start mt-0p23"
+                  iconProps={{ strokeWidth: 2 }}
+                  icon="bin"
+                  onClick={() => handleDelete(ntfn.id)}
+                  fit
+                />
+              )}
             </div>
             {ntfn.success ? (
               <>
@@ -198,7 +219,7 @@ export const NotificationBar = ({ size = 1.25, className = "", headerHeight: _ }
                   valid for 5 days only.
                   <br />
                   <span className={classes.code}>{ntfn.code}</span>
-                  <Copy value={() => ntfn.code} />
+                  <Copy className="ml-0p5 d-inline-block fs-0" value={() => ntfn.code} />
                 </span>
                 <div className={classes.controls}>
                   <Button type="secondary" className="m-0 m-0 p-0p5" onClick={() => handleCode(ntfn, false)} fit>
@@ -232,14 +253,15 @@ export const NotificationBar = ({ size = 1.25, className = "", headerHeight: _ }
                 <StatusIcon className={[classes.icon, classes.info].join(" ")} />
                 <span className={classes.title}>Workspace downgraded</span>
               </div>
-              <Button
-                type="primary"
-                className="p-0p5 ml-auto flex-shrink-0"
-                onClick={() => handleDelete(ntfn.id)}
-                iconProps={{ strokeWidth: 2 }}
-                icon="bin"
-                fit
-              />
+              {!ntfn.isPersistent && (
+                <Button
+                  className="p-0p5 align-self-flex-start mt-0p23"
+                  iconProps={{ strokeWidth: 2 }}
+                  icon="bin"
+                  onClick={() => handleDelete(ntfn.id)}
+                  fit
+                />
+              )}
             </div>
             <span className={classes.msg}>
               Your workspace <span className={classes.mark}>{`${wrspc?.name ?? "Unknown"}`}</span> has been downgraded
