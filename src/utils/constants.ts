@@ -1,4 +1,7 @@
 import { NotificationType } from "@/models/notification";
+import errors from "@/assets/server-errors.json";
+import successes from "@/assets/app-success.json";
+import fallbackErrors from "@/assets/app-errors.json";
 
 export const usernameRegex = /^[^!@#$%^&*()+={}[\]`~:;"?/<>\s]{3,}$/;
 export const nameRegex = /^.[^!@#$%^&*()+={}[\]`~:;"?/<>]{3,}$/;
@@ -32,35 +35,19 @@ export const imageToIcon: Record<string, string> = {
   "hide-env-deno:dev": "deno",
 };
 
-export type UserError = { title: string; message: string; validationErr: string };
+export type UserError = { title: string; message: string; validationErr?: string };
+export type UserSuccess = { title: string; message: string };
 
-export const errorMap: Record<string, UserError> = {
-  INVALID_EMAIL: {
-    title: "Invalid email",
-    message: "Provided email is invalid, please check and try again",
-    validationErr: "",
-  },
-  EMAIL_REQUEST_CODE_MAX_ATTEMPTS_REACHED: {
-    title: "Max attempts reached",
-    message: "Cannot request email verification pin, please try again in 15 minutes.",
-    validationErr: "",
-  },
-  EMAIL_VERIFY_CODE_MAX_ATTEMPTS_REACHED: {
-    title: "Max attempts reached",
-    message: "Too many wrong attempts, please try again in 15 minutes.",
-    validationErr: "",
-  },
-  PIN_EXPIRED: {
-    title: "Invalid pin",
-    message: "Provided pin is invalid, please try again.",
-    validationErr: "Invalid pin",
-  },
-  EMAIL_VERIFY_CODE_WRONG: {
-    title: "Wrong verification pin",
-    message: "Provided pin for email verification is wrong, please try again.",
-    validationErr: "Wrong pin",
-  },
+export const errorMap: Record<string, UserError> = errors;
+export const fallbackErrorMap: Record<string, UserError | undefined> = fallbackErrors;
+export const firebaseErrorMap: Record<string, string> = {
+  "auth/invalid-email": "INVALID_EMAIL",
+  "auth/quota-exceeded": "QUOTA_EXCEEDED",
+  "auth/user-token-expired": "TOKEN_EXPIRED",
+  "auth/too-many-requests": "TOO_MANY_ATTEMPTS_TRY_LATER",
+  "auth/unverified-email": "UNVERIFIED_EMAIL",
 };
+export const successMap: Record<string, UserSuccess> = successes;
 
 export const persistentNtfnTypes: NotificationType[] = ["workspace-invite", "workspace-access-code"];
 

@@ -6,3 +6,9 @@ export enum State {
   ERROR,
   SUCCESS,
 }
+export type ServerError = {
+  statusCode: number;
+  timestamp: string;
+  path: string;
+  message: string;
+};

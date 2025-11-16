@@ -5,7 +5,7 @@ import Backdrop from "@/components/common/Backdrop/Backdrop";
 import { usePrevious } from "@/hooks/prev";
 import { useAppDispatch } from "@/hooks/store";
 import { notify } from "@/store/notifications";
-import { noop } from "@/utils";
+import { getUserError, noop } from "@/utils";
 import { socket } from "@/config/socket";
 import { ProvisionPayload, ProvisionSuccess } from "@/models/workspace";
 import { processNewWorkspace } from "@/store/workspace";
@@ -97,23 +97,7 @@ export const Status = () => {
 
   useEffect(() => {
     if (provStatus?.action === "error") {
-      if (isNew) {
-        dispatch(
-          notify({
-            title: "Could not provision workspace",
-            status: "error",
-            message: "Something went wrong while provisioning your workspace, please try again later",
-          } as InternalNotificationPayload)
-        );
-      } else {
-        dispatch(
-          notify({
-            title: "Could not connect to workspace",
-            status: "error",
-            message: "Something went wrong while connecting to your workspace, please try again later",
-          } as InternalNotificationPayload)
-        );
-      }
+      dispatch(notify(getUserError(isNew ? "APPERR_0014" : "APPERR_0021").ntfn));
       handleDismiss("/dashboard");
     } else if (provStatus?.action === "success") {
       if (uuid) return;
@@ -133,10 +117,10 @@ export const Status = () => {
   let displayStatus = `0/6:${isNew ? "Creating your workspace" : "Restoring your workspace"}`;
   if (provStatus?.action === "status") {
     displayStatus = provStatus.payload.message;
-  } else if (provStatus?.action === "success") {
-    // displayStatus = "Ready";
   } else if (provStatus?.action === "error") {
     displayStatus = "Error";
+  } else if (provStatus?.action === "success") {
+    // _
   }
 
   const [meta, msg] = displayStatus.split(":");

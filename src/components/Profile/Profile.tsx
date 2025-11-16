@@ -170,22 +170,13 @@ const Profile = ({ profile, save, action }: ProfileProps) => {
     URL.revokeObjectURL(oldUrl);
     setAvatar(croppedAvatarImg.current);
 
-    try {
-      const picture = await dispatch(uploadAvatar({ data: croppedImage, uid: auth.currentUser!.uid })).unwrap();
-      if (action === "edit") {
-        await dispatch(updateProfile({ picture }));
-      }
-    } catch (error) {
-      console.log(error);
-      dispatch(
-        notify({
-          status: "error",
-          title: "Avatar update failed",
-          message: "Could not upload avatar image, please try again",
-        } as InternalNotificationPayload)
-      );
+    const picture = await dispatch(uploadAvatar({ data: croppedImage, uid: auth.currentUser!.uid })).unwrap();
+    if (!picture) {
       setUploadBusy(false);
       return;
+    }
+    if (action === "edit") {
+      await dispatch(updateProfile({ picture }));
     }
 
     setUploadBusy(false);

@@ -1,0 +1,164 @@
+{
+  "INVALID_AUTH_HEADER": {
+    "title": "Unauthorized access",
+    "message": "Action is not allowed"
+  },
+  "INVALID_TOKEN": {
+    "title": "Unauthorized access",
+    "message": "Action is not allowed"
+  },
+  "INVALID_EMAIL": {
+    "title": "Invalid email",
+    "message": "Provided email is invalid, please check and try again"
+  },
+  "EMAIL_REQUEST_CODE_MAX_ATTEMPTS_REACHED": {
+    "title": "Max attempts reached",
+    "message": "Cannot request email verification pin, please try again in 15 minutes."
+  },
+  "EMAIL_VERIFY_CODE_MAX_ATTEMPTS_REACHED": {
+    "title": "Max attempts reached",
+    "message": "Too many wrong attempts, please try again in 15 minutes."
+  },
+  "PIN_EXPIRED": {
+    "title": "Invalid pin",
+    "message": "Provided pin is invalid, please try again.",
+    "validationErr": "Invalid pin"
+  },
+  "EMAIL_VERIFY_CODE_WRONG": {
+    "title": "Wrong verification pin",
+    "message": "Provided pin for email verification is wrong, please try again.",
+    "validationErr": "Wrong pin"
+  },
+  "QUOTA_EXCEEDED": {
+    "title": "Quota exceeded",
+    "message": "Not allowed to perform more actions"
+  },
+  "TOKEN_EXPIRED": {
+    "title": "Invalid sign-in",
+    "message": "Please sign-in again"
+  },
+  "TOO_MANY_ATTEMPTS_TRY_LATER": {
+    "title": "Max attempts reached",
+    "message": "Too many attempts, please try again later"
+  },
+  "UNVERIFIED_EMAIL": {
+    "title": "Unverified email",
+    "message": "Provided email is unverified"
+  },
+  "USER_DETAILS_MISSING": {
+    "title": "Registration details missing",
+    "message": "Please provide all details"
+  },
+  "INVALID_USER_NAME": {
+    "title": "Invalid name",
+    "message": "Please provide a valid name"
+  },
+  "INVALID_USER_USERNAME": {
+    "title": "Invalid username",
+    "message": "Please provide a valid username"
+  },
+  "USER_ALREADY_REGISTERED": {
+    "title": "Already registered",
+    "message": "Provided user is already registered"
+  },
+  "INVALID_USER_IDENTITY": {
+    "title": "Invalid user identity",
+    "message": "User identity mismatch, please try again"
+  },
+  "UPDATE_USER_FORBIDDEN": {
+    "title": "Not allowed",
+    "message": "Profile update not allowed for some fields"
+  },
+  "USER_NOT_FOUND": {
+    "title": "Not found",
+    "message": "User not found"
+  },
+  "UNKNOWN": {
+    "title": "Something went wrong",
+    "message": "Something went wrong, please try again"
+  },
+  "NEED_CONFIRMATION": {
+    "title": "Account already exists",
+    "message": "Account already exists with the same email"
+  },
+  "WORKSPACE_PROVISION_INVALID_REQUEST": {
+    "title": "Invalid request",
+    "message": "Your request for provisioning a workspace was invalid"
+  },
+  "WORKSPACE_PROVISION_QUOTA_REACHED": {
+    "title": "Quota exceeded",
+    "message": "Workspace provisioning quota reached, not allowed to provision more workspaces"
+  },
+  "NO_WORKSPACE_MEMBERSHIP": {
+    "title": "Not a member",
+    "message": "You are not a member of this workspace"
+  },
+  "ACCESS_CODE_USE_FAILED": {
+    "title": "Access code usage failed",
+    "message": "Failed to use provided access code, please try again later"
+  },
+  "NO_CAPACITY": {
+    "title": "Capacity exhausted",
+    "message": "Your request cannot be processed at the moment, please try again later"
+  },
+  "WORKSPACE_PROVISION_FAILED": {
+    "title": "Workspace provision failed",
+    "message": "Failed to provision a new workspace, please try again later"
+  },
+  "WORKSPACE_RESTORE_FAILED": {
+    "title": "Workspace restore failed",
+    "message": "Failed to restore the workspace, please try again later"
+  },
+  "WORKSPACE_BOOT_FAILED": {
+    "title": "Workspace start failed",
+    "message": "Failed to start your workspace, please try again later"
+  },
+  "WORKSPACE_DELETE_INVALID_REQUEST": {
+    "title": "Invalid request",
+    "message": "Your request to delete a workspace was invalid"
+  },
+  "WORKSPACE_NOT_FOUND": {
+    "title": "Workspace not found",
+    "message": "Requested workspace not found"
+  },
+  "WORKSPACE_ACTION_NOT_AUTHORIZED": {
+    "title": "Insufficient privileges",
+    "message": "Not allowed to perform provided action on this workspace due to insufficient privileges"
+  },
+  "ACCESS_CODE_LIMIT": {
+    "title": "Quota exceeded",
+    "message": "Cannot request more access codes since you already have a pending request"
+  },
+  "WORKSPACE_OPEN_INVALID_REQUEST": {
+    "title": "Invalid request",
+    "message": "Your request to open a workspace was invalid"
+  },
+  "WORKSPACE_OPEN_FAILED": {
+    "title": "Failed to open workspace",
+    "message": "Something went wrong while opening your workspace, please try again later"
+  },
+  "WORKSPACE_UNREACHABLE": {
+    "title": "Workspace unreachable",
+    "message": "Workspace is unreachable, please try again later"
+  },
+  "FS_ERR_FETCH_DIRECTORY": {
+    "title": "Failed to fetch directory",
+    "message": "Failed to fetch directory, please try again"
+  },
+  "FS_ERR_READ_FILE": {
+    "title": "Failed to read file",
+    "message": "Failed to read file, please try again"
+  },
+  "FS_ERR_FETCH_FILE": {
+    "title": "Failed to read file",
+    "message": "Failed to read file, please try again"
+  },
+  "FATAL_ERR_NO_WORKSPACE": {
+    "title": "Workspace disconnected",
+    "message": "Workspace was disconnected, please try again"
+  },
+  "FS_TIMEOUT": {
+    "title": "Workspace timed out",
+    "message": "Workspace did not respond in time, please try again later"
+  }
+}

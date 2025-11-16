@@ -15,7 +15,7 @@ import {
 } from "@/utils/driver";
 import { auth } from "@/config/firebase";
 import { getDetails } from "@/services/user";
-import { isNotificationPersistent } from "@/utils";
+import { getUserError, isNotificationPersistent } from "@/utils";
 
 type NotificationsState = {
   pending: UserNotificationPayload[];
@@ -105,13 +105,7 @@ export const fetchNotifications = createAsyncThunk<void, UserNotificationPayload
       dispatch(setPending(ntfns));
     } catch (error) {
       console.log(error);
-      dispatch(
-        notify({
-          status: "warning",
-          title: "Could not fetch latest notifications",
-          message: "Something went wrong while getting recent notifications",
-        } as InternalNotificationPayload)
-      );
+      dispatch(notify(getUserError(error, "APPERR_0018", "warning").ntfn));
     }
   }
 );
@@ -121,13 +115,7 @@ export const loadNotifications = createAsyncThunk("notifications/load-all", asyn
     dispatch(setPending(ntfns));
   } catch (error) {
     console.log(error);
-    dispatch(
-      notify({
-        status: "warning",
-        title: "Could not load notifications",
-        message: "Something went wrong while loading notifications",
-      } as InternalNotificationPayload)
-    );
+    dispatch(notify(getUserError(error, "APPERR_0019", "warning").ntfn));
   }
 });
 export const notify = createAsyncThunk<void, InternalNotificationPayload | UserNotificationPayload>(

@@ -1,16 +1,12 @@
 import { useRef, useState } from "react";
 import classes from "./EmailProvider.module.css";
 import { useAppDispatch } from "@/hooks/store";
-import { AuthType, signIn } from "@/store/auth";
+import { AuthType, registerUserEmail, signIn } from "@/store/auth";
 import Button from "@/components/common/Button/Button";
 import { Input, InputRef } from "@/components/common/Input/Input";
-import { emailPinRegex, emailRegex, errorMap } from "@/utils/constants";
-import { registerEmail } from "@/services/auth";
-import { notify } from "@/store/notifications";
-import { InternalNotificationPayload } from "@/models/notification";
+import { emailPinRegex, emailRegex } from "@/utils/constants";
 import PINInput, { PINInputRef } from "@/components/common/PINInput/PINInput";
 import classNames from "classnames";
-import { isAxiosError } from "axios";
 
 const EmailProvider = () => {
   const dispatch = useAppDispatch();
@@ -41,10 +37,6 @@ const EmailProvider = () => {
         pinInput.current?.clear(true);
         if (error.validationErr) {
           pinInput.current?.invalidate(error.validationErr);
-        } else {
-          dispatch(
-            notify({ status: "error", title: error.title, message: error.message } as InternalNotificationPayload)
-          );
         }
       }
     } else {
@@ -54,26 +46,10 @@ const EmailProvider = () => {
         return;
       }
 
-      try {
-        await registerEmail(email);
+      const success = await dispatch(registerUserEmail(email));
+      if (success) {
         setpinRequested(true);
-      } catch (error) {
-        if (!isAxiosError(error) || !errorMap[error.response?.data.message]) {
-          console.log(error);
-          dispatch(
-            notify({
-              status: "error",
-              title: "Email registration failed",
-              message: "Could not request for email registration, please try again",
-            } as InternalNotificationPayload)
-          );
-          pinInput.current?.clear(true);
-          return;
-        }
-        const errMsg = errorMap[error.response?.data.message];
-        dispatch(
-          notify({ status: "error", title: errMsg.title, message: errMsg.message } as InternalNotificationPayload)
-        );
+      } else {
         pinInput.current?.clear(true);
       }
     }

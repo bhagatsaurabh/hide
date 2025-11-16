@@ -16,7 +16,7 @@ import { auth } from "@/config/firebase";
 import { storeSSHKey } from "@/utils/driver";
 import { notify, removeNotification } from "./notifications";
 import { InternalNotificationPayload, WorkspaceAccessRequest, WorkspaceInvite } from "@/models/notification";
-import { isAxiosError } from "axios";
+import { getUserError, getUserSuccess } from "@/utils";
 
 type WorkspaceState = {
   workspaces: WorkspaceDTO[];
@@ -60,9 +60,9 @@ export const fetchWorkspaces = createAsyncThunk("workspace/get-all", async (_, {
     dispatch(setWorkspaces(res.data));
   } catch (error) {
     console.log(error);
+    dispatch(notify(getUserError(error, "APPERR_0011").ntfn));
   }
 });
-
 export const createNewWorkspace = createAsyncThunk<{ success: boolean; wait?: boolean }, WorkspaceCreateDTO>(
   "workspace/create",
   async (data, { dispatch }) => {
@@ -70,14 +70,8 @@ export const createNewWorkspace = createAsyncThunk<{ success: boolean; wait?: bo
       const res = await createWorkspace(data);
       return { success: true, wait: res.data.wait };
     } catch (error) {
-      dispatch(
-        notify({
-          title: "Failed to create new workspace",
-          message: "Something went wrong when creating new workspace, please try again later",
-          status: "error",
-        } as InternalNotificationPayload)
-      );
       console.log(error);
+      dispatch(notify(getUserError(error, "APPERR_0014").ntfn));
     }
     return { success: false };
   }
@@ -103,21 +97,21 @@ export const processNewWorkspace = createAsyncThunk<void, { workspace: Workspace
 export const updateExistingWorkspace = createAsyncThunk<boolean, WorkspaceUpdateDTO>(
   "workspace/update",
   async (data, { dispatch }) => {
+    let success = false;
     try {
       await updateWorkspace(data);
-      await dispatch(fetchWorkspaces());
-      return true;
+      success = true;
     } catch (error) {
-      dispatch(
-        notify({
-          title: "Failed to update workspace",
-          message: "Something went wrong when updating the workspace, please try again later.",
-          status: "error",
-        } as InternalNotificationPayload)
-      );
+      console.log(error);
+      dispatch(notify(getUserError(error, "APPERR_0012").ntfn));
+    }
+
+    try {
+      await dispatch(fetchWorkspaces()).unwrap();
+    } catch (error) {
       console.log(error);
     }
-    return false;
+    return success;
   }
 );
 export const deleteExistingWorkspace = createAsyncThunk<boolean, string>(
@@ -127,14 +121,8 @@ export const deleteExistingWorkspace = createAsyncThunk<boolean, string>(
       await deleteWorkspace(uuid);
       return true;
     } catch (error) {
-      dispatch(
-        notify({
-          title: "Failed to delete workspace",
-          message: "Something went wrong when deleting the workspace, please try again later.",
-          status: "error",
-        } as InternalNotificationPayload)
-      );
       console.log(error);
+      dispatch(notify(getUserError(error, "APPERR_0015").ntfn));
     }
     return false;
   }
@@ -144,28 +132,11 @@ export const requestDedicatedAccess = createAsyncThunk<boolean, { reason?: strin
   async ({ reason = "" }, { dispatch }) => {
     try {
       await requestAccess(reason);
-      dispatch(
-        notify({
-          title: "Access request",
-          message: "Request submitted successfully ! You'll get a notification with an access code soon",
-          status: "success",
-        } as InternalNotificationPayload)
-      );
+      dispatch(notify(getUserSuccess("APPSUCCESS_0001").ntfn));
       return true;
     } catch (error) {
-      if (isAxiosError(error)) {
-        // TODO
-        console.log(error.toJSON());
-      } else {
-        console.log(error);
-      }
-      dispatch(
-        notify({
-          title: "Failed to request access code",
-          message: "Something went wrong when requesting the access code, please try again later.",
-          status: "error",
-        } as InternalNotificationPayload)
-      );
+      console.log(error);
+      dispatch(notify(getUserError(error, "APPERR_0016").ntfn));
     }
     return false;
   }
@@ -177,20 +148,18 @@ export const respondToInvitation = createAsyncThunk<void, { accept: boolean; ntf
       if (accept) {
         const res = await acceptInvitation({ id: ntfn.id, token: ntfn.token });
         await storeSSHKey(auth.currentUser!.uid, ntfn.workspaceUUID, res.data.sshKey);
-        await dispatch(fetchWorkspaces());
       } else {
         await ignoreInvitation({ id: ntfn.id, token: ntfn.token });
       }
       dispatch(removeNotification(ntfn.id));
     } catch (error) {
-      if (!accept) return;
-      dispatch(
-        notify({
-          title: "Failed to accept invitation",
-          message: "Something went wrong while accepting the invitation, please try again.",
-          status: "error",
-        } as InternalNotificationPayload)
-      );
+      console.log(error);
+      dispatch(notify(getUserError(error, "APPERR_0013").ntfn));
+    }
+
+    try {
+      await dispatch(fetchWorkspaces()).unwrap();
+    } catch (error) {
       console.log(error);
     }
   }
@@ -203,6 +172,7 @@ export const deleteAccessCode = createAsyncThunk<void, WorkspaceAccessRequest>(
       dispatch(removeNotification(ntfn.id));
     } catch (error) {
       console.log(error);
+      dispatch(notify(getUserError(error, "APPERR_0017").ntfn));
     }
   }
 );

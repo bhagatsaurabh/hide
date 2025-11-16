@@ -2,7 +2,6 @@ import { useState } from "react";
 import Search from "../common/Search/Search";
 import classes from "./AddMembers.module.css";
 import Spinner from "../common/Spinner/Spinner";
-import { search } from "@/services/user";
 import { User, UserSearchHits } from "@/models/user";
 import { useAppDispatch } from "@/hooks/store";
 import { notify } from "@/store/notifications";
@@ -15,6 +14,7 @@ import { getSSHKey } from "@/utils/driver";
 import { auth } from "@/config/firebase";
 import { InternalNotificationPayload } from "@/models/notification";
 import classNames from "classnames";
+import { searchUsers } from "@/store/typesense";
 
 interface AddMembersProps {
   workspace: WorkspaceDTO;
@@ -33,23 +33,12 @@ const AddMembers = ({ workspace, onBack }: AddMembersProps) => {
   const handleSearch = async (query: string) => {
     setHits(null);
     setBusy(true);
-    try {
-      const res = await search(auth.currentUser!.uid, query, page);
+    const res = await dispatch(searchUsers({ uid: auth.currentUser!.uid, query, page })).unwrap();
+    if (res) {
       setPage(res.page);
-      setBusy(false);
       setHits(res.data);
-    } catch (error) {
-      console.log(error);
-      dispatch(
-        notify({
-          title: "Something went wrong, please try again",
-          message: "Cannot search users",
-          status: "error",
-        } as InternalNotificationPayload)
-      );
-    } finally {
-      setBusy(false);
     }
+    setBusy(false);
   };
   const handleAdd = (user: User) => {
     setAdded((prev) => {

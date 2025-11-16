@@ -4,7 +4,7 @@ import { RootState } from ".";
 import { close, getTemplates, open } from "@/services/env";
 import { notify } from "./notifications";
 import { EnvCloseDTO, EnvOpenDTO, Template } from "@/models/env";
-import { InternalNotificationPayload } from "@/models/notification";
+import { getUserError } from "@/utils";
 
 type EnvState = {
   uuid: string;
@@ -39,13 +39,7 @@ export const openEnv = createAsyncThunk<{ success: boolean; wait?: boolean }, En
       return { success: true, wait: res.data.wait };
     } catch (error) {
       console.log(error);
-      dispatch(
-        notify({
-          title: "Failed to open workspace",
-          message: "Could not open workspace, please try again later",
-          status: "error",
-        } as InternalNotificationPayload)
-      );
+      dispatch(notify(getUserError(error, "APPERR_0020").ntfn));
     }
     return { success: false };
   }

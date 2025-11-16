@@ -1,6 +1,5 @@
 import { createAsyncThunk, createSlice, PayloadAction } from "@reduxjs/toolkit";
 import {
-  AuthErrorCodes,
   getAdditionalUserInfo,
   GithubAuthProvider,
   GoogleAuthProvider,
@@ -15,14 +14,11 @@ import { auth, db, storage } from "@/config/firebase";
 import { storeUser } from "@/utils/driver";
 import { collection, getDocs, query, where } from "firebase/firestore";
 import { notify } from "./notifications";
-import { checkNetwork, convertToPng } from "@/utils";
+import { convertToPng, getUserError } from "@/utils";
 import { deleteUser, register, update } from "@/services/user";
-import { InternalNotificationPayload } from "@/models/notification";
-import { verifyEmail } from "@/services/auth";
+import { registerEmail, verifyEmail } from "@/services/auth";
 import { VerifyEmailDTO } from "@/models/auth";
-import { isAxiosError } from "axios";
-import { errorMap, UserError } from "@/utils/constants";
-import { FirebaseError } from "firebase/app";
+import { UserError } from "@/utils/constants";
 import { User } from "@/models/user";
 import { getDownloadURL, ref, uploadBytes } from "firebase/storage";
 import { userConverter } from "@/config/firestore";
@@ -96,8 +92,9 @@ export const createProfile = createAsyncThunk<boolean, Pick<User, "name" | "user
       dispatch(setUsername(username));
       dispatch(setUid(auth.currentUser!.uid));
       dispatch(setPicture(picture));
+      dispatch(setStatus(AuthStatus.SIGNED_IN));
     } catch (error) {
-      void error;
+      dispatch(notify(getUserError(error, "APPERR_0001").ntfn));
       return false;
     }
     return true;
@@ -123,38 +120,22 @@ export const updateProfile = createAsyncThunk<boolean, Partial<Pick<User, "name"
     try {
       await update({ name, username, picture, uid: auth.currentUser!.uid });
 
-      if (name) {
-        dispatch(setName(name));
-      }
-      if (username) {
-        dispatch(setUsername(username));
-      }
-      if (picture) {
-        dispatch(setPicture(picture));
-      }
+      if (name) dispatch(setName(name));
+      if (username) dispatch(setUsername(username));
+      if (picture) dispatch(setPicture(picture));
     } catch (error) {
-      if (isAxiosError(error)) {
-        dispatch(
-          notify({
-            status: "error",
-            title: "Profile update failed",
-            message: "Could not update profile information, please try again",
-          } as InternalNotificationPayload)
-        );
-      } else {
-        console.log(error);
-      }
+      dispatch(notify(getUserError(error, "APPERR_0002").ntfn));
       return false;
     }
     return true;
   }
 );
-export const signIn = createAsyncThunk<UserError | void | undefined, { type: AuthType; req?: unknown }>(
+export const signIn = createAsyncThunk<UserError | null, { type: AuthType; req?: unknown }>(
   "auth/sign-in",
   async ({ type, req }, { dispatch }) => {
     dispatch(setStatus(AuthStatus.SIGNING_IN));
     try {
-      let res: UserError | void | undefined;
+      let res: UserError | null = null;
       if (type === AuthType.GUEST) {
         res = await dispatch(signInGuest()).unwrap();
       } else if (type === AuthType.EMAIL) {
@@ -168,26 +149,28 @@ export const signIn = createAsyncThunk<UserError | void | undefined, { type: Aut
       }
       return res;
     } catch (error) {
-      dispatch(
-        notify({
-          status: "error",
-          title: "Could not sign in",
-          message: checkNetwork("Something went wrong, please try again"),
-        } as InternalNotificationPayload)
-      );
-      dispatch(setStatus(AuthStatus.PENDING));
       console.log(error);
+      const { userError, ntfn } = getUserError(error, "APPERR_0003");
+      if (userError.validationErr) return userError;
+      else dispatch(notify(ntfn));
+
+      dispatch(setStatus(AuthStatus.PENDING));
     }
+    return null;
   }
 );
-export const signInGuest = createAsyncThunk<UserError | void | undefined, void>(
-  "auth/sign-in-guest",
-  async (_, { dispatch }) => {
+export const signInGuest = createAsyncThunk<UserError | null, void>("auth/sign-in-guest", async (_, { dispatch }) => {
+  try {
     const userCred = await signInAnonymously(auth);
     await dispatch(checkSignedInUser(userCred)).unwrap();
+  } catch (error) {
+    const { userError, ntfn } = getUserError(error, "APPERR_0003");
+    if (userError.validationErr) return userError;
+    else dispatch(notify(ntfn));
   }
-);
-export const signInEmail = createAsyncThunk<UserError | void | undefined, VerifyEmailDTO>(
+  return null;
+});
+export const signInEmail = createAsyncThunk<UserError | null, VerifyEmailDTO>(
   "auth/sign-in-email",
   async ({ email, code }, { dispatch }) => {
     try {
@@ -196,78 +179,38 @@ export const signInEmail = createAsyncThunk<UserError | void | undefined, Verify
       const userCred = await signInWithCustomToken(auth, token);
       await dispatch(checkSignedInUser(userCred)).unwrap();
     } catch (error) {
-      if (!isAxiosError(error) || !errorMap[error.response?.data.message]) {
-        console.log(error);
-        dispatch(
-          notify({
-            status: "error",
-            title: "Sign in failed",
-            message: "Something went wrong while verifying your email, please try again",
-          } as InternalNotificationPayload)
-        );
-        return;
-      }
-      return errorMap[error.response?.data.message];
+      const { userError, ntfn } = getUserError(error, "APPERR_0004");
+      if (userError.validationErr) return userError;
+      else dispatch(notify(ntfn));
     }
+    return null;
   }
 );
-export const signInGitHub = createAsyncThunk<UserError | void | undefined>(
-  "auth/sign-in-github",
-  async (_, { dispatch }) => {
-    try {
-      const userCred = await signInWithPopup(auth, githubAuthProvider);
-      dispatch(setPicture(userCred.user.photoURL ?? ""));
-      await dispatch(checkSignedInUser(userCred)).unwrap();
-    } catch (error) {
-      if ((error as FirebaseError).code === AuthErrorCodes.NEED_CONFIRMATION) {
-        dispatch(
-          notify({
-            status: "error",
-            title: "Account already exists",
-            message: "Account already exists with the same email",
-          } as InternalNotificationPayload)
-        );
-        return;
-      }
-      dispatch(
-        notify({
-          status: "error",
-          title: "Sign-in failed",
-          message: "Something went wrong when signing you in, please try again",
-        } as InternalNotificationPayload)
-      );
-    }
+export const signInGitHub = createAsyncThunk<UserError | null>("auth/sign-in-github", async (_, { dispatch }) => {
+  try {
+    const userCred = await signInWithPopup(auth, githubAuthProvider);
+    dispatch(setPicture(userCred.user.photoURL ?? ""));
+    await dispatch(checkSignedInUser(userCred)).unwrap();
+  } catch (error) {
+    const { userError, ntfn } = getUserError(error, "APPERR_0003");
+    if (userError.validationErr) return userError;
+    else dispatch(notify(ntfn));
   }
-);
-export const signInGoogle = createAsyncThunk<UserError | void | undefined>(
-  "auth/sign-in-google",
-  async (_, { dispatch }) => {
-    try {
-      const userCred = await signInWithPopup(auth, googleAuthProvider);
-      dispatch(setPicture(userCred.user.photoURL ?? ""));
-      await dispatch(checkSignedInUser(userCred)).unwrap();
-    } catch (error) {
-      if ((error as FirebaseError).code === AuthErrorCodes.NEED_CONFIRMATION) {
-        dispatch(
-          notify({
-            status: "error",
-            title: "Account already exists",
-            message: "Account already exists with the same email",
-          } as InternalNotificationPayload)
-        );
-        return;
-      }
-      dispatch(
-        notify({
-          status: "error",
-          title: "Sign-in failed",
-          message: "Something went wrong when signing you in, please try again",
-        } as InternalNotificationPayload)
-      );
-    }
+  return null;
+});
+export const signInGoogle = createAsyncThunk<UserError | null>("auth/sign-in-google", async (_, { dispatch }) => {
+  try {
+    const userCred = await signInWithPopup(auth, googleAuthProvider);
+    dispatch(setPicture(userCred.user.photoURL ?? ""));
+    await dispatch(checkSignedInUser(userCred)).unwrap();
+  } catch (error) {
+    const { userError, ntfn } = getUserError(error, "APPERR_0003");
+    if (userError.validationErr) return userError;
+    else dispatch(notify(ntfn));
   }
-);
-export const signInMicrosoft = createAsyncThunk<UserError | void | undefined>(
+  return null;
+});
+export const signInMicrosoft = createAsyncThunk<UserError | null>(
   "auth/sign-in-microsoft",
   async (_, { dispatch }) => {
     try {
@@ -285,37 +228,33 @@ export const signInMicrosoft = createAsyncThunk<UserError | void | undefined>(
       }
       await dispatch(checkSignedInUser(userCred)).unwrap();
     } catch (error) {
-      if ((error as FirebaseError).code === AuthErrorCodes.NEED_CONFIRMATION) {
-        dispatch(
-          notify({
-            status: "error",
-            title: "Account already exists",
-            message: "Account already exists with the same email",
-          } as InternalNotificationPayload)
-        );
-        return;
-      }
-      dispatch(
-        notify({
-          status: "error",
-          title: "Sign-in failed",
-          message: "Something went wrong when signing you in, please try again",
-        } as InternalNotificationPayload)
-      );
+      const { userError, ntfn } = getUserError(error, "APPERR_0003");
+      if (userError.validationErr) return userError;
+      else dispatch(notify(ntfn));
     }
+    return null;
   }
 );
 export const uploadAvatar = createAsyncThunk<string, { convert?: boolean; data: Blob; uid: string }>(
   "auth/upload-avatar",
   async ({ convert = false, data, uid }, { dispatch }) => {
     let pngBlob: Blob | null = data;
+    let picture = "";
     if (convert) {
       pngBlob = await convertToPng(data);
     }
-    if (!pngBlob) throw new Error("Could not convert profile image to png");
-    const profileImageRef = ref(storage, `users/${uid}/avatar.png`);
-    await uploadBytes(profileImageRef, pngBlob);
-    const picture = await getDownloadURL(profileImageRef);
+    if (!pngBlob) {
+      dispatch(notify(getUserError("APPERR_0009").ntfn));
+      return picture;
+    }
+    try {
+      const profileImageRef = ref(storage, `users/${uid}/avatar.png`);
+      await uploadBytes(profileImageRef, pngBlob);
+      picture = await getDownloadURL(profileImageRef);
+    } catch (error) {
+      console.log(error);
+      dispatch(notify(getUserError("APPERR_0008").ntfn));
+    }
     dispatch(setPicture(picture));
     return picture;
   }
@@ -341,34 +280,33 @@ export const signOut = createAsyncThunk("auth/sign-out", async (_, { dispatch })
     await auth.signOut();
   } catch (error) {
     console.log(error);
-    dispatch(
-      notify({
-        title: "Couldn't sign you out",
-        status: "error",
-        message: "Something went wrong, please try again",
-      } as InternalNotificationPayload)
-    );
+    dispatch(notify(getUserError(error, "APPERR_0005").ntfn));
   } finally {
     dispatch(setStatus(AuthStatus.SIGNED_OUT));
   }
 });
-
 export const deleteAccount = createAsyncThunk<boolean>("auth/delete-account", async (_, { dispatch }) => {
   try {
     await deleteUser();
     return true;
   } catch (error) {
-    dispatch(
-      notify({
-        title: "Couldn't delete your account",
-        status: "error",
-        message: "Something went wrong, please try again",
-      } as InternalNotificationPayload)
-    );
     console.log(error);
+    dispatch(notify(getUserError(error, "APPERR_0006").ntfn));
     return false;
   }
 });
+export const registerUserEmail = createAsyncThunk<boolean, string>(
+  "auth/register-email",
+  async (email: string, { dispatch }) => {
+    try {
+      await registerEmail(email);
+      return true;
+    } catch (error) {
+      dispatch(notify(getUserError(error, "APPERR_0007").ntfn));
+    }
+    return false;
+  }
+);
 
 export const { setStatus, setUsername, setName, setUid, setPicture } = authSlice.actions;
 
