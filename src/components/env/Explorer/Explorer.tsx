@@ -13,11 +13,11 @@ import { buildIndex, ExplorerState, fileTreeReducer, findNode } from "@/reducers
 import { produce } from "immer";
 import { socket } from "@/config/socket";
 import { EnvContext } from "@/context/env/env.context";
-import { InSocketMessage } from "@/models/common";
+import { InSocketMessage, InSocketMessagePayloadError } from "@/models/common";
 import classes from "./Explorer.module.css";
 import { closePath, openPath, runCommand } from "@/services/env";
 import { FNode, FNodeOf, FSDirEntries, FSFile } from "@/models/filesystem";
-import { noop } from "@/utils";
+import { getUserError, noop } from "@/utils";
 import { ViewContext } from "@/context/view/view.context";
 import Spinner from "@/components/common/Spinner/Spinner";
 import { TooltipContext } from "@/context/tooltip/tooltip.context";
@@ -81,6 +81,8 @@ const Explorer = ({ ref }: ExplorerProps) => {
       fsDispatch({ type: "LOAD", payload: { path: "/", nodes } });
     } catch (error) {
       console.log(error);
+      dispatch(notify(getUserError((error as InSocketMessagePayloadError).code).ntfn));
+      // TODO: Force close workspace
     }
   }, [workspace.uuid]);
   const handleFSMessage = async (msg: InSocketMessage<"fs">) => {
@@ -139,6 +141,8 @@ const Explorer = ({ ref }: ExplorerProps) => {
     const resps = await Promise.allSettled(
       newPaths.map((newPath) => openPath<FSDirEntries>(workspace.uuid, newPath))
     );
+
+    let forceClose = false;
     newPaths.forEach((newPath, idx) => {
       if (resps[idx].status === "fulfilled") {
         const nodes = resps[idx].value.entries.map(
@@ -155,9 +159,16 @@ const Explorer = ({ ref }: ExplorerProps) => {
           type: "LOAD",
           payload: { path: newPath, nodes, forceOpen: true },
         });
+      } else if (resps[idx].status === "rejected") {
+        const { code } = (resps[idx].reason ?? {}) as InSocketMessagePayloadError;
+        if (code === "FATAL_ERR_NO_WORKSPACE") forceClose = true;
       }
     });
     fsDispatch({ type: "CLEAR_STALE", payload: null });
+    if (forceClose) {
+      dispatch(notify(getUserError("FATAL_ERR_NO_WORKSPACE").ntfn));
+      // TODO: Force close workspace
+    }
   }, [fs.stalePaths, workspace.uuid, fsDispatch]);
 
   useEffect(() => {
@@ -189,6 +200,11 @@ const Explorer = ({ ref }: ExplorerProps) => {
         return true;
       } catch (error) {
         console.log(error);
+        const { code } = error as InSocketMessagePayloadError;
+        if (code === "FATAL_ERR_NO_WORKSPACE") {
+          dispatch(notify(getUserError(code).ntfn));
+          // TODO: Force close workspace
+        }
       }
       return false;
     } else {
@@ -202,6 +218,11 @@ const Explorer = ({ ref }: ExplorerProps) => {
         return true;
       } catch (error) {
         console.log(error);
+        const { code } = error as InSocketMessagePayloadError;
+        if (code === "FATAL_ERR_NO_WORKSPACE") {
+          dispatch(notify(getUserError(code).ntfn));
+          // TODO: Force close workspace
+        }
       }
       return false;
     }

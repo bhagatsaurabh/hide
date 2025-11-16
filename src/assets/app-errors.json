@@ -1,0 +1,86 @@
+{
+  "APPERR_0001": {
+    "title": "Profile creation failed",
+    "message": "Failed to create your profile, please try again"
+  },
+  "APPERR_0002": {
+    "title": "Profile update failed",
+    "message": "Could not update profile information, please try again"
+  },
+  "APPERR_0003": {
+    "title": "Sign-in failed",
+    "message": "Something went wrong when signing you in, please try again"
+  },
+  "APPERR_0004": {
+    "title": "Sign in failed",
+    "message": "Something went wrong while verifying your email, please try again"
+  },
+  "APPERR_0005": {
+    "title": "Couldn't sign you out",
+    "message": "Something went wrong, please try again"
+  },
+  "APPERR_0006": {
+    "title": "Couldn't delete your account",
+    "message": "Something went wrong, please try again"
+  },
+  "APPERR_0007": {
+    "title": "Email registration failed",
+    "message": "Could not request for email registration, please try again"
+  },
+  "APPERR_0008": {
+    "title": "Profile image update failed",
+    "message": "Failed to update profile image"
+  },
+  "APPERR_0009": {
+    "title": "Process failed",
+    "message": "Failed to process profile image"
+  },
+  "APPERR_0010": {
+    "title": "User search failed",
+    "message": "Something went wrong while searching users, please try again"
+  },
+  "APPERR_0011": {
+    "title": "Something went wrong",
+    "message": "Could not get workspaces"
+  },
+  "APPERR_0012": {
+    "title": "Failed to update workspace",
+    "message": "Something went wrong when updating the workspace, please try again later."
+  },
+  "APPERR_0013": {
+    "title": "Failed to update invitation",
+    "message": "Something went wrong while responding to the invitation, please try again."
+  },
+  "APPERR_0014": {
+    "title": "Failed to create new workspace",
+    "message": "Something went wrong while creating new workspace, please try again later"
+  },
+  "APPERR_0015": {
+    "title": "Failed to delete workspace",
+    "message": "Something went wrong while deleting the workspace, please try again later."
+  },
+  "APPERR_0016": {
+    "title": "Failed to request access code",
+    "message": "Something went wrong while requesting the access code, please try again later."
+  },
+  "APPERR_0017": {
+    "title": "Failed to delete access code",
+    "message": "Something went wrong while deleting the access code, please try again later."
+  },
+  "APPERR_0018": {
+    "title": "Could not fetch latest notifications",
+    "message": "Something went wrong while getting your recent notifications"
+  },
+  "APPERR_0019": {
+    "title": "Could not load notifications",
+    "message": "Something went wrong while loading your notifications"
+  },
+  "APPERR_0020": {
+    "title": "Failed to open workspace",
+    "message": "Could not open workspace, please try again later"
+  },
+  "APPERR_0021": {
+    "title": "Could not connect to workspace",
+    "message": "Something went wrong while connecting to your workspace, please try again later"
+  }
+}

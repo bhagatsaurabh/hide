@@ -3,8 +3,23 @@ import { Location } from "react-router";
 import iconMapping from "@/assets/icon-map.json";
 import { FNode } from "@/models/filesystem";
 import { Area } from "react-easy-crop";
-import { NotificationType, UserNotificationPayload, WorkspaceAccessRequest } from "@/models/notification";
-import { persistentNtfnTypes } from "./constants";
+import {
+  InternalNotificationPayload,
+  NotificationType,
+  UserNotificationPayload,
+  WorkspaceAccessRequest,
+} from "@/models/notification";
+import {
+  errorMap,
+  fallbackErrorMap,
+  firebaseErrorMap,
+  persistentNtfnTypes,
+  successMap,
+  UserError,
+} from "./constants";
+import { ServerError } from "./types";
+import { isAxiosError } from "axios";
+import { FirebaseError } from "firebase/app";
 
 type IconMap = {
   fileNames: Record<string, string>;
@@ -277,4 +292,42 @@ export const persistentNtfnTypesChecks: Partial<
 };
 export const isNotificationPersistent = (ntfn: UserNotificationPayload) => {
   return persistentNtfnTypes.includes(ntfn.type) && (persistentNtfnTypesChecks[ntfn.type]?.(ntfn) ?? true);
+};
+
+export const getUserError = (
+  error: unknown,
+  fallbackCode?: string,
+  status = "error"
+): { userError: UserError; ntfn: InternalNotificationPayload } => {
+  let userError = fallbackCode ? fallbackErrorMap[fallbackCode] : null;
+
+  if (typeof error === "string") {
+    userError = errorMap[error];
+  } else if (error instanceof FirebaseError) {
+    userError = errorMap[firebaseErrorMap[error.code]];
+  } else if (isAxiosError<ServerError>(error) && error.response && error.response.data.message !== "UNKNOWN") {
+    userError = errorMap[error.response.data.message];
+  }
+  userError = userError ?? errorMap["UNKNOWN"];
+
+  return {
+    userError,
+    ntfn: {
+      status,
+      title: userError.title,
+      message: userError.message,
+    } as InternalNotificationPayload,
+  };
+};
+
+export const getUserSuccess = (successCode: string) => {
+  const userSuccess = successMap[successCode];
+  return {
+    userSuccess,
+    ntfn: {
+      status: "success",
+      title: userSuccess.title,
+      message: userSuccess.message,
+    } as InternalNotificationPayload,
+  };
 };

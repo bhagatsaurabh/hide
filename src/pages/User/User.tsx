@@ -25,16 +25,7 @@ const User = () => {
   const navigate = useNavigate();
 
   const handleSave = async (name: string, username: string) => {
-    const success = await dispatch(updateProfile({ name, username, picture })).unwrap();
-    if (!success) {
-      dispatch(
-        notify({
-          status: "error",
-          title: "Update profile",
-          message: "Profile update failed, try again",
-        } as InternalNotificationPayload)
-      );
-    }
+    await dispatch(updateProfile({ name, username, picture })).unwrap();
   };
 
   const handleDelete = async () => {

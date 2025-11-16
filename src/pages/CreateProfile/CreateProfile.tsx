@@ -1,9 +1,7 @@
 import { useEffect } from "react";
 import { useNavigate } from "react-router";
 import { useAppDispatch, useAppSelector } from "@/hooks/store";
-import { AuthStatus, createProfile, selectPicture, selectStatus, setStatus } from "@/store/auth";
-import { notify } from "@/store/notifications";
-import { InternalNotificationPayload } from "@/models/notification";
+import { AuthStatus, createProfile, selectPicture, selectStatus } from "@/store/auth";
 import Profile from "@/components/Profile/Profile";
 
 const CreateProfile = () => {
@@ -19,18 +17,7 @@ const CreateProfile = () => {
   }, [navigate, status]);
 
   const handleContinue = async (name: string, username: string) => {
-    const success = await dispatch(createProfile({ name, username, picture })).unwrap();
-    if (success) {
-      dispatch(setStatus(AuthStatus.SIGNED_IN));
-    } else {
-      dispatch(
-        notify({
-          message: "Profile creation failed, try again",
-          status: "error",
-          title: "Create profile",
-        } as InternalNotificationPayload)
-      );
-    }
+    await dispatch(createProfile({ name, username, picture })).unwrap();
   };
 
   return <Profile action="create" profile={{ picture }} save={handleContinue} />;
