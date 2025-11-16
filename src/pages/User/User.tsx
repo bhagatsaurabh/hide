@@ -1,8 +1,6 @@
 import Profile from "@/components/Profile/Profile";
 import { useAppDispatch, useAppSelector } from "@/hooks/store";
 import { deleteAccount, selectName, selectPicture, selectUsername, signOut, updateProfile } from "@/store/auth";
-import { notify } from "@/store/notifications";
-import { InternalNotificationPayload } from "@/models/notification";
 import Button from "@/components/common/Button/Button";
 import classNames from "classnames";
 import classes from "./User.module.css";

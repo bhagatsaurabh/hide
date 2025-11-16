@@ -4,7 +4,6 @@ import { RootState } from ".";
 import { close, getTemplates, open } from "@/services/env";
 import { notify } from "./notifications";
 import { EnvCloseDTO, EnvOpenDTO, Template } from "@/models/env";
-import { InternalNotificationPayload } from "@/models/notification";
 import { getUserError } from "@/utils";
 
 type EnvState = {

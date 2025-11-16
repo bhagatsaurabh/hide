@@ -16,7 +16,6 @@ import { auth } from "@/config/firebase";
 import { storeSSHKey } from "@/utils/driver";
 import { notify, removeNotification } from "./notifications";
 import { InternalNotificationPayload, WorkspaceAccessRequest, WorkspaceInvite } from "@/models/notification";
-import { isAxiosError } from "axios";
 import { getUserError, getUserSuccess } from "@/utils";
 
 type WorkspaceState = {
