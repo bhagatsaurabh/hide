@@ -36,10 +36,10 @@ const createSchema = (database: IDBDatabase, uid?: string, objectStores?: string
   }
 };
 const schemaChange = async (uid: string) => {
-  if (db!.objectStoreNames.contains(`sshkeys:${uid}`)) return;
+  if (!db || db.objectStoreNames.contains(`sshkeys:${uid}`)) return;
 
   await closeDB();
-  await openDB(uid, db!.version + 1);
+  await openDB(uid, db.version + 1);
 };
 const closeDB = async () => {
   db?.addEventListener("close", closeListener);

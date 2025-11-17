@@ -12,6 +12,10 @@
   margin-bottom: 1.5rem;
   font-weight: 300;
 }
+.codemsg {
+  text-align: center;
+  font-weight: 300;
+}
 .warning {
   text-align: center;
   margin: 0;

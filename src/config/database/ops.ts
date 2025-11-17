@@ -46,6 +46,10 @@ const getObject = async <T>(objectStore: string, key: string) => {
     }
   });
 };
+const storeExists = (objectStore: string) => {
+  if (!db) return false;
+  return db.objectStoreNames.contains(objectStore);
+};
 const updateObject = async <T>(objectStore: string, key: string, value: T) => {
   return new Promise<void>((resolve, reject) => {
     if (!db) {
@@ -198,4 +202,5 @@ export {
   getCount,
   stream,
   getIndexCount,
+  storeExists,
 };

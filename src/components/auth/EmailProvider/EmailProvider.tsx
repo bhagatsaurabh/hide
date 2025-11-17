@@ -83,7 +83,10 @@ const EmailProvider = () => {
           ref={emailInput}
         />
       ) : (
-        <PINInput length={5} onChange={setPin} validator={validatePin} ref={pinInput} />
+        <>
+          <h3 className={classes.codemsg}>A one time verification code has been sent to your email</h3>
+          <PINInput length={5} onChange={setPin} validator={validatePin} ref={pinInput} />
+        </>
       )}
       <div className={classNames({ [classes.actions]: true, "mt-2": true })}>
         {pinRequested && (

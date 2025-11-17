@@ -7,6 +7,7 @@ import { app } from "@/config/firebase";
 import { useAppDispatch, useAppSelector } from "@/hooks/store";
 import { connectSocket, disconnectSocket } from "@/config/socket";
 import { setConnected } from "@/store/workspace";
+import { storeUser } from "@/utils/driver";
 
 const auth = getAuth(app);
 auth.useDeviceLanguage();
@@ -24,6 +25,7 @@ const AuthListener = () => {
           if (!profile) {
             dispatch(setStatus(AuthStatus.INCOMPLETE_PROFILE));
           } else {
+            await storeUser(auth.currentUser!.uid);
             dispatch(setStatus(AuthStatus.SIGNED_IN));
           }
         }
