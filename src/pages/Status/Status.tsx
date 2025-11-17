@@ -6,7 +6,6 @@ import { usePrevious } from "@/hooks/prev";
 import { useAppDispatch } from "@/hooks/store";
 import { notify } from "@/store/notifications";
 import { getUserError, noop } from "@/utils";
-import { socket } from "@/config/socket";
 import { ProvisionPayload, ProvisionSuccess } from "@/models/workspace";
 import { processNewWorkspace } from "@/store/workspace";
 import { InternalNotificationPayload } from "@/models/notification";
