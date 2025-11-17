@@ -45,9 +45,11 @@ export const Dashboard = () => {
     };
   }, []);
   useEffect(() => {
-    socket.on("provision", (msg) => bufferedBus.emit("internal.provision.message", msg));
+    if (!connected) return;
+
+    socket?.on("provision", (msg) => bufferedBus.emit("internal.provision.message", msg));
     return () => void socket.off("provision");
-  }, []);
+  }, [connected]);
 
   useEffect(() => {
     init();
