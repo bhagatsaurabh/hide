@@ -21,7 +21,7 @@ export const Status = () => {
   const node = useRef<Node>(null);
   const bound = useRef<{ first: HTMLElement | null; last: HTMLElement | null }>(null);
   const location = useLocation();
-  const workspaceName = usePrevious<string>(location.state?.workspaceName);
+  const workspaceName = location.state?.workspaceName as string;
   const isNew = usePrevious<string>(location.state?.isNew);
   const [provStatus, setProvStatus] = useState<ProvisionPayload | null>(null);
   const dispatch = useAppDispatch();
@@ -36,8 +36,11 @@ export const Status = () => {
       console.log(msg);
       setProvStatus(msg);
     });
-    return () => void socket.off("provision");
-  }, [navigate, workspaceName]);
+    return () => {
+      console.log("De-registering provision");
+      socket.off("provision");
+    };
+  }, []);
 
   const trapFocus = useCallback((event: KeyboardEvent) => {
     if (event.key === "Tab") {
