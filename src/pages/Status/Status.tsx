@@ -97,7 +97,7 @@ export const Status = () => {
 
   useEffect(() => {
     if (provStatus?.action === "error") {
-      dispatch(notify(getUserError(isNew ? "APPERR_0014" : "APPERR_0021").ntfn));
+      dispatch(notify(getUserError(provStatus.payload.message, isNew ? "APPERR_0014" : "APPERR_0021").ntfn));
       handleDismiss("/dashboard");
     } else if (provStatus?.action === "success") {
       if (uuid) return;

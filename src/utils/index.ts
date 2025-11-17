@@ -302,7 +302,7 @@ export const getUserError = (
   let userError = fallbackCode ? fallbackErrorMap[fallbackCode] : null;
 
   if (typeof error === "string") {
-    userError = errorMap[error];
+    userError = errorMap[error] ?? userError;
   } else if (error instanceof FirebaseError) {
     userError = errorMap[firebaseErrorMap[error.code]];
   } else if (isAxiosError<ServerError>(error) && error.response && error.response.data.message !== "UNKNOWN") {

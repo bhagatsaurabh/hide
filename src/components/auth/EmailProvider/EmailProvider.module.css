@@ -14,7 +14,10 @@
 }
 .codemsg {
   text-align: center;
-  font-weight: 300;
+  color: beige;
+  margin-top: 0;
+  font-size: 1rem;
+  font-weight: 100;
 }
 .warning {
   text-align: center;
