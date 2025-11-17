@@ -14,6 +14,7 @@ import Button from "@/components/common/Button/Button";
 import RadialProgress from "@/components/common/RadialProgress/RadialProgress";
 import { AnimatePresence, motion } from "motion/react";
 import { openEnv } from "@/store/env";
+import bufferedBus from "@/config/buffered-bus";
 
 export const Status = () => {
   const navigate = useNavigate();
@@ -21,7 +22,7 @@ export const Status = () => {
   const node = useRef<Node>(null);
   const bound = useRef<{ first: HTMLElement | null; last: HTMLElement | null }>(null);
   const location = useLocation();
-  const workspaceName = location.state?.workspaceName as string;
+  const workspaceName = usePrevious<string>(location.state?.workspaceName);
   const isNew = usePrevious<string>(location.state?.isNew);
   const [provStatus, setProvStatus] = useState<ProvisionPayload | null>(null);
   const dispatch = useAppDispatch();
@@ -30,17 +31,20 @@ export const Status = () => {
   const [launchBusy, setLaunchBusy] = useState(false);
 
   useEffect(() => {
-    if (!workspaceName) navigate("/dashboard", { replace: true });
+    if (!workspaceName) {
+      navigate("/dashboard", { replace: true });
+      return;
+    }
 
-    socket.on("provision", (msg) => {
-      console.log(msg);
-      setProvStatus(msg);
-    });
-    return () => {
-      console.log("De-registering provision");
-      socket.off("provision");
+    const handleProvisionMessage = (msg: unknown) => {
+      setProvStatus(msg as ProvisionPayload);
     };
-  }, []);
+    bufferedBus.on("internal.provision.message", handleProvisionMessage);
+
+    return () => {
+      bufferedBus.off("internal.provision.message", handleProvisionMessage);
+    };
+  }, [navigate, workspaceName]);
 
   const trapFocus = useCallback((event: KeyboardEvent) => {
     if (event.key === "Tab") {

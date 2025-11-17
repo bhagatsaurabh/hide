@@ -16,6 +16,7 @@ import WorkspaceList from "@/components/WorkspaceList/WorkspaceList";
 import { AnimatePresence, motion } from "motion/react";
 import { socket } from "@/config/socket";
 import { WorkspaceMembersModified } from "@/models/workspace";
+import bufferedBus from "@/config/buffered-bus";
 
 export const Dashboard = () => {
   const navigate = useNavigate();
@@ -42,6 +43,10 @@ export const Dashboard = () => {
     return () => {
       socket?.off("workspace");
     };
+  }, []);
+  useEffect(() => {
+    socket.on("provision", (msg) => bufferedBus.emit("internal.provision.message", msg));
+    return () => void socket.off("provision");
   }, []);
 
   useEffect(() => {
