@@ -1,5 +1,5 @@
 import { schemaChange } from "@/config/database";
-import { deleteObject, getAll, getObject, updateObject } from "@/config/database/ops";
+import { deleteObject, getAll, getObject, storeExists, updateObject } from "@/config/database/ops";
 import { UserNotificationPayload } from "@/models/notification";
 
 export const storeSSHKey = async (uid: string, workspaceUUID: string, sshKey: string) => {
@@ -10,7 +10,12 @@ export const getSSHKey = async (uid: string, workspaceUUID: string) => {
   return await getObject<string>(`sshkeys:${uid}`, workspaceUUID);
 };
 
+export const storedUserExists = (uid: string) => {
+  return storeExists(`sshkeys:${uid}`);
+};
+
 export const storeUser = async (uid: string) => {
+  if (storedUserExists(uid)) return;
   await schemaChange(uid);
 };
 
