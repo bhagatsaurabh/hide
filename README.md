@@ -1,50 +1,82 @@
-# React + TypeScript + Vite
+<p align="center">
+<img src="https://github.com/bhagatsaurabh/hide-server/blob/main/docs/resources/logo.svg" width="300" alt="H-IDE Logo"/>
+</p>
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+<p align="center">
+<a href="https://github.com/bhagatsaurabh/hide/actions/workflows/cd.yml" style="text-decoration: none;">
+<img alt="Build status" src="https://img.shields.io/github/actions/workflow/status/bhagatsaurabh/hide/cd.yml?branch=main&label=Build%20%26%20Deploy&logo=data%3Aimage%2Fpng%3Bbase64%2CiVBORw0KGgoAAAANSUhEUgAAABAAAAAQEAYAAABPYyMiAAAABGdBTUEAALGPC%2FxhBQAAACBjSFJNAAB6JgAAgIQAAPoAAACA6AAAdTAAAOpgAAA6mAAAF3CculE8AAAABmJLR0QAAAAAAAD5Q7t%2FAAAACXBIWXMAAABgAAAAYADwa0LPAAAAB3RJTUUH5gUMEiAyzA5gywAAAsBJREFUSMe9VF1Ik2EYPc%2FnXGP5UyGEFZUWxZRp9CdCbRXihQQKgxSCgogo%2FCG6yO2bsSIpZBfRRT90aYE3lpSIdZUsKHTfSiuTYlQ35m9dLSW37zvd9C2o1vyJzuX7Pud5z%2FMc3gP8QIDks7WrVjW%2FovH8W2kp5onF8kwoZoO5r0DmvpGRjA6I8Wpw0BehoR1rafmV4MsjtTVVVS3ryf77BQXz5aWCmMrNBsmbXEBcr19jEEBhT0%2FyPAryiNvNF0DGtY4OOQvR7169moonTwBY4nGUAThstSoPAP1De%2FvFuMju68PDPyfrJiPtqqquI7Xz9%2B75xsgXe4qK%2FrTyx7TZFsMjFcXvISPBtjZz87JQz5YK0zp9M5Cx1uVS%2FrcAvR%2B0BmMxCQESy8pKKyBAGv2bcnL8tTS0cFOTb4wMF7vdixUg5RB9dV2d8QEU76NHv1kQIKlpdvtcJgg6nRKFQLxe3AKAmhpMALIzkcAOEK0HDzIHwJ3KyowbgFHY2%2FvbxMsApcRmU95B8LCszAiD5NDQ5XxRdg51dlrMQnU5GTl%2B6FDCDvBWcbFEITgxMLDknYcAeqamZkJA%2FPalS1fyRSkfnZ1N3vsO0BhYs2WLaiEjffX1qSxQN5Kap7HR%2F57G8zMu15KFmfDvpxF%2B29AQIA0tnJf3zxrPEwpPQRR%2FLKZvgOifsrP%2Fv4CbgP60u5u7AMu7kyfNwDALzOAxA0b9SGpaV1e6yE3FU8NkeMbvN%2BuSv8AsVBoAo%2FroUUQB%2BhMJjgN46nLRA7BtelpWANJcU5N8KQbiQDCIbRBUf%2F6MWkD22mwoBLi9ouJvPFlXWirpJpgLAblZVVViB%2FQphwNdgLxpbaUK4MrkpHU5EO9zOC6ISPnoly%2FpeBBATk9MGDqQed3hWLBnahONyHhJiZnl8%2BWd20pDCzudXi%2F58uXKleb5d6Pys7dtSKvmAAAAJXRFWHRkYXRlOmNyZWF0ZQAyMDIyLTA1LTEyVDE4OjMyOjUwKzAwOjAwDrtGqwAAACV0RVh0ZGF0ZTptb2RpZnkAMjAyMi0wNS0xMlQxODozMjo1MCswMDowMH%2Fm%2FhcAAAAASUVORK5CYII%3D&style=flat-square">
+</a>
+</p>
 
-Currently, two official plugins are available:
+<p align="center">
+An online development environment that provisions isolated Linux workspaces, supports real-time collaborative tools, SSH sessions, customizability and team management.
+</p>
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+## Features
 
-## Expanding the ESLint configuration
+- Team management
+- Configurable dev environments
+- Cloud IDE
+- Dedicated & Spot workspaces
+- Collaborative editing
+- Variety of Linux templates
+- Secure by design
+- Quick & customizable environments
 
-If you are developing a production application, we recommend updating the configuration to enable type aware lint rules:
+#### Planned
 
-- Configure the top-level `parserOptions` property like this:
+- Text/Voice communication
+- Publicly accessible preview URL
 
-```js
-export default tseslint.config({
-  languageOptions: {
-    // other options...
-    parserOptions: {
-      project: ['./tsconfig.node.json', './tsconfig.app.json'],
-      tsconfigRootDir: import.meta.dirname,
-    },
-  },
-})
+## Development
+
+### Firebase emulators
+
+Refer the following documentations on how to run firebase emulators locally
+
+[Firebase CLI](https://firebase.google.com/docs/cli#setup_update_cli), [Auth emulator setup](https://firebase.google.com/docs/emulator-suite/connect_auth#admin_sdks), [Firestore emulator setup](https://firebase.google.com/docs/emulator-suite/connect_firestore#admin_sdks), [Storage emulator setup](https://firebase.google.com/docs/emulator-suite/connect_storage#admin_sdks)
+
+#### Caddy
+
+Since H-IDE uses [Typesense](https://github.com/typesense/typesense) as a search engine together with Firestore extension, it is crucial to proxy the local Typesense server on https, current setup uses [Caddy](https://github.com/caddyserver/caddy) to do just that.
+
+Make sure the following variable is set in the current environment to the path where Caddy stores the local root certificate.
+
+_NODE_EXTRA_CA_CERTS_
+
+#### Emulate
+
+Run firebase emulators
+
+```shell
+npm run emulate
 ```
 
-- Replace `tseslint.configs.recommended` to `tseslint.configs.recommendedTypeChecked` or `tseslint.configs.strictTypeChecked`
-- Optionally add `...tseslint.configs.stylisticTypeChecked`
-- Install [eslint-plugin-react](https://github.com/jsx-eslint/eslint-plugin-react) and update the config:
+#### Start the H-IDE Client
 
-```js
-// eslint.config.js
-import react from 'eslint-plugin-react'
-
-export default tseslint.config({
-  // Set the react version
-  settings: { react: { version: '18.3' } },
-  plugins: {
-    // Add the react plugin
-    react,
-  },
-  rules: {
-    // other rules...
-    // Enable its recommended rules
-    ...react.configs.recommended.rules,
-    ...react.configs['jsx-runtime'].rules,
-  },
-})
+```shell
+npm run dev
 ```
+
+### Sequence
+
+Since the local firebase emulators (including the extensions emulator for typesense) depends on the availability of the local typesense server, it is recommended to start the the local typesense service first, before running the firebase emulators.
+
+Once all the firebase emulators are up, all H-IDE backend services can be stopped/started normally.
+
+This is to ensure that Firestore and the Typesense extension for firebase can both work correctly while developing.
+
+## Feedback
+
+Feel free to send any feedback on personal@saurabhagat.me
+
+## License
+
+[MIT](https://github.com/bhagatsaurabh/hide/blob/main/LICENSE) Licensed | 2025-present | Saurabh Bhagat
+
+## Attributions
+
+- [XTerm](https://github.com/xtermjs/xterm.js)
+- [React Reverse Portal](https://github.com/httptoolkit/react-reverse-portal)
+- [Yjs](https://github.com/yjs/yjs)
+- [Typesense](https://github.com/typesense/typesense)

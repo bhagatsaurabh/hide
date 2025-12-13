@@ -160,5 +160,25 @@
   "FS_TIMEOUT": {
     "title": "Workspace timed out",
     "message": "Workspace did not respond in time, please try again later"
+  },
+  "INVALID_WORKSPACE_NAME": {
+    "title": "Invalid request",
+    "message": "Workspace name is not valid"
+  },
+  "MISSING_WORKSPACE_ID": {
+    "title": "Invalid request",
+    "message": "Workspace id not provided"
+  },
+  "MISSING_WORKSPACE_UUID": {
+    "title": "Invalid request",
+    "message": "Workspace uuid not provided"
+  },
+  "INVALID_INVITATION_TOKEN": {
+    "title": "Invalid invitation",
+    "message": "Workspace invitation is invalid"
+  },
+  "WORKSPACE_DISPOSE_INVALID_REQUEST": {
+    "title": "Invalid request",
+    "message": "Invalid workspace dispose request"
   }
 }
