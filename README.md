@@ -30,6 +30,8 @@ An online development environment that provisions isolated Linux workspaces, sup
 
 ## Development
 
+[H-IDE Backend](https://github.com/bhagatsaurabh/hide-server)
+
 ### Firebase emulators
 
 Refer the following documentations on how to run firebase emulators locally
