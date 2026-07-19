@@ -13,6 +13,10 @@ const cdn = axios.create({
   baseURL: import.meta.env.VITE_HIDE_CDN,
 });
 
+const actApi = axios.create({
+  baseURL: import.meta.env.VITE_HIDE_ACTIVATION_SERVER,
+});
+
 api.interceptors.request.use(
   async (config) => {
     const user = auth.currentUser;
@@ -29,4 +33,4 @@ api.interceptors.request.use(
 );
 
 export default api;
-export { publicApi, cdn };
+export { publicApi, actApi, cdn };

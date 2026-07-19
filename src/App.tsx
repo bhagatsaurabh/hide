@@ -11,11 +11,13 @@ import { useMediaQuery } from "./hooks/media-query";
 import Banner from "./components/common/Banner/Banner";
 import { useAppDispatch } from "./hooks/store";
 import { fetchTemplates } from "./store/env";
+import ServiceCheck from "./components/ServiceCheck/ServiceCheck";
 
 function App() {
   const [ready, setReady] = useState(false);
   const isHandheld = useMediaQuery("(max-width: 1024px)");
   const dispatch = useAppDispatch();
+  const isServiceActivationEnabled = import.meta.env.VITE_HIDE_ACTIVATION;
 
   useEffect(() => {
     const init = async () => {
@@ -30,13 +32,14 @@ function App() {
   return (
     <>
       {!ready ? (
-        <span>Loading...</span>
+        <span>...</span>
       ) : (
         <>
           <AuthListener />
           <Heartbeat />
           {isHandheld ? <Toast /> : <Banner />}
           <RouterProvider router={router} />
+          {isServiceActivationEnabled && <ServiceCheck />}
           <ContextMenu />
           <div style={{ display: "none" }} id="default-title"></div>
           <div style={{ display: "none" }} id="default-activity"></div>

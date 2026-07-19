@@ -63,6 +63,19 @@ export default defineConfig({
           res.setHeader("Content-Type", "application/json");
           res.end(json);
         });
+        server.middlewares.use("/status", (_req, res) => {
+          res.setHeader("Content-Type", "application/json");
+          res.end(JSON.stringify({ id: "hide", status: "running" }));
+        });
+        server.middlewares.use("/start", (_req, res) => {
+          res.setHeader("Content-Type", "application/json");
+          res.end(JSON.stringify({ id: "hide", status: "starting" }));
+        });
+        server.middlewares.use("/api/health", (_req, res) => {
+          res.setHeader("Content-Type", "application/json");
+          res.statusCode = 200;
+          res.end("");
+        });
       },
     },
   ],

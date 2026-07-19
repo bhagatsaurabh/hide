@@ -24,7 +24,7 @@ export default class GlobalErrorBoundary extends Component<GlobalErrorBoundaryPr
 
   render() {
     if (this.state.hasError) {
-      return <CrashBoard />;
+      return <CrashBoard code={this.state.error?.message} />;
     }
     return this.props.children;
   }
