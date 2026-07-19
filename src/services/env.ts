@@ -1,4 +1,4 @@
-import api, { cdn, publicApi } from "@/config/axios";
+import api, { cdn } from "@/config/axios";
 import { socket } from "@/config/socket";
 import { InSocketMessage, InSocketMessagePayload } from "@/models/common";
 import { CommandMap } from "@/models/context-menu";
