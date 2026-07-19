@@ -54,6 +54,18 @@ Run firebase emulators
 npm run emulate
 ```
 
+#### Example `.env.local`
+
+```env
+VITE_HIDE_EMULATION_ENABLED=true
+VITE_HIDE_FIREBASE_PUBLIC_KEY='<public-key>'
+VITE_HIDE_SERVER=http://localhost:3001/api
+VITE_HIDE_WS_SERVER=http://localhost:3001
+VITE_HIDE_CDN=
+VITE_HIDE_IMAGE_DEV=true
+VITE_HIDE_TYPESENSE_SEARCH_API_KEY=search-key
+```
+
 #### Start the H-IDE Client
 
 ```shell
