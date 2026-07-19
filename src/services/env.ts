@@ -1,4 +1,4 @@
-import api, { publicApi } from "@/config/axios";
+import api, { cdn } from "@/config/axios";
 import { socket } from "@/config/socket";
 import { InSocketMessage, InSocketMessagePayload } from "@/models/common";
 import { CommandMap } from "@/models/context-menu";
@@ -35,7 +35,7 @@ export const closePath = (wsUuid: string, path: string, ino?: number) => {
 export const runCommand = async <K extends keyof CommandMap>(
   wsUuid: string,
   command: K,
-  ctx: Parameters<CommandMap[K]>[0]
+  ctx: Parameters<CommandMap[K]>[0],
 ) =>
   new Promise<void>((res, rej) => {
     const correlationId = uuid();
@@ -55,5 +55,5 @@ export const runCommand = async <K extends keyof CommandMap>(
   });
 
 export const getTemplates = async () => {
-  return await publicApi.get<Template[]>("/templates");
+  return await cdn.get<Template[]>("/templates.json");
 };

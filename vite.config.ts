@@ -51,8 +51,18 @@ export default defineConfig({
           "</head>",
           ` <meta name="version" content="${pkg.version}">
             <meta name="builddate" content="${new Date().toUTCString()}">
-          </head>`
+          </head>`,
         );
+      },
+    },
+    {
+      name: "mock",
+      configureServer(server) {
+        server.middlewares.use("/templates.json", (_req, res) => {
+          const json = readFileSync(path.resolve(__dirname, "mocks/templates.json"), "utf8");
+          res.setHeader("Content-Type", "application/json");
+          res.end(json);
+        });
       },
     },
   ],
