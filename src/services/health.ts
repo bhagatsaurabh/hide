@@ -19,7 +19,7 @@ export const start = async (): Promise<ActivationResponse> => {
 
 export const health = async (): Promise<boolean> => {
   try {
-    const response = await api.get("/api/health");
+    const response = await api.get("/health");
     return response.status === 200;
   } catch {
     return false;
