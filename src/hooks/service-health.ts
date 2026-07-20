@@ -78,7 +78,7 @@ export function useServiceHealth(api: StartupApi) {
 
             case State.ACTIVATE: {
               setTitle("Service stopped: Waking up...");
-              setMessage("This might take few minutes, browser window can be safely closed.");
+              setMessage("This might take a few minutes. You can safely close this browser window and come back later.");
 
               const response = await api.start();
 
@@ -100,7 +100,7 @@ export function useServiceHealth(api: StartupApi) {
 
             case State.WAIT_FOR_SERVER: {
               setTitle("Service stopped: Waking up...");
-              setMessage("This might take few minutes, browser window can be safely closed.");
+              setMessage("This might take a few minutes. You can safely close this browser window and come back later.");
 
               await sleep(STATUS_RETRY);
 
@@ -110,7 +110,7 @@ export function useServiceHealth(api: StartupApi) {
 
             case State.WAIT_FOR_HEALTH: {
               setTitle("Service started: Waiting to come online...");
-              setMessage("Almost there, browser window can be safely closed.");
+              setMessage("Almost there");
 
               const healthy = await api.health();
 
