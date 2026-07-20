@@ -55,7 +55,7 @@ export function useServiceHealth(api: StartupApi) {
 
               const response = await api.status();
 
-              switch (response.status) {
+              switch (response.state) {
                 case "running":
                   state = State.WAIT_FOR_HEALTH;
                   break;
@@ -70,7 +70,7 @@ export function useServiceHealth(api: StartupApi) {
                   break;
 
                 default:
-                  throw new Error(`Unknown status: ${response.status}`);
+                  throw new Error(`Unknown status: ${response.state}`);
               }
 
               break;
@@ -82,7 +82,7 @@ export function useServiceHealth(api: StartupApi) {
 
               const response = await api.start();
 
-              switch (response.status) {
+              switch (response.state) {
                 case "running":
                   state = State.WAIT_FOR_HEALTH;
                   break;
@@ -92,7 +92,7 @@ export function useServiceHealth(api: StartupApi) {
                   break;
 
                 default:
-                  throw new Error(`Unexpected activation status: ${response.status}`);
+                  throw new Error(`Unexpected activation status: ${response.state}`);
               }
 
               break;
