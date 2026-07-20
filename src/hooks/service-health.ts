@@ -3,8 +3,8 @@ import { isAxiosError } from "axios";
 import { useEffect, useMemo, useRef, useState } from "react";
 
 const POPUP_DELAY = 3_500;
-const STATUS_RETRY = 3 * 60 * 1000;
-const HEALTH_RETRY = 5_000;
+const STATUS_RETRY = 30 * 1000;
+const HEALTH_RETRY = 4_000;
 
 const sleep = (ms: number) => new Promise<void>((resolve) => setTimeout(resolve, ms));
 
