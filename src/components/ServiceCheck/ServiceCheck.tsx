@@ -15,7 +15,7 @@ const ServiceCheck = () => {
           <SimpleModal title="service-check" className="p-1p5" layer={100} plain>
             <div>
               <Spinner size={1.5} />
-              <h2>{startup.title}</h2>
+              <h3>{startup.title}</h3>
               <p>{startup.message}</p>
             </div>
           </SimpleModal>
